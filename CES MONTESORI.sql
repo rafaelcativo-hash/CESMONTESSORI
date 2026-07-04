@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE - Registro de Calificaciones CES Montessori</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <div id="login-section" class="flex items-center justify-center min-h-screen px-4">
+        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-indigo-800">CES Montessori</h2>
+                <p class="text-sm text-gray-500 mt-1">Control de Calificaciones y Avances</p>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Correo Electrónico</label>
+                <input type="email" id="login-email" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="ej: docente@escuela.com o padre@correo.com">
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Contraseña</label>
+                <input type="password" id="login-password" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="••••••••">
+            </div>
+            
+            <button onclick="iniciarSesion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-lg shadow transition duration-200">
+                Ingresar al Sistema
+            </button>
+        </div>
+    </div>
+
+    <div id="app-section" class="hidden min-h-screen flex flex-col">
+        <header class="bg-indigo-900 text-white px-6 py-4 flex justify-between items-center shadow-md">
+            <div>
+                <h1 class="text-lg font-bold tracking-wide">Plataforma Educativa en Línea</h1>
+                <p class="text-xs text-indigo-200" id="role-indicator"></p>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="user-display" class="text-sm font-medium bg-indigo-800 px-3 py-1.5 rounded-lg"></span>
+                <button onclick="cerrarSesion()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow transition">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 p-6 max-w-6xl w-full mx-auto">
+            
+            <div id="view-docente" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div class="border-b border-gray-200 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Registro de Evaluación Cuantitativa y Actitudinal</h2>
+                    <p class="text-sm text-gray-500 de">Seleccione los parámetros para desplegar la lista de estudiantes.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Asignatura / Materia:</label>
+                        <select id="select-materia" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white" onchange="cargarPlanillaDocente()"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Periodo Evaluativo:</label>
+                        <select id="select-periodo" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white" onchange="cargarPlanillaDocente()">
+                            <option value="Trimestre 1">Trimestre 1</option>
+                            <option value="Trimestre 2">Trimestre 2</option>
+                            <option value="Trimestre 3">Trimestre 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="w-full table-auto border-collapse text-left text-sm">
+                        <thead class="bg-gray-100 font-semibold text-gray-700 uppercase tracking-wider text-xs border-b border-gray-200">
+                            <tr>
+                                <th class="p-4">Estudiante (Apellidos, Nombre)</th>
+                                <th class="p-4 w-28 text-center">Calificación (0-100)</th>
+                                <th class="p-4">Observaciones y Criterio Actitudinal</th>
+                                <th class="p-4 w-32 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-docente-body" class="divide-y divide-gray-200">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-padre" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div class="border-b border-gray-200 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Informe de Avance del Estudiante</h2>
+                    <p class="text-sm text-gray-500">Consulte las actualizaciones en tiempo real provistas por el cuerpo docente.</p>
+                </div>
+                
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="w-full table-auto border-collapse text-left text-sm">
+                        <thead class="bg-indigo-50 font-semibold text-indigo-900 uppercase tracking-wider text-xs border-b border-indigo-100">
+                            <tr>
+                                <th class="p-4">Materia</th>
+                                <th class="p-4">Periodo</th>
+                                <th class="p-4 text-center">Nota Numérica</th>
+                                <th class="p-4">Retroalimentación / Comentario Docente</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-padre-body" class="divide-y divide-gray-200">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
