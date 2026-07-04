@@ -1,6 +1,6 @@
 // CONFIGURACIÓN DE SUPABASE (Reemplazar con tus credenciales de Supabase)
-const SUPABASE_URL = "https://tu-proyecto-id.supabase.co";
-const SUPABASE_KEY = "tu-anon-public-key-de-supabase";
+const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
 
 // Instancia limpia evitando conflictos de nombres con la librería global
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
