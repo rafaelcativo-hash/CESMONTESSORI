@@ -1,44 +1,32 @@
-// CONFIGURACIÓN DE SUPABASE (Reemplazar con tus credenciales de Supabase)
+// CONFIGURACIÓN DE SUPABASE
 const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
 
-// Instancia limpia evitando conflictos de nombres con la librería global
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Inicializar el cliente de Supabase
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let usuarioActual = null;
-let esDocente = false;
-
-// 1. CONTROL DE ACCESO (LOGIN DE USUARIOS)
+// FUNCIÓN PARA INICIAR SESIÓN
 async function iniciarSesion() {
+    // Capturar los datos de los inputs del index.html
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
 
     if (!email || !password) {
-        alert("Por favor, rellene todos los campos.");
+        alert("Por favor, complete todos los campos.");
         return;
     }
 
-    try {
-        // Llamada corregida utilizando el cliente unificado y estable
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ 
-            email: email, 
-            password: password 
-        });
+    // Petición de autenticación a Supabase
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
 
-        if (error) {
-            alert("Error al iniciar sesión: " + error.message);
-            return;
-        }
-
-        // Autenticación exitosa
-        usuarioActual = data.user;
-        alert("¡Inicio de sesión exitoso!");
-        
-        // Aquí puedes ejecutar la redirección o actualizar el menú visual
-        // cargarInterfazUsuario();
-
-    } catch (err) {
-        console.error("Error inesperado:", err);
-        alert("Ocurrió un error inesperado al conectar con el servidor.");
+    if (error) {
+        alert("Error al ingresar: " + error.message);
+    } else {
+        alert("¡Inicio de sesión exitoso! Redirigiendo...");
+        // Redirección automática al panel principal
+        window.location.href = "dashboard.html";
     }
 }
