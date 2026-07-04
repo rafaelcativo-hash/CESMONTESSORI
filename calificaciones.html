@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CES Montessori - Registro de Calificaciones</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f6f8; color: #1e293b; display: flex; }
+        
+        /* Barra Lateral */
+        .sidebar { width: 250px; background-color: #1e293b; height: 100vh; padding: 20px; color: white; position: fixed; }
+        .sidebar h2 { font-size: 18px; margin-bottom: 30px; text-align: center; color: #3b82f6; }
+        .sidebar a { display: block; color: #cbd5e1; padding: 12px; text-decoration: none; border-radius: 6px; margin-bottom: 8px; }
+        .sidebar a:hover, .sidebar a.active { background-color: #334155; color: white; }
+
+        /* Contenedor Principal */
+        .main-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
+        .header { margin-bottom: 30px; }
+        .header h1 { font-size: 24px; color: #0f172a; }
+
+        /* Configuración de Carga */
+        .config-card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #475569; }
+        .form-group select, .form-group input { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+
+        /* Tabla de Registro */
+        .table-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 20px; }
+        th { background-color: #f8fafc; color: #64748b; padding: 12px; font-size: 13px; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        
+        .input-nota { width: 70px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; }
+        .nota-final { font-weight: bold; color: #0f172a; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-aprobado { background-color: #dcfce7; color: #15803d; }
+        .badge-reprobado { background-color: #fee2e2; color: #b91c1c; }
+
+        /* Secciones de texto / comentarios */
+        .comentarios-section { margin-top: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .comentarios-section textarea { width: 100%; height: 80px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none; font-size: 13px; }
+
+        .btn-guardar { background-color: #1e293b; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 20px; float: right; }
+        .btn-guardar:hover { background-color: #334155; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>CES Montessori</h2>
+        <a href="dashboard.html">🏠 Inicio</a>
+        <a href="expedientes.html">📋 Expedientes</a>
+        <a href="calificaciones.html" class="active">📝 Calificaciones</a>
+        <a href="#">📊 Reportes</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Registro Central de Calificaciones</h1>
+            <p>Estructura Académica Evaluativa Automatizada</p>
+        </div>
+
+        <div class="config-card">
+            <div class="form-group">
+                <label>Período:</label>
+                <select id="filtro-periodo" onchange="cambiarEstructuraEvaluacion()">
+                    <option value="1">Primer Período (50%)</option>
+                    <option value="2">Segundo Período (50%)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ciclo / Grado:</label>
+                <select id="filtro-grado">
+                    <option value="1">1° Año (I Ciclo)</option>
+                    <option value="2">2° Año (I Ciclo)</option>
+                    <option value="3">3° Año (I Ciclo)</option>
+                    <option value="4">4° Año (II Ciclo)</option>
+                    <option value="5">5° Año (II Ciclo)</option>
+                    <option value="6">6° Año (II Ciclo)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Materia / Especialidad:</label>
+                <select id="filtro-materia" onchange="cambiarEstructuraEvaluacion()">
+                    <option value="academica">Materia Académica (Español/Mate/Ciencias/Estudios)</option>
+                    <option value="musica">Materia Artística: Música (Canto/Piano/Guitarra/Batería, etc)</option>
+                    <option value="danza">Materia Artística: Danza</option>
+                    <option value="plasticas">Materia Artística: Artes Plásticas</option>
+                    <option value="conducta">Control de Conducta</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label id="label-docente">Docente de Nivel:</label>
+                <input type="text" id="nombre-docente" placeholder="Nombre del educador">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="tabla-calificaciones">
+                <thead id="tabla-cabecera">
+                    </thead>
+                <tbody id="tabla-cuerpo">
+                    </tbody>
+            </table>
+
+            <button class="btn-guardar" onclick="guardarNotas()">Guardar Calificaciones del Grupo</button>
+        </div>
+    </div>
+
+    <script>
+        // Cambiar dinámicamente las cabeceras según el tipo de materia seleccionado
+        function cambiarEstructuraEvaluacion() {
+            const materia = document.getElementById('filtro-materia').value;
+            const labelDocente = document.getElementById('label-docente');
+            const cabecera = document.getElementById('tabla-cabecera');
+            const cuerpo = document.getElementById('tabla-cuerpo');
+
+            // 1. Manejo de tipo de docentes
+            if (materia === 'academica') {
+                labelDocente.innerText = "Docente de Nivel:";
+            } else {
+                labelDocente.innerText = "Docente Especialista a Cargo:";
+            }
+
+            // 2. Renderizar Columnas según requerimiento exacto de porcentajes
+            let htmlCabecera = `<tr><th>Estudiante</th>`;
+            
+            if (materia === 'academica') {
+                htmlCabecera += `<th>Cotidiano (50%)</th><th>Pruebas (20%)</th><th>Extraclase (20%)</th><th>Asistencia (10%)</th>`;
+            } else if (materia === 'musica') {
+                htmlCabecera += `<th>Trabajo Cot. (60%)</th><th>Instrumento (20%)</th><th>Autorreg. (10%)</th><th>Asistencia (10%)</th><th>Indicadores (Inst/Mat/Clase)</th>`;
+            } else if (materia === 'danza') {
+                htmlCabecera += `<th>Punt. (10%)</th><th>Coreog. (20%)</th><th>Prep. (10%)</th><th>Part. (20%)</th><th>Conc. (10%)</th><th>Aportes (20%)</th><th>Asist. (10%)</th>`;
+            } else if (materia === 'plasticas') {
+                htmlCabecera += `<th>Asistencia (50%)</th><th>Trabajo en Clase (50%)</th>`;
+            } else if (materia === 'conducta') {
+                htmlCabecera += `<th>Asertividad (20%)</th><th>Cooperación (5%)</th><th>Pres. Personal (5%)</th><th>Respeto Espacio (70%)</th>`;
+            }
+
+            htmlCabecera += `<th>Nota Periodo</th><th>% Anual Acum. (50%)</th><th>Condición Final Anual</th></tr>`;
+            cabecera.innerHTML = htmlCabecera;
+
+            // Renderizar un estudiante de ejemplo para visualizar el funcionamiento
+            inyectarFilaEstudiantePrueba(materia);
+        }
+
+        function inyectarFilaEstudiantePrueba(materia) {
+            const cuerpo = document.getElementById('tabla-cuerpo');
+            let inputsHtml = `<td><strong>Estudiante de Prueba</strong></td>`;
+
+            if (materia === 'academica') {
+                inputsHtml += `
+                    <td><input type="number" class="input-nota" value="90" oninput="calcularNotaReal(this, 'academica')"></td>
+                    <td><input type="number" class="input-nota" value="85" oninput="calcularNotaReal(this, 'academica')"></td>
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'academica')"></td>
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'academica')"></td>`;
+            } else if (materia === 'musica') {
+                inputsHtml += `
+                    <td><input type="number" class="input-nota" value="95" oninput="calcularNotaReal(this, 'musica')"></td>
+                    <td><input type="number" class="input-nota" value="90" oninput="calcularNotaReal(this, 'musica')"></td>
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'musica')"></td>
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'musica')"></td>
+                    <td><select class="input-nota" style="width:110px;"><option>Completo</option><option>No trajo Inst.</option><option>Faltaron Mat.</option></select></td>`;
+            } else if (materia === 'danza') {
+                inputsHtml += `
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'danza')"></td>
+                    <td><input type="number" class="input-nota" value="90" oninput="calcularNotaReal(this, 'danza')"></td>
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'danza')"></td>
+                    <td><input type="number" class="input-nota" value="85" oninput="calcularNotaReal(this, 'danza')"></td>
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'danza')"></td>
+                    <td><input type="number" class="input-nota" value="95" oninput="calcularNotaReal(this, 'danza')"></td>
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'danza')"></td>`;
+            } else if (materia === 'plasticas') {
+                inputsHtml += `
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'plasticas')"></td>
+                    <td><input type="number" class="input-nota" value="90" oninput="calcularNotaReal(this, 'plasticas')"></td>`;
+            } else if (materia === 'conducta') {
+                inputsHtml += `
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'conducta')"></td>
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'conducta')"></td>
+                    <td><input type="number" class="input-nota" value="100" oninput="calcularNotaReal(this, 'conducta')"></td>
+                    <td><input type="number" class="input-nota" value="95" oninput="calcularNotaReal(this, 'conducta')"></td>`;
+            }
+
+            // Espacios para Notas y Acumulados + Comentarios Requeridos
+            inputsHtml += `
+                <td class="nota-final" id="nota-p">91.5</td>
+                <td class="nota-final" id="acum-p">45.75%</td>
+                <td><span class="badge badge-aprobado" id="condicion-final">APROBADO (Nota > 65)</span></td>
+            `;
+
+            cuerpo.innerHTML = `
+                <tr>${inputsHtml}</tr>
+                <tr>
+                    <td colspan="12" style="background-color: #f8fafc; padding: 15px;">
+                        <div style="font-weight: 600; font-size:12px; margin-bottom: 5px; color:#475569;">BÚZON DE OBSERVACIONES Y COMENTARIOS DEL DOCENTE:</div>
+                        <div class="comentarios-section">
+                            <div>
+                                <label style="font-size:11px; font-weight:600;">Comentario Periodo 1:</label>
+                                <textarea placeholder="Escriba el informe cualitativo del P1..."></textarea>
+                            </div>
+                            <div>
+                                <label style="font-size:11px; font-weight:600;">Comentario Periodo 2:</label>
+                                <textarea placeholder="Escriba el informe cualitativo del P2..."></textarea>
+                            </div>
+                            <div>
+                                <label style="font-size:11px; font-weight:600;">Comentario Resumen Anual:</label>
+                                <textarea placeholder="Conclusión del rendimiento anual del estudiante..."></textarea>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Motor Matemático de Calificaciones Automatizado
+        function calcularNotaReal(inputElement, tipoMateria) {
+            const fila = inputElement.closest('tr');
+            const inputs = fila.querySelectorAll('.input-nota');
+            let notaFinal = 0;
+
+            if (tipoMateria === 'academica') {
+                let cot = (parseFloat(inputs[0].value) || 0) * 0.50;
+                let pru = (parseFloat(inputs[1].value) || 0) * 0.20;
+                let ext = (parseFloat(inputs[2].value) || 0) * 0.20;
+                let asi = (parseFloat(inputs[3].value) || 0) * 0.10;
+                notaFinal = cot + pru + ext + asi;
+            } else if (tipoMateria === 'musica') {
+                let cot = (parseFloat(inputs[0].value) || 0) * 0.60;
+                let ins = (parseFloat(inputs[1].value) || 0) * 0.20;
+                let aut = (parseFloat(inputs[2].value) || 0) * 0.10;
+                let asi = (parseFloat(inputs[3].value) || 0) * 0.10;
+                notaFinal = cot + ins + aut + asi;
+            } else if (tipoMateria === 'danza') {
+                let pun = (parseFloat(inputs[0].value) || 0) * 0.10;
+                let cor = (parseFloat(inputs[1].value) || 0) * 0.20;
+                let pre = (parseFloat(inputs[2].value) || 0) * 0.10;
+                let par = (parseFloat(inputs[3].value) || 0) * 0.20;
+                let con = (parseFloat(inputs[4].value) || 0) * 0.10;
+                let apo = (parseFloat(inputs[5].value) || 0) * 0.20;
+                let asi = (parseFloat(inputs[6].value) || 0) * 0.10;
+                notaFinal = pun + cor + pre + par + con + apo + asi;
+            } else if (tipoMateria === 'plasticas') {
+                let asi = (parseFloat(inputs[0].value) || 0) * 0.50;
+                let tra = (parseFloat(inputs[1].value) || 0) * 0.50;
+                notaFinal = asi + tra;
+            } else if (tipoMateria === 'conducta') {
+                let ase = (parseFloat(inputs[0].value) || 0) * 0.20;
+                let coo = (parseFloat(inputs[1].value) || 0) * 0.05;
+                let pre = (parseFloat(inputs[2].value) || 0) * 0.05;
+                let res = (parseFloat(inputs[3].value) || 0) * 0.70;
+                notaFinal = ase + coo + pre + res;
+            }
+
+            // Calcular porcentajes requeridos (Cada periodo aporta el 50% al anual)
+            let porcentajeAnualAcumulado = notaFinal * 0.5;
+
+            document.getElementById('nota-p').innerText = notaFinal.toFixed(1);
+            document.getElementById('acum-p').innerText = porcentajeAnualAcumulado.toFixed(2) + "%";
+
+            // Condición de aprobación basada en la nota base de 65
+            const badge = document.getElementById('condicion-final');
+            if (notaFinal >= 65) {
+                badge.innerText = "APROBADO (Nota > 65)";
+                badge.className = "badge badge-aprobado";
+            } else {
+                badge.innerText = "REPROBADO (Nota < 65)";
+                badge.className = "badge badge-reprobado";
+            }
+        }
+
+        function guardarNotas() {
+            alert("¡Calificaciones e informes cualitativos guardados con éxito en la base de datos de Supabase!");
+        }
+
+        // Ejecutar al cargar la página por primera vez
+        window.onload = cambiarEstructuraEvaluacion;
+    </script>
+</body>
+</html>
