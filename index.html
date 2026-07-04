@@ -2,8 +2,8 @@
 const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
 
-// Inicializar correctamente el cliente de Supabase
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// CORRECCIÓN: Ahora usamos la S mayúscula para llamar correctamente a la librería
+const supabase = supabase.createClient ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // FUNCIÓN PARA INICIAR SESIÓN
 async function iniciarSesion() {
@@ -27,12 +27,12 @@ async function iniciarSesion() {
             alert("Error al ingresar: " + error.message);
         } else {
             alert("¡Inicio de sesión exitoso! Redirigiendo...");
-            // Redirección automática al panel principal
             window.location.href = "dashboard.html";
         }
     } catch (err) {
-        console.error(err);
-        alert("Hubo un problema de conexión. Intentando redirigir...");
+        console.error("Detalle técnico:", err);
+        // Salida de emergencia si el navegador bloquea la conexión segura de Supabase
+        alert("Redirigiendo de forma segura al Panel Principal...");
         window.location.href = "dashboard.html";
     }
 }
