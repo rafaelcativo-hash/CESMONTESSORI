@@ -17,7 +17,7 @@
             display: flex;
         }
         
-        /* Barra Lateral (Menu) */
+        /* Barra Lateral (Menú Oscuro de la Izquierda) */
         .sidebar {
             width: 250px;
             background-color: #1e293b;
@@ -30,23 +30,31 @@
             font-size: 18px;
             margin-bottom: 30px;
             text-align: center;
-            color: #3b82f6;
+            color: #ffffff;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
         .sidebar a {
-            display: block;
+            display: flex;
+            align-items: center;
             color: #cbd5e1;
-            padding: 12px;
+            padding: 12px 15px;
             text-decoration: none;
             border-radius: 6px;
             margin-bottom: 8px;
+            font-size: 15px;
             transition: background 0.2s, color 0.2s;
         }
         .sidebar a:hover, .sidebar a.active {
             background-color: #334155;
             color: white;
         }
+        .sidebar a span {
+            margin-right: 12px;
+            font-size: 18px;
+        }
 
-        /* Contenido Principal */
+        /* Contenido Principal de la Derecha */
         .main-content {
             margin-left: 250px;
             padding: 40px;
@@ -56,11 +64,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 20px;
         }
         .header h1 {
             font-size: 28px;
             color: #0f172a;
+            font-weight: 700;
         }
         .btn-logout {
             background-color: #ef4444;
@@ -78,7 +89,7 @@
             background-color: #dc2626;
         }
 
-        /* Tarjetas de Acceso Rápido */
+        /* Tarjetas de Acceso Rápido del Panel */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -92,22 +103,23 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             border-left: 5px solid #cbd5e1;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
             text-decoration: none;
             display: block;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
         .card-estudiantes { border-color: #3b82f6; }
-        .card-calificaciones { border-color: #10b981; }
-        .card-reportes { border-color: #f59e0b; }
+        .card-asistencia { border-color: #10b981; }
+        .card-reportes { border-color: #8b5cf6; }
 
         .card h3 {
             font-size: 20px;
             color: #0f172a;
             margin-bottom: 10px;
+            font-weight: 600;
         }
         .card p {
             font-size: 14px;
@@ -118,44 +130,42 @@
 </head>
 <body>
 
-    <!-- MENÚ LATERAL -->
+    <!-- MENÚ LATERAL (Estructura conectada con archivos reales) -->
     <div class="sidebar">
         <h2>CES Montessori</h2>
-        <a href="dashboard.html" class="active">🏠 Inicio</a>
-        <a href="expedientes.html">📋 Expedientes</a>
-        <a href="calificaciones.html">📝 Calificaciones</a>
-        <a href="#">📊 Reportes</a>
+        <a href="dashboard.html" class="active"><span>🏠</span> Inicio</a>
+        <a href="expedientes.html"><span>📋</span> Expedientes</a>
+        <a href="calificaciones.html"><span>📊</span> Calificaciones</a>
+        <a href="#"><span>⚙️</span> Configuración</a>
     </div>
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="main-content">
         <div class="header">
-            <div>
-                <h1>Bienvenido al Sistema de Gestión</h1>
-                <p style="color: #64748b; margin-top: 5px;">Colegio CES Montessori - Administración Docente</p>
-            </div>
+            <h1>Bienvenido al Sistema de Gestión</h1>
+            <!-- Botón de Cerrar Sesión apunta a index.html (Login) -->
             <a href="index.html" class="btn-logout">Cerrar Sesión</a>
         </div>
 
-        <!-- TARJETAS CON ENLACES REALES -->
+        <!-- TARJETAS DE ACCESO DIRECTO -->
         <div class="cards-grid">
             
-            <!-- Acceso a Expedientes -->
+            <!-- Tarjeta 1: Estudiantes (Abre Expedientes) -->
             <a href="expedientes.html" class="card card-estudiantes">
                 <h3>Estudiantes</h3>
-                <p>Gestione el registro, niveles Montessori (Casa de Niños, Taller I, Taller II) y datos de los alumnos de la institución.</p>
+                <p>Gestione el registro, niveles Montessori y datos de los alumnos.</p>
             </a>
 
-            <!-- Acceso a Calificaciones -->
-            <a href="calificaciones.html" class="card card-calificaciones">
-                <h3>Control de Calificaciones</h3>
-                <p>Asigne notas por periodo (P1 50% / P2 50%), evalúe materias académicas, música, danza, plásticas y control de conducta.</p>
+            <!-- Tarjeta 2: Control de Asistencia (Lleva a Calificaciones para registrar asistencia) -->
+            <a href="calificaciones.html" class="card card-asistencia">
+                <h3>Control de Asistencia</h3>
+                <p>Monitoree el ingreso diario de la comunidad estudiantil y su asistencia a clases.</p>
             </a>
 
-            <!-- Acceso a Reportes (Simulado) -->
+            <!-- Tarjeta 3: Reportes Pedagógicos (Lleva a Calificaciones donde están los resúmenes y notas) -->
             <a href="calificaciones.html" class="card card-reportes">
                 <h3>Reportes Pedagógicos</h3>
-                <p>Consulte y descargue minutas, notas finales y los informes cualitativos anuales redactados por los docentes.</p>
+                <p>Consulte y descargue minutas e informes cualitativos de avance.</p>
             </a>
 
         </div>
