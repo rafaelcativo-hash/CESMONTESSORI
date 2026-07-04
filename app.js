@@ -1,14 +1,14 @@
-// CONFIGURACIÓN DE SUPABASE (Reemplaza con tus credenciales reales en producción)
+// CONFIGURACIÓN DE SUPABASE (Reemplazar con tus credenciales de Supabase)
 const SUPABASE_URL = "https://tu-proyecto-id.supabase.co";
 const SUPABASE_KEY = "tu-anon-public-key-de-supabase";
 
-// Usamos supabaseClient para evitar confusiones con la librería global 'supabase'
+// Instancia limpia evitando conflictos de nombres con la librería global
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let usuarioActual = null;
 let esDocente = false;
 
-// 1. CONTROL DE ACCESO (LOGIN)
+// 1. CONTROL DE ACCESO (LOGIN DE USUARIOS)
 async function iniciarSesion() {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
@@ -19,7 +19,7 @@ async function iniciarSesion() {
     }
 
     try {
-        // Autenticación con Supabase Auth utilizando el cliente correcto
+        // Llamada corregida utilizando el cliente unificado y estable
         const { data, error } = await supabaseClient.auth.signInWithPassword({ 
             email: email, 
             password: password 
@@ -30,16 +30,15 @@ async function iniciarSesion() {
             return;
         }
 
-        // Si el login es exitoso, guardamos el usuario
+        // Autenticación exitosa
         usuarioActual = data.user;
         alert("¡Inicio de sesión exitoso!");
         
-        // Aquí puedes agregar la función para redigir al usuario o cargar el menú
-        // ejemplo: cargarInterfazUsuario();
+        // Aquí puedes ejecutar la redirección o actualizar el menú visual
+        // cargarInterfazUsuario();
 
     } catch (err) {
         console.error("Error inesperado:", err);
-        alert("Ocurrió un error inesperado al intentar conectar con el servidor.");
+        alert("Ocurrió un error inesperado al conectar con el servidor.");
     }
-}
 }
