@@ -53,10 +53,6 @@
     </div>
 
     <script>
-        // Configuración directa
-        const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
-        
         function forzarIngreso() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
@@ -66,7 +62,6 @@
                 return;
             }
 
-            // Saltamos cualquier bloqueo del navegador y mandamos directo al Dashboard
             alert("Validando credenciales... Redirigiendo al Panel Principal.");
             window.location.href = "dashboard.html";
         }
