@@ -1,0 +1,38 @@
+-- =======================================================
+-- 1. TABLA: CONFIGURACIÓN DE PERÍODOS LECTIVOS
+-- (Inicio, finalización del curso y vacaciones)
+-- =======================================================
+CREATE TABLE IF NOT EXISTS periodos_lectivos (
+    anio_lectivo INT PRIMARY KEY DEFAULT EXTRACT(YEAR FROM NOW()),
+    fecha_inicio_curso DATE NOT NULL,
+    fecha_fin_curso DATE NOT NULL,
+    vacaciones_inicio DATE,
+    vacaciones_fin DATE,
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL    
+);
+
+-- =======================================================
+-- 2. ASEGURAR TABLA DE CATÁLOGO DE MATERIAS / INSTRUMENTOS
+-- (Para guardar de manera independiente la lista de materias disponibles)
+-- =======================================================
+CREATE TABLE IF NOT EXISTS catalogo_materias (
+    id SERIAL PRIMARY KEY,
+    nombre_materia TEXT NOT NULL UNIQUE,
+    tipo TEXT CHECK (tipo IN ('principal', 'adicional', 'academica')) DEFAULT 'principal'
+);
+
+--- =======================================================
+--- 🔒 SEGURIDAD RLS PARA LOS NUEVOS MÓDULOS
+--- =======================================================
+ALTER TABLE periodos_lectivos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE catalogo_materias ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Cualquiera ve el calendario escolar" ON periodos_lectivos FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Solo administradores configuran el calendario" ON periodos_lectivos FOR ALL TO authenticated USING (
+  (SELECT rol FROM perfiles WHERE id = auth.uid()) = 'administrador'
+);
+
+CREATE POLICY "Cualquiera ve las materias" ON catalogo_materias FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Solo admins configuran el catalogo de materias" ON catalogo_materias FOR ALL TO authenticated USING (
+  (SELECT rol FROM perfiles WHERE id = auth.uid()) = 'administrador'
+);
