@@ -3,54 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración Manual - CES Montessori</title>
+    <title>Configuración General - CES Montessori</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .section-title { border-bottom: 2px solid #007bff; padding-bottom: 5px; margin-top: 30px; margin-bottom: 20px; color: #007bff; }
+    </style>
 </head>
 <body class="bg-light">
     <div class="container my-5">
-        <div class="card shadow">
+        <div class="card shadow border-0">
             <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <h3 class="mb-0">Administración Manual - CES Montessori</h3>
-                <a href="dashboard.html" class="btn btn-sm btn-outline-light">Volver al Dashboard</a>
+                <h3 class="mb-0">📍 Panel de Control Absoluto — CES Montessori</h3>
+                <span class="badge badge-info">Ciclo Lectivo 2026</span>
             </div>
             <div class="card-body">
 
-                <h4 class="text-primary border-bottom pb-2">➕ Registrar Nuevo Docente</h4>
-                <div class="row mb-4">
-                    <div class="col-md-4 form-group">
-                        <label>UUID de Autenticación del Docente:</label>
-                        <input type="text" id="docenteUuid" class="form-control" placeholder="Pegar el UUID de Auth/Users">
+                <h5 class="section-title">📅 Curso Lectivo y Vacaciones</h5>
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label>Inicio de Curso:</label>
+                        <input type="date" id="calInicioCurso" class="form-control">
                     </div>
-                    <div class="col-md-5 form-group">
+                    <div class="form-group col-md-3">
+                        <label>Finalización de Curso:</label>
+                        <input type="date" id="calFinCurso" class="form-control">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>Inicio de Vacaciones:</label>
+                        <input type="date" id="calInicioVacaciones" class="form-control">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>Fin de Vacaciones:</label>
+                        <input type="date" id="calFinVacaciones" class="form-control">
+                    </div>
+                </div>
+                <div class="text-right mb-4">
+                    <button class="btn btn-primary" id="btnGuardarCalendario">Establecer Fechas del Curso</button>
+                </div>
+
+                <h5 class="section-title">👥 Registro y Gestión de Docentes</h5>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label>UUID de Auth (Supabase):</label>
+                        <input type="text" id="docenteUuid" class="form-control" placeholder="Pegar código UUID">
+                    </div>
+                    <div class="form-group col-md-5">
                         <label>Nombre Completo del Docente:</label>
-                        <input type="text" id="docenteNombre" class="form-control" placeholder="Ej: Juan Pérez">
+                        <input type="text" id="docenteNombre" class="form-control" placeholder="Ej: Rafael Cativo">
                     </div>
-                    <div class="col-md-3 form-group d-flex align-items-end">
-                        <button class="btn btn-success btn-block" id="btnCrearDocente">Registrar Docente</button>
+                    <div class="form-group col-md-3 d-flex align-items-end">
+                        <button class="btn btn-success btn-block" id="btnCrearDocente">Guardar Docente</button>
                     </div>
                 </div>
 
-                <h4 class="text-primary border-bottom pb-2 mt-4">📝 Incluir Estudiante y Matrícula Inicial</h4>
-                <div class="row">
-                    <div class="col-md-4 form-group">
-                        <label>UUID de Autenticación del Estudiante:</label>
-                        <input type="text" id="estudianteUuid" class="form-control" placeholder="Pegar el UUID de Auth/Users">
+                <h5 class="section-title">📝 Matricular Estudiante a Mano</h5>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label>UUID de Auth (Supabase):</label>
+                        <input type="text" id="estudianteUuid" class="form-control" placeholder="Pegar código UUID">
                     </div>
-                    <div class="col-md-4 form-group">
+                    <div class="form-group col-md-4">
                         <label>Nombre:</label>
-                        <input type="text" id="estudianteNombre" class="form-control" placeholder="Ej: Luis">
+                        <input type="text" id="estudianteNombre" class="form-control">
                     </div>
-                    <div class="col-md-4 form-group">
+                    <div class="form-group col-md-4">
                         <label>Apellido:</label>
-                        <input type="text" id="estudianteApellido" class="form-control" placeholder="Ej: Gómez">
+                        <input type="text" id="estudianteApellido" class="form-control">
                     </div>
                 </div>
-                <div class="row mb-4">
-                    <div class="col-md-4 form-group">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
                         <label>Fecha de Nacimiento:</label>
                         <input type="date" id="estudianteFechaNac" class="form-control">
                     </div>
-                    <div class="col-md-4 form-group">
+                    <div class="form-group col-md-5">
                         <label>Ambiente CES Montessori:</label>
                         <select id="estudianteNivel" class="form-control">
                             <option value="Casa de Niños">Casa de Niños</option>
@@ -58,8 +84,23 @@
                             <option value="Taller II">Taller II</option>
                         </select>
                     </div>
-                    <div class="col-md-4 form-group d-flex align-items-end">
-                        <button class="btn btn-primary btn-block" id="btnMatricularEstudiante">Dar de Alta y Matricular</button>
+                    <div class="form-group col-md-3 d-flex align-items-end">
+                        <button class="btn btn-primary btn-block" id="btnMatricularEstudiante">Dar de Alta Estudiante</button>
+                    </div>
+                </div>
+
+                <h5 class="section-title">🎵 Asignación de Materias e Instrumentos</h5>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label>Estudiante (UUID):</label>
+                        <input type="text" id="insEstudianteUuid" class="form-control" placeholder="UUID del alumno">
+                    </div>
+                    <div class="form-group col-md-5">
+                        <label>Materia / Instrumento:</label>
+                        <input type="text" id="insNombreMateria" class="form-control" placeholder="Ej: Piano, Guitarra, Flauta">
+                    </div>
+                    <div class="form-group col-md-3 d-flex align-items-end">
+                        <button class="btn btn-warning text-white btn-block" id="btnAsignarMateria">Cargar Instrumento</button>
                     </div>
                 </div>
 
