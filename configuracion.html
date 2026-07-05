@@ -1,45 +1,18 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración Administrativa - CES Montessori</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body class="bg-light">
-    <div class="container mt-5">
-        <div class="jumbotron bg-white shadow-sm">
-            <h1 class="display-4 text-primary">Configuración del Sistema</h1>
-            <p class="lead">Gestión independiente de asignaciones de Docentes por Nivel.</p>
-            <hr class="my-4">
-            
-            <div class="card card-body mb-4">
-                <h5>Asignar Docente a Ambiente Montessori</h5>
-                <div class="row">
-                    <div class="col-md-5 form-group">
-                        <label for="selectDocenteConfig">Seleccione el Docente:</label>
-                        <select id="selectDocenteConfig" class="form-control">
-                            </select>
-                    </div>
-                    <div class="col-md-5 form-group">
-                        <label for="selectNivelConfig">Nivel / Ambiente:</label>
-                        <select id="selectNivelConfig" class="form-control">
-                            <option value="Casa de Niños">Casa de Niños</option>
-                            <option value="Taller I">Taller I</option>
-                            <option value="Taller II">Taller II</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 form-group d-flex align-items-end">
-                        <button class="btn btn-success btn-block" id="btnGuardarConfig">Asignar</button>
-                    </div>
-                </div>
-            </div>
-            
-            <a class="btn btn-secondary" href="dashboard.html">Volver al Dashboard</a>
-        </div>
+<h4 class="text-primary border-bottom pb-2 mt-4">👥 Roles, Docentes y Niveles</h4>
+<div class="row mb-4">
+    <div class="col-md-4 form-group">
+        <label>Docente:</label>
+        <select id="selectDocenteConfig" class="form-control"></select>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js"></script>
-</body>
-</html>
+    <div class="col-md-4 form-group">
+        <label>Nivel / Ambiente CES Montessori:</label>
+        <select id="selectNivelConfig" class="form-control">
+            <option value="Casa de Niños">Casa de Niños</option>
+            <option value="Taller I">Taller I</option>
+            <option value="Taller II">Taller II</option>
+        </select>
+    </div>
+    <div class="col-md-4 form-group d-flex align-items-end">
+        <button class="btn btn-success btn-block" id="btnAsignarDocenteNivel">Asignar Docente a Nivel</button>
+    </div>
+</div>
