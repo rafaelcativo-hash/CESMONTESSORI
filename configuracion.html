@@ -1,18 +1,73 @@
-<h4 class="text-primary border-bottom pb-2 mt-4">👥 Roles, Docentes y Niveles</h4>
-<div class="row mb-4">
-    <div class="col-md-4 form-group">
-        <label>Docente:</label>
-        <select id="selectDocenteConfig" class="form-control"></select>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración Manual - CES Montessori</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container my-5">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Administración Manual - CES Montessori</h3>
+                <a href="dashboard.html" class="btn btn-sm btn-outline-light">Volver al Dashboard</a>
+            </div>
+            <div class="card-body">
+
+                <h4 class="text-primary border-bottom pb-2">➕ Registrar Nuevo Docente</h4>
+                <div class="row mb-4">
+                    <div class="col-md-4 form-group">
+                        <label>UUID de Autenticación del Docente:</label>
+                        <input type="text" id="docenteUuid" class="form-control" placeholder="Pegar el UUID de Auth/Users">
+                    </div>
+                    <div class="col-md-5 form-group">
+                        <label>Nombre Completo del Docente:</label>
+                        <input type="text" id="docenteNombre" class="form-control" placeholder="Ej: Juan Pérez">
+                    </div>
+                    <div class="col-md-3 form-group d-flex align-items-end">
+                        <button class="btn btn-success btn-block" id="btnCrearDocente">Registrar Docente</button>
+                    </div>
+                </div>
+
+                <h4 class="text-primary border-bottom pb-2 mt-4">📝 Incluir Estudiante y Matrícula Inicial</h4>
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>UUID de Autenticación del Estudiante:</label>
+                        <input type="text" id="estudianteUuid" class="form-control" placeholder="Pegar el UUID de Auth/Users">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Nombre:</label>
+                        <input type="text" id="estudianteNombre" class="form-control" placeholder="Ej: Luis">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Apellido:</label>
+                        <input type="text" id="estudianteApellido" class="form-control" placeholder="Ej: Gómez">
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-4 form-group">
+                        <label>Fecha de Nacimiento:</label>
+                        <input type="date" id="estudianteFechaNac" class="form-control">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Ambiente CES Montessori:</label>
+                        <select id="estudianteNivel" class="form-control">
+                            <option value="Casa de Niños">Casa de Niños</option>
+                            <option value="Taller I">Taller I</option>
+                            <option value="Taller II">Taller II</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group d-flex align-items-end">
+                        <button class="btn btn-primary btn-block" id="btnMatricularEstudiante">Dar de Alta y Matricular</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
-    <div class="col-md-4 form-group">
-        <label>Nivel / Ambiente CES Montessori:</label>
-        <select id="selectNivelConfig" class="form-control">
-            <option value="Casa de Niños">Casa de Niños</option>
-            <option value="Taller I">Taller I</option>
-            <option value="Taller II">Taller II</option>
-        </select>
-    </div>
-    <div class="col-md-4 form-group d-flex align-items-end">
-        <button class="btn btn-success btn-block" id="btnAsignarDocenteNivel">Asignar Docente a Nivel</button>
-    </div>
-</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+</body>
+</html>
