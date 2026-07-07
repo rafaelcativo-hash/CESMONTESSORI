@@ -87,7 +87,7 @@
                     </button>
                 </div>
 
-                <!-- BLOQUE MATERIAS ESPECIALES (AHORA CON NIVEL INDEPENDIENTE) -->
+                <!-- BLOQUE MATERIAS ESPECIALES -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                     <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2 border-b pb-3 text-purple-600">
                         <span>🎵</span> Materias Especiales / Artísticas
@@ -108,7 +108,6 @@
                             </select>
                         </div>
                         <div>
-                            <!-- RESTAURADO: Nivel Independiente para Especiales -->
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nivel / Grado:</label>
                             <select id="especialGrado" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400">
                                 <option value="Primero">Primero (1°)</option>
@@ -120,7 +119,6 @@
                             </select>
                         </div>
                     </div>
-                    <!-- RESPONSABLE VISIBLE EN LA INTERFAZ DE ENTRADA -->
                     <div class="bg-purple-50 border border-purple-100 rounded-xl p-3 flex items-center justify-between">
                         <span class="text-xs font-medium text-purple-800">Profesor Responsable:</span>
                         <span id="txtResponsable" class="text-xs font-bold text-purple-900 font-mono">Buscando...</span>
@@ -170,6 +168,7 @@
 
         let listaDocentesGlobal = [];
         let entornoActivo = null;
+        let profesorResponsableTexto = "Por asignar";
 
         document.addEventListener('DOMContentLoaded', async () => {
             await cargarDocentes();
@@ -183,10 +182,15 @@
             }
         }
 
+        function obtenerNombreProfesorResponsable(materia) {
+            const docente = listaDocentesGlobal.find(d => d.materia_especifica === materia || d.materia_specifica === materia);
+            return docente ? `Prof. Responsable ID: ${docente.perfil_id.substring(0,10)}...` : 'Por asignar';
+        }
+
         function actualizarResponsableEspecialidad() {
             const materia = document.getElementById('especialMateria').value;
-            const docente = listaDocentesGlobal.find(d => d.materia_especifica === materia || d.materia_specifica === materia);
-            document.getElementById('txtResponsable').innerText = docente ? `ID: ${docente.perfil_id.substring(0,10)}...` : 'Por asignar';
+            profesorResponsableTexto = obtenerNombreProfesorResponsable(materia);
+            document.getElementById('txtResponsable').innerText = profesorResponsableTexto;
         }
 
         function regresarAlMenu() {
@@ -201,6 +205,7 @@
             if(tipo === 'Academico') {
                 const grado = document.getElementById('academicoGrado').value;
                 const materia = document.getElementById('academicoMateria').value;
+                profesorResponsableTexto = `Docente de Grado (${grado})`;
                 
                 entornoActivo = { tipo: tipo, materia: materia, grado: grado };
                 document.getElementById('lblTituloPlanilla').innerText = `Registro de ${materia}`;
@@ -216,12 +221,11 @@
             } else {
                 const materia = document.getElementById('especialMateria').value;
                 const grado = document.getElementById('especialGrado').value;
-                const docente = listaDocentesGlobal.find(d => d.materia_especifica === materia || d.materia_specifica === materia);
-                const nombreProf = docente ? `Responsable ID: ${docente.perfil_id.substring(0,12)}...` : 'Sin docente asignado';
+                profesorResponsableTexto = obtenerNombreProfesorResponsable(materia);
                 
                 entornoActivo = { tipo: tipo, materia: materia, grado: grado };
                 document.getElementById('lblTituloPlanilla').innerText = `Registro de ${materia} (${grado} Año)`;
-                document.getElementById('lblSubtituloPlanilla').innerText = nombreProf;
+                document.getElementById('lblSubtituloPlanilla').innerText = profesorResponsableTexto;
                 
                 if(materia === 'Danza') {
                     document.getElementById('badgePauta').innerText = "Pauta Sumativa Danza (10% Asis)";
@@ -238,6 +242,9 @@
             await desplegarPlanillaAlumnos();
         }
 
+        // ==========================================
+        // DISEÑOS DE CABECERAS CON COLUMNA COMENTARIO
+        // ==========================================
         function armarCabeceraAcademica() {
             document.getElementById('filaCabeceraTabla').innerHTML = `
                 <th class="p-3">Estudiante</th>
@@ -246,6 +253,7 @@
                 <th class="p-3 text-center">Extraclase (10%)</th>
                 <th class="p-3 text-center">Asistencia (10%)</th>
                 <th class="p-3 text-center">Nota Final</th>
+                <th class="p-3">Comentario</th>
                 <th class="p-3 text-right">Acción</th>
             `;
         }
@@ -258,6 +266,7 @@
                 <th class="p-3 text-center">Autorregulación (10%)</th>
                 <th class="p-3 text-center">Instrumento (20%)</th>
                 <th class="p-3 text-center">Promedio Final</th>
+                <th class="p-3">Comentario</th>
                 <th class="p-3 text-right">Acción</th>
             `;
         }
@@ -273,6 +282,7 @@
                 <th class="p-3 text-center">Aportes (20%)</th>
                 <th class="p-3 text-center">Asistencia (10%)</th>
                 <th class="p-3 text-center">Nota Final</th>
+                <th class="p-3">Comentario</th>
                 <th class="p-3 text-right">Acción</th>
             `;
         }
@@ -282,6 +292,7 @@
                 <th class="p-3">Estudiante</th>
                 <th class="p-3 text-center">Asistencia y Trabajo en Clase (100%)</th>
                 <th class="p-3 text-center">Nota Final</th>
+                <th class="p-3">Comentario</th>
                 <th class="p-3 text-right">Acción</th>
             `;
         }
@@ -297,28 +308,30 @@
                 <th class="p-3 text-center">No Verbal (10%)</th>
                 <th class="p-3 text-center">Esp. Psicológico (20%)</th>
                 <th class="p-3 text-center">Nota Conducta</th>
+                <th class="p-3">Comentario</th>
                 <th class="p-3 text-right">Acción</th>
             `;
         }
 
+        // ==========================================
+        // RENDERIZADO DE FILAS CON EL CUADRO COMENTARIO
+        // ==========================================
         async function desplegarPlanillaAlumnos() {
             const tbody = document.getElementById('cuerpoTablaCalificaciones');
-            tbody.innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-400">Consultando estudiantes matriculados...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="14" class="py-6 text-center text-slate-400">Consultando estudiantes matriculados...</td></tr>`;
 
-            // Filtrado estricto por nivel asignado en ambos entornos
             let { data: alumnos, error } = await supabaseClient
                 .from('estudiantes')
                 .select('*')
                 .eq('nivel_asignado', entornoActivo.grado);
 
             if(error) {
-                tbody.innerHTML = `<tr><td colspan="12" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="14" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
                 return;
             }
 
             let filtrados = alumnos || [];
             
-            // Si es materia especial instrumental, además del nivel, filtra que lleven esa especialidad
             if(entornoActivo.tipo === 'Especial' && !['Danza', 'Artes Plásticas'].includes(entornoActivo.materia)) {
                 filtrados = (alumnos || []).filter(a => 
                     a.instrumento_principal === entornoActivo.materia ||
@@ -328,7 +341,7 @@
             }
 
             if(filtrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-400">No hay alumnos asignados a este grado y materia actualmente.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="14" class="py-6 text-center text-slate-400">No hay alumnos asignados a este grado y materia actualmente.</td></tr>`;
                 return;
             }
 
@@ -343,6 +356,7 @@
                 
                 let inputsHtml = '';
                 let notaFinalInicial = n ? parseFloat(n.nota_final).toFixed(1) : "100.0";
+                let comentarioInicial = n ? (n.comentario || '') : '';
 
                 if (entornoActivo.materia === 'Conducta') {
                     inputsHtml = `
@@ -390,6 +404,13 @@
                     ${inputsHtml}
                     <td class="p-3 text-center font-extrabold text-slate-900 bg-slate-50 text-sm">
                         <span id="tot-${al.id}">${notaFinalInicial}</span>
+                    </td>
+                    <!-- CUADRO DE TEXTO COMENTARIO CON RESPONSABLE -->
+                    <td class="p-2">
+                        <div class="space-y-1">
+                            <textarea id="com-${al.id}" rows="1" class="w-48 border border-slate-200 text-[11px] rounded p-1 outline-none focus:border-blue-400" placeholder="Escriba un comentario...">${comentarioInicial}</textarea>
+                            <div class="text-[9px] text-slate-400 font-medium italic truncate max-w-[190px]">✍️ ${profesorResponsableTexto}</div>
+                        </div>
                     </td>
                     <td class="p-3 text-right">
                         <button onclick="guardarFilaReal(${al.id}, '${al.cedula}')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-1 px-3 rounded-lg shadow-sm transition">Guardar</button>
@@ -448,10 +469,11 @@
 
         async function guardarFilaReal(alumnoId, cedula) {
             const final = parseFloat(document.getElementById(`tot-${alumnoId}`).innerText);
+            const comentarioText = document.getElementById(`com-${alumnoId}`).value.trim();
             
             let cot = 100, pru = 100, asi = 100;
             if(document.getElementById(`cot-${alumnoId}`)) cot = parseFloat(document.getElementById(`cot-${alumnoId}`).value) || 100;
-            if(document.getElementById(`pru-${alumnoId}`)) pru = parseFloat(document.getElementById(`pru-${alumnoId}`).value) || 100;
+            if(document.getElementById('pru-' + alumnoId)) pru = parseFloat(document.getElementById('pru-' + alumnoId).value) || 100;
             if(document.getElementById(`asi-${alumnoId}`)) asi = parseFloat(document.getElementById(`asi-${alumnoId}`).value) || 100;
             if(document.getElementById(`pla-${alumnoId}`)) cot = parseFloat(document.getElementById(`pla-${alumnoId}`).value) || 100;
 
@@ -466,7 +488,8 @@
                 nota_asistencia: asi,
                 nota_cotidiano: cot,
                 nota_pruebas: pru,
-                nota_final: final
+                nota_final: final,
+                comentario: comentarioText
             };
 
             if(ext && ext.length > 0) {
@@ -482,7 +505,7 @@
             }
 
             if(res.error) alert("Error: " + res.error.message);
-            else alert("¡Calificación asentada con éxito!");
+            else alert("¡Calificación y comentario guardados con éxito!");
         }
     </script>
 </body>
