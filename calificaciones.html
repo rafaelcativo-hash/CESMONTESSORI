@@ -41,11 +41,11 @@
     <!-- CONTENIDO PRINCIPAL -->
     <div class="ml-64 p-10 w-full">
         
-        <!-- VISTA 1: INTERFAZ DE ENTRADA POR SECCIONES (ACADÉMICAS VS ESPECIALES) -->
+        <!-- VISTA 1: INTERFAZ DE ENTRADA POR SECCIONES INDEPENDIENTES -->
         <div id="vistaEntrada" class="space-y-8">
             <div class="border-b border-slate-200 pb-5">
                 <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Registro de Calificaciones</h1>
-                <p class="text-sm text-slate-500 mt-1">Seleccione el área académica o especialidad artística correspondiente.</p>
+                <p class="text-sm text-slate-500 mt-1">Seleccione la asignatura o especialidad artística junto al nivel correspondiente.</p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -87,24 +87,38 @@
                     </button>
                 </div>
 
-                <!-- BLOQUE MATERIAS ESPECIALES -->
+                <!-- BLOQUE MATERIAS ESPECIALES (AHORA CON NIVEL INDEPENDIENTE) -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                     <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2 border-b pb-3 text-purple-600">
                         <span>🎵</span> Materias Especiales / Artísticas
                     </h3>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Seleccionar Especialidad:</label>
-                        <select id="especialMateria" onchange="actualizarResponsableEspecialidad()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400">
-                            <option value="Guitarra">Guitarra</option>
-                            <option value="Piano">Piano</option>
-                            <option value="Flauta">Flauta</option>
-                            <option value="Ukulele">Ukulele</option>
-                            <option value="Bajo Eléctrico">Bajo Eléctrico</option>
-                            <option value="Batería">Batería</option>
-                            <option value="Canto">Canto</option>
-                            <option value="Danza">Danza</option>
-                            <option value="Artes Plásticas">Artes Plásticas</option>
-                        </select>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Especialidad:</label>
+                            <select id="especialMateria" onchange="actualizarResponsableEspecialidad()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400">
+                                <option value="Guitarra">Guitarra</option>
+                                <option value="Piano">Piano</option>
+                                <option value="Flauta">Flauta</option>
+                                <option value="Ukulele">Ukulele</option>
+                                <option value="Bajo Eléctrico">Bajo Eléctrico</option>
+                                <option value="Batería">Batería</option>
+                                <option value="Canto">Canto</option>
+                                <option value="Danza">Danza</option>
+                                <option value="Artes Plásticas">Artes Plásticas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <!-- RESTAURADO: Nivel Independiente para Especiales -->
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nivel / Grado:</label>
+                            <select id="especialGrado" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400">
+                                <option value="Primero">Primero (1°)</option>
+                                <option value="Segundo">Segundo (2°)</option>
+                                <option value="Tercero">Tercero (3°)</option>
+                                <option value="Cuarto">Cuarto (4°)</option>
+                                <option value="Quinto">Quinto (5°)</option>
+                                <option value="Sexto">Sexto (6°)</option>
+                            </select>
+                        </div>
                     </div>
                     <!-- RESPONSABLE VISIBLE EN LA INTERFAZ DE ENTRADA -->
                     <div class="bg-purple-50 border border-purple-100 rounded-xl p-3 flex items-center justify-between">
@@ -118,7 +132,7 @@
             </div>
         </div>
 
-        <!-- VISTA 2: PLANILLA DETALLADA DE CALIFICACIÓN (OCULTA POR DEFECTO) -->
+        <!-- VISTA 2: PLANILLA DETALLADA DE CALIFICACIÓN -->
         <div id="vistaPlanilla" class="hidden space-y-6">
             <div class="flex justify-between items-center border-b pb-4">
                 <div>
@@ -169,7 +183,6 @@
             }
         }
 
-        // Muestra dinámicamente quién imparte la especialidad elegida en el bloque derecho
         function actualizarResponsableEspecialidad() {
             const materia = document.getElementById('especialMateria').value;
             const docente = listaDocentesGlobal.find(d => d.materia_especifica === materia || d.materia_specifica === materia);
@@ -181,7 +194,6 @@
             document.getElementById('vistaEntrada').classList.remove('hidden');
         }
 
-        // Configuración y despliegue del entorno solicitado
         async function ingresarRegistro(tipo) {
             document.getElementById('vistaEntrada').classList.add('hidden');
             document.getElementById('vistaPlanilla').classList.remove('hidden');
@@ -203,11 +215,12 @@
                 }
             } else {
                 const materia = document.getElementById('especialMateria').value;
+                const grado = document.getElementById('especialGrado').value;
                 const docente = listaDocentesGlobal.find(d => d.materia_especifica === materia || d.materia_specifica === materia);
-                const nombreProf = docente ? `Docente Responsable ID: ${docente.perfil_id.substring(0,12)}...` : 'Sin docente asignado';
+                const nombreProf = docente ? `Responsable ID: ${docente.perfil_id.substring(0,12)}...` : 'Sin docente asignado';
                 
-                entornoActivo = { tipo: tipo, materia: materia, grado: 'Especial' };
-                document.getElementById('lblTituloPlanilla').innerText = `Registro de Especialidad: ${materia}`;
+                entornoActivo = { tipo: tipo, materia: materia, grado: grado };
+                document.getElementById('lblTituloPlanilla').innerText = `Registro de ${materia} (${grado} Año)`;
                 document.getElementById('lblSubtituloPlanilla').innerText = nombreProf;
                 
                 if(materia === 'Danza') {
@@ -225,9 +238,6 @@
             await desplegarPlanillaAlumnos();
         }
 
-        // ==========================================
-        // DISEÑOS DE CABECERAS SEGÚN COMPONENTES
-        // ==========================================
         function armarCabeceraAcademica() {
             document.getElementById('filaCabeceraTabla').innerHTML = `
                 <th class="p-3">Estudiante</th>
@@ -291,18 +301,15 @@
             `;
         }
 
-        // ==========================================
-        // CONSULTA Y CONSTRUCCIÓN DE LAS FILAS DE ALUMNOS
-        // ==========================================
         async function desplegarPlanillaAlumnos() {
             const tbody = document.getElementById('cuerpoTablaCalificaciones');
             tbody.innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-400">Consultando estudiantes matriculados...</td></tr>`;
 
-            let query = supabaseClient.from('estudiantes').select('*');
-            if(entornoActivo.tipo === 'Academico') {
-                query = query.eq('nivel_asignado', entornoActivo.grado);
-            }
-            const { data: alumnos, error } = await query;
+            // Filtrado estricto por nivel asignado en ambos entornos
+            let { data: alumnos, error } = await supabaseClient
+                .from('estudiantes')
+                .select('*')
+                .eq('nivel_asignado', entornoActivo.grado);
 
             if(error) {
                 tbody.innerHTML = `<tr><td colspan="12" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
@@ -310,22 +317,21 @@
             }
 
             let filtrados = alumnos || [];
-            if(entornoActivo.tipo === 'Especial') {
-                filtrados = alumnos.filter(a => 
+            
+            // Si es materia especial instrumental, además del nivel, filtra que lleven esa especialidad
+            if(entornoActivo.tipo === 'Especial' && !['Danza', 'Artes Plásticas'].includes(entornoActivo.materia)) {
+                filtrados = (alumnos || []).filter(a => 
                     a.instrumento_principal === entornoActivo.materia ||
                     a.instrumento_opcional_1 === entornoActivo.materia ||
-                    a.instrumento_opcional_2 === entornoActivo.materia ||
-                    (entornoActivo.materia === 'Danza' && a.nivel_asignado !== '') || 
-                    (entornoActivo.materia === 'Artes Plásticas' && a.nivel_asignado !== '')
+                    a.instrumento_opcional_2 === entornoActivo.materia
                 );
             }
 
             if(filtrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-400">No hay alumnos asignados a este nivel o materia especial.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-400">No hay alumnos asignados a este grado y materia actualmente.</td></tr>`;
                 return;
             }
 
-            // Descargar registros de notas existentes
             const { data: notas } = await supabaseClient.from('calificaciones').select('*').eq('materia_evaluada', entornoActivo.materia);
 
             tbody.innerHTML = '';
@@ -338,7 +344,6 @@
                 let inputsHtml = '';
                 let notaFinalInicial = n ? parseFloat(n.nota_final).toFixed(1) : "100.0";
 
-                // Inyectar inputs numéricos personalizados según los nuevos componentes
                 if (entornoActivo.materia === 'Conducta') {
                     inputsHtml = `
                         <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="c1-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
@@ -351,10 +356,10 @@
                     `;
                 } else if(entornoActivo.tipo === 'Academico') {
                     inputsHtml = `
-                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded font-semibold" id="cot-${al.id}" value="${n ? n.nota_cotidiano:100}" onchange="calcAcad(${al.id})"></td>
-                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded font-semibold" id="pru-${al.id}" value="${n ? n.nota_pruebas:100}" onchange="calcAcad(${al.id})"></td>
-                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded font-semibold" id="ext-${al.id}" value="100" onchange="calcAcad(${al.id})"></td>
-                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded font-semibold" id="asi-${al.id}" value="${n ? n.nota_asistencia:100}" onchange="calcAcad(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded" id="cot-${al.id}" value="${n ? n.nota_cotidiano:100}" onchange="calcAcad(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded" id="pru-${al.id}" value="${n ? n.nota_pruebas:100}" onchange="calcAcad(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded" id="ext-${al.id}" value="100" onchange="calcAcad(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded" id="asi-${al.id}" value="${n ? n.nota_asistencia:100}" onchange="calcAcad(${al.id})"></td>
                     `;
                 } else if(entornoActivo.materia === 'Danza') {
                     inputsHtml = `
@@ -369,7 +374,6 @@
                 } else if(entornoActivo.materia === 'Artes Plásticas') {
                     inputsHtml = `<td class="p-2 text-center"><input type="number" class="w-24 text-center border rounded font-bold" id="pla-${al.id}" value="100" onchange="calcPlast(${al.id})"></td>`;
                 } else {
-                    // Especialidades artísticas regulares (Música) con campo de Comentario integrado
                     inputsHtml = `
                         <td class="p-2 text-center"><input type="number" class="w-16 text-center border rounded" id="cot-${al.id}" value="${n ? n.nota_cotidiano:100}" onchange="calcArt(${al.id})"></td>
                         <td class="p-2 text-center"><input type="number" class="w-16 text-center border rounded" id="asi-${al.id}" value="${n ? n.nota_asistencia:100}" onchange="calcArt(${al.id})"></td>
@@ -395,9 +399,6 @@
             });
         }
 
-        // ==========================================
-        // OPERACIONES MATEMÁTICAS EN VIVO POR FILA
-        // ==========================================
         function calcAcad(id) {
             const cot = parseFloat(document.getElementById(`cot-${id}`).value) || 0;
             const pru = parseFloat(document.getElementById(`pru-${id}`).value) || 0;
@@ -445,13 +446,9 @@
             document.getElementById(`tot-${id}`).innerText = total.toFixed(1);
         }
 
-        // ==========================================
-        // PERSISTENCIA DE CALIFICACIONES EN SUPABASE
-        // ==========================================
         async function guardarFilaReal(alumnoId, cedula) {
             const final = parseFloat(document.getElementById(`tot-${alumnoId}`).innerText);
             
-            // Valores de respaldo estándar para la tabla relacional
             let cot = 100, pru = 100, asi = 100;
             if(document.getElementById(`cot-${alumnoId}`)) cot = parseFloat(document.getElementById(`cot-${alumnoId}`).value) || 100;
             if(document.getElementById(`pru-${alumnoId}`)) pru = parseFloat(document.getElementById(`pru-${alumnoId}`).value) || 100;
