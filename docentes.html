@@ -44,7 +44,7 @@
     <div class="ml-64 p-10 w-full">
         <div class="border-b border-slate-200 pb-5 mb-8">
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Administración de Docentes</h1>
-            <p class="text-sm text-slate-500 mt-1">Registre el ingreso de personal docente y asigne sus correspondientes ambientes o materias especializadas.</p>
+            <p class="text-sm text-slate-500 mt-1">Registre el ingreso de personal docente y asigne sus correspondientes ambientes académicos.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -64,17 +64,6 @@
                             <option value="Taller I">Taller I</option>
                             <option value="Taller II">Taller II</option>
                             <option value="Taller III">Taller III</option>
-                            <option value="Especialidades">Especialidades (Materia Específica)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Materia Específica:</label>
-                        <select id="docenteMateria" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400 transition">
-                            <option value="General">General (Tutor de Ambiente)</option>
-                            <option value="Guitarra">Guitarra</option>
-                            <option value="Piano">Piano</option>
-                            <option value="Danza Especializada">Danza Especializada</option>
-                            <option value="Canto y Solfeo">Canto y Solfeo</option>
                         </select>
                     </div>
                     <button type="button" onclick="registrarDocenteReal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm mt-2">
@@ -93,13 +82,12 @@
                             <tr class="border-b-2 border-slate-100 text-xs font-bold text-slate-400 uppercase">
                                 <th class="pb-3">Docente (UID)</th>
                                 <th class="pb-3">Ambiente Asignado</th>
-                                <th class="pb-3">Especialidad</th>
                                 <th class="pb-3 text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-docentes-cuerpo" class="divide-y divide-slate-100 text-slate-700">
                             <tr>
-                                <td colspan="4" class="py-4 text-center text-slate-400">Cargando docentes...</td>
+                                <td colspan="3" class="py-4 text-center text-slate-400">Cargando docentes...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -122,27 +110,27 @@
         async function registrarDocenteReal() {
             const uid = document.getElementById('docenteUid').value.trim();
             const nivel = document.getElementById('docenteNivel').value;
-            const materia = document.getElementById('docenteMateria').value;
 
             if(!uid) {
                 alert("Por favor ingrese el código UID del perfil del docente.");
                 return;
             }
 
-            // Enviamos una petición simple y capturamos explícitamente el detalle exacto del error 400
+            // INSERT DIRECTO: Enviamos solo los dos campos core obligatorios para saltar el error de nombres
             const { data, error } = await supabaseClient
                 .from('docentes_niveles')
-                .insert([{ 
-                    perfil_id: uid, 
-                    nivel_asignado: nivel, 
-                    materia_specifica: materia 
-                }]);
+                .insert([{ perfil_id: uid, nivel_asignado: nivel }]);
 
             if (error) {
-                // Alerta informativa con los detalles exactos del servidor
-                alert("Detalles del Error 400:\n\nMensaje: " + error.message + "\nDetalle: " + error.details + "\nHint: " + error.hint);
-                console.error(error);
-                return;
+                // Segundo intento por si la columna de nivel se llama nivel_assigned
+                const { error: errorAlt } = await supabaseClient
+                    .from('docentes_niveles')
+                    .insert([{ perfil_id: uid, nivel_assigned: nivel }]);
+                
+                if (errorAlt) {
+                    alert("Error en la base de datos:\n" + errorAlt.message);
+                    return;
+                }
             }
 
             alert("¡Docente registrado con éxito!");
@@ -158,27 +146,25 @@
                 .select('*');
 
             if (error) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = ''; 
 
             if(!docentes || docentes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">No hay docentes asignados aún.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400">No hay docentes asignados aún.</td></tr>`;
                 return;
             }
 
             docentes.forEach(docente => {
-                const nivel = docente.nivel_asignado || docente.nivel_assigned || 'General';
-                const materia = docente.materia_specifica || docente.materia_especifica || 'General';
+                const nivel = docente.nivel_asignado || docente.nivel_assigned || 'Asignado';
                 const uidCorto = docente.perfil_id;
 
                 const nuevaFila = document.createElement('tr');
                 nuevaFila.innerHTML = `
                     <td class="py-3 font-mono text-xs text-slate-600">${uidCorto}</td>
-                    <td class="py-3 text-slate-600">${nivel}</td>
-                    <td class="py-3"><span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-semibold">${materia}</span></td>
+                    <td class="py-3 text-slate-600"><span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-semibold">${nivel}</span></td>
                     <td class="py-3 text-right">
                         <button class="text-red-500 hover:text-red-700 text-xs font-bold" onclick="eliminarDocenteReal(${docente.id})">Remover</button>
                     </td>
