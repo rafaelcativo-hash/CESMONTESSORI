@@ -1,381 +1,43 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Montessori - Panel de Calificaciones Seguro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-800 flex min-h-screen">
-
-    <div class="w-64 bg-slate-900 text-white flex flex-col justify-between p-6 fixed h-screen z-10">
-        <div>
-            <h2 class="text-xl font-bold mb-8 text-center tracking-wide text-blue-400">CES MONTESSORI</h2>
-            <nav class="space-y-2">
-                <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                    <span>🏠</span> <span>Inicio</span>
-                </a>
-                <a href="expedientes.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                    <span>📋</span> <span>Expedientes</span>
-                </a>
-                <a href="docentes.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                    <span>👨‍🏫</span> <span>Docentes</span>
-                </a>
-                <a href="calificaciones.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-slate-800 text-white transition font-semibold">
-                    <span>📊</span> <span>Calificaciones</span>
-                </a>
-            </nav>
-        </div>
-        <div>
-            <div class="text-xs text-center text-slate-500 bg-slate-950 p-2 rounded">
-                Seguridad: <span class="font-bold text-red-400">Filtro por Docente</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="ml-64 p-10 w-full">
+<!-- Agrega este script dentro de tu archivo calificaciones.html -->
+<script>
+    // Esta función vincula al docente con sus grupos automáticamente
+    async function obtenerCargaDocenteExclusiva() {
+        const grid = document.getElementById('gridCargasDocente');
         
-        <div id="vistaEntrada" class="space-y-6">
-            <div class="border-b border-slate-200 pb-5">
-                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Mis Cargas Académicas</h1>
-                <p class="text-sm text-slate-500 mt-1">A continuación se muestran los únicos niveles y asignaturas que tiene permitidos evaluar.</p>
-            </div>
+        // 1. Identificar quién está entrando
+        const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
-            <div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Grupos y Materias Asignadas</h3>
-                <div id="gridCargasDocente" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="col-span-full text-center py-8 text-slate-400">Verificando identidad y permisos de acceso...</div>
-                </div>
-            </div>
-        </div>
+        if (authError || !user) {
+            window.location.href = "index.html"; // Si no hay sesión, regresa al login
+            return;
+        }
 
-        <div id="vistaPlanilla" class="hidden space-y-6">
-            <div class="flex justify-between items-center border-b pb-4">
-                <div>
-                    <button onclick="regresarAlMenu()" class="text-xs font-bold text-slate-500 hover:text-slate-800 bg-slate-200 px-3 py-1.5 rounded-lg transition mb-2 block">
-                        ⬅️ Volver a Mis Cargas
-                    </button>
-                    <h2 id="lblTituloPlanilla" class="text-2xl font-extrabold text-slate-900">--</h2>
-                    <p id="lblSubtituloPlanilla" class="text-xs text-slate-500 mt-0.5">--</p>
-                </div>
-                <div id="badgePauta" class="text-xs px-4 py-2 bg-slate-900 text-slate-100 font-mono rounded-xl tracking-tight">--</div>
-            </div>
+        // 2. Consultar la tabla de docentes_niveles para traer su carga actual
+        // Al usar el ID del usuario logueado, la vinculación se actualiza sola al cambiar datos en la tabla
+        const { data: cargas, error: dbError } = await supabaseClient
+            .from('docentes_niveles')
+            .select('*')
+            .eq('perfil_id', user.id); // Vínculo directo por ID de usuario
 
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-                <table class="w-full text-xs text-left border-collapse">
-                    <thead>
-                        <tr id="filaCabeceraTabla" class="border-b border-slate-200 font-bold text-slate-400 uppercase bg-slate-50">
-                            </tr>
-                    </thead>
-                    <tbody id="cuerpoTablaCalificaciones" class="divide-y divide-slate-100 text-slate-700">
-                        </tbody>
-                </table>
-            </div>
-        </div>
+        if (dbError || !cargas || cargas.length === 0) {
+            grid.innerHTML = `<div class="col-span-full text-center p-4 text-red-500">No tienes grupos asignados. Contacta al administrador.</div>`;
+            return;
+        }
 
-    </div>
+        grid.innerHTML = '';
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        let usuarioLogueadoId = null;
-        let entornoActivo = null;
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            await obtenerCargaDocenteExclusiva();
+        // 3. Generar las tarjetas de acceso automáticamente
+        cargas.forEach(carga => {
+            const card = document.createElement('div');
+            card.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-blue-500 transition cursor-pointer";
+            card.onclick = () => abrirPlanillaSegura(carga.materia_especifica, carga.nivel_asignado);
+            
+            card.innerHTML = `
+                <h4 class="text-lg font-bold text-slate-900">${carga.materia_especifica}</h4>
+                <p class="text-xs text-slate-500">Nivel: ${carga.nivel_asignado}</p>
+                <div class="mt-4 text-blue-600 text-xs font-bold">Acceder al registro ➔</div>
+            `;
+            grid.appendChild(card);
         });
-
-        // 1. Obtener la sesión real de Supabase Auth y descargar UNICAMENTE la carga de este profesor
-        async function obtenerCargaDocenteExclusiva() {
-            const grid = document.getElementById('gridCargasDocente');
-            
-            const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-
-            if (authError || !user) {
-                grid.innerHTML = `<div class="col-span-full bg-amber-50 text-amber-700 p-4 rounded-xl text-center font-medium border border-amber-200">⚠️ No se detecta una sesión activa. Por favor, ingrese sus credenciales en el portal de acceso.</div>`;
-                return;
-            }
-
-            usuarioLogueadoId = user.id;
-
-            // Descargar las asignaciones del docente actual desde docentes_niveles
-            const { data: cargas, error: dbError } = await supabaseClient
-                .from('docentes_niveles')
-                .select('*')
-                .eq('perfil_id', usuarioLogueadoId);
-
-            if (dbError || !cargas || cargas.length === 0) {
-                grid.innerHTML = `<div class="col-span-full bg-red-50 text-red-700 p-4 rounded-xl text-center font-medium border border-red-200">🔒 Seguridad: Tu cuenta no posee materias ni grupos asignados en el registro institucional actualmente.</div>`;
-                return;
-            }
-
-            grid.innerHTML = '';
-
-            // Construir la interfaz de tarjetas únicas basadas exclusivamente en tu carga real
-            cargas.forEach(carga => {
-                const materia = carga.materia_especifica || carga.materia_specifica;
-                const grado = carga.nivel_asignado;
-                
-                const card = document.createElement('div');
-                card.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-blue-400 transition cursor-pointer flex flex-col justify-between space-y-4";
-                card.setAttribute('onclick', `abrirPlanillaSegura('${materia}', '${grado}')`);
-                
-                const esAcademica = ["Español", "Matemáticas", "Ciencias", "Estudios Sociales", "Inglés", "Conducta"].includes(materia);
-                const icono = esAcademica ? "📚" : "🎵";
-                const colorTexto = esAcademica ? "text-blue-600" : "text-purple-600";
-
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start">
-                            <span class="text-2xl">${icono}</span>
-                            <span class="text-[10px] bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded uppercase font-mono">Autorizado</span>
-                        </div>
-                        <h4 class="text-lg font-bold text-slate-900 mt-2">${materia}</h4>
-                        <p class="text-xs text-slate-500 font-medium">Nivel: ${grado}</p>
-                    </div>
-                    <div class="border-t pt-3 flex justify-between items-center text-xs text-blue-500 font-bold">
-                        <span>Ingresar calificaciones</span>
-                        <span>➔</span>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function regresarAlMenu() {
-            document.getElementById('vistaPlanilla').classList.add('hidden');
-            document.getElementById('vistaEntrada').classList.remove('hidden');
-        }
-
-        // 2. Levantar la planilla de notas aplicando los componentes estipulados de seguridad
-        function abrirPlanillaSegura(materia, grado) {
-            document.getElementById('vistaEntrada').classList.add('hidden');
-            document.getElementById('vistaPlanilla').classList.remove('hidden');
-
-            const esAcademica = ["Español", "Matemáticas", "Ciencias", "Estudios Sociales", "Inglés"].includes(materia);
-            
-            entornoActivo = { materia: materia, grado: grado, esAcademica: esAcademica };
-            document.getElementById('lblTituloPlanilla').innerText = `Planilla de ${materia}`;
-            document.getElementById('lblSubtituloPlanilla').innerText = `Grupo: ${grado} | Evaluador a Cargo`;
-
-            if (materia === 'Conducta') {
-                document.getElementById('badgePauta').innerText = "Pauta de Conducta (Asertividad/Respeto)";
-                armarCabeceraConducta();
-            } else if (esAcademica) {
-                document.getElementById('badgePauta').innerText = "Pauta Académica Básica (50/30/10/10)";
-                armarCabeceraAcademica();
-            } else if (materia === 'Danza') {
-                document.getElementById('badgePauta').innerText = "Pauta Sumativa Danza (10% Asistencia)";
-                armarCabeceraDanza();
-            } else if (materia === 'Artes Plásticas') {
-                document.getElementById('badgePauta').innerText = "Pauta Simplificada: Plásticas (100%)";
-                armarCabeceraPlasticas();
-            } else {
-                document.getElementById('badgePauta').innerText = "Pauta Especialidades Artísticas RAE (60/10/10/20)";
-                armarCabeceraArtisticasMusica();
-            }
-
-            desplegarAlumnosSeguros();
-        }
-
-        function armarCabeceraAcademica() {
-            document.getElementById('filaCabeceraTabla').innerHTML = `<th class="p-3">Estudiante</th><th class="p-3 text-center">Cotidiano (50%)</th><th class="p-3 text-center">Pruebas (30%)</th><th class="p-3 text-center">Extraclase (10%)</th><th class="p-3 text-center">Asistencia (10%)</th><th class="p-3 text-center">Nota Final</th><th class="p-3">Comentario</th><th class="p-3 text-right">Acción</th>`;
-        }
-        function armarCabeceraArtisticasMusica() {
-            document.getElementById('filaCabeceraTabla').innerHTML = `<th class="p-3">Estudiante</th><th class="p-3 text-center">Cotidiano (60%)</th><th class="p-3 text-center">Asistencia (10%)</th><th class="p-3 text-center">Autorregulación (10%)</th><th class="p-3 text-center">Instrumento (20%)</th><th class="p-3 text-center">Promedio Final</th><th class="p-3">Comentario</th><th class="p-3 text-right">Acción</th>`;
-        }
-        function armarCabeceraDanza() {
-            document.getElementById('filaCabeceraTabla').innerHTML = `<th class="p-3">Estudiante</th><th class="p-3 text-center">Puntualidad (10%)</th><th class="p-3 text-center">Coreografía (20%)</th><th class="p-3 text-center">Prep. Previa (10%)</th><th class="p-3 text-center">Participación (20%)</th><th class="p-3 text-center">Concentración (10%)</th><th class="p-3 text-center">Aportes (20%)</th><th class="p-3 text-center">Asistencia (10%)</th><th class="p-3 text-center">Nota Final</th><th class="p-3">Comentario</th><th class="p-3 text-right">Acción</th>`;
-        }
-        function armarCabeceraPlasticas() {
-            document.getElementById('filaCabeceraTabla').innerHTML = `<th class="p-3">Estudiante</th><th class="p-3 text-center">Asistencia y Trabajo (100%)</th><th class="p-3 text-center">Nota Final</th><th class="p-3">Comentario</th><th class="p-3 text-right">Acción</th>`;
-        }
-        function armarCabeceraConducta() {
-            document.getElementById('filaCabeceraTabla').innerHTML = `<th class="p-3">Estudiante</th><th class="p-3 text-center">Asertividad (20%)</th><th class="p-3 text-center">Cooperación (5%)</th><th class="p-3 text-center">Pres. Personal (5%)</th><th class="p-3 text-center">Esp. Físico (20%)</th><th class="p-3 text-center">Esp. Verbal (20%)</th><th class="p-3 text-center">No Verbal (10%)</th><th class="p-3 text-center">Esp. Psicológico (20%)</th><th class="p-3 text-center">Nota Conducta</th><th class="p-3">Comentario</th><th class="p-3 text-right">Acción</th>`;
-        }
-
-        // 3. Descargar únicamente los alumnos vinculados estrictamente a este grupo seguro
-        async function desplegarAlumnosSeguros() {
-            const tbody = document.getElementById('cuerpoTablaCalificaciones');
-            tbody.innerHTML = `<tr><td colspan="14" class="py-6 text-center text-slate-400">Descargando lista autorizada...</td></tr>`;
-
-            const { data: alumnos, error } = await supabaseClient
-                .from('estudiantes')
-                .select('*')
-                .eq('nivel_asignado', entornoActivo.grado);
-
-            if(error) {
-                tbody.innerHTML = `<tr><td colspan="14" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
-                return;
-            }
-
-            let filtrados = alumnos || [];
-            
-            // Si es especialidad instrumental, filtra adicionalmente que el alumno tenga asignado tu instrumento
-            if(!entornoActivo.esAcademica && !['Danza', 'Artes Plásticas', 'Conducta'].includes(entornoActivo.materia)) {
-                filtrados = (alumnos || []).filter(a => 
-                    a.instrumento_principal === entornoActivo.materia ||
-                    a.instrumento_opcional_1 === entornoActivo.materia ||
-                    a.instrumento_opcional_2 === entornoActivo.materia
-                );
-            }
-
-            if(filtrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="14" class="py-6 text-center text-slate-400">No hay estudiantes matriculados en esta asignatura para este nivel.</td></tr>`;
-                return;
-            }
-
-            const { data: notas } = await supabaseClient.from('calificaciones').select('*').eq('materia_evaluada', entornoActivo.materia);
-
-            tbody.innerHTML = '';
-
-            filtrados.forEach(al => {
-                const n = notas ? notas.find(x => x.estudiante_id === al.id) : null;
-                const r = document.createElement('tr');
-                r.className = "hover:bg-slate-50 transition border-b border-slate-100";
-                
-                let inputsHtml = '';
-                let notaFinalInicial = n ? parseFloat(n.nota_final).toFixed(1) : "100.0";
-                let comentarioInicial = n ? (n.comentario || '') : '';
-
-                if (entornoActivo.materia === 'Conducta') {
-                    inputsHtml = `
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="c1-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="c2-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="c3-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="c4-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="c5-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="c6-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="c7-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
-                    `;
-                } else if(entornoActivo.esAcademica) {
-                    inputsHtml = `
-                        <td class="p-1 text-center"><input type="number" class="w-14 text-center border rounded" id="cot-${al.id}" value="${n ? n.nota_cotidiano:100}" onchange="calcAcad(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-14 text-center border rounded" id="pru-${al.id}" value="${n ? n.nota_pruebas:100}" onchange="calcAcad(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-14 text-center border rounded" id="ext-${al.id}" value="100" onchange="calcAcad(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-14 text-center border rounded" id="asi-${al.id}" value="${n ? n.nota_asistencia:100}" onchange="calcAcad(${al.id})"></td>
-                    `;
-                } else if(entornoActivo.materia === 'Danza') {
-                    inputsHtml = `
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="d1-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="d2-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="d3-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="d4-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="d5-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="d6-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-10 text-center border rounded" id="d7-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
-                    `;
-                } else if(entornoActivo.materia === 'Artes Plásticas') {
-                    inputsHtml = `<td class="p-1 text-center"><input type="number" class="w-24 text-center border rounded font-bold" id="pla-${al.id}" value="100" onchange="calcPlast(${al.id})"></td>`;
-                } else {
-                    inputsHtml = `
-                        <td class="p-1 text-center"><input type="number" class="w-14 text-center border rounded" id="cot-${al.id}" value="${n ? n.nota_cotidiano:100}" onchange="calcArt(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-14 text-center border rounded" id="asi-${al.id}" value="${n ? n.nota_asistencia:100}" onchange="calcArt(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-14 text-center border rounded" id="aut-${al.id}" value="100" onchange="calcArt(${al.id})"></td>
-                        <td class="p-1 text-center"><input type="number" class="w-14 text-center border rounded" id="ins-${al.id}" value="${n ? n.nota_pruebas:100}" onchange="calcArt(${al.id})"></td>
-                    `;
-                }
-
-                r.innerHTML = `
-                    <td class="p-3 font-medium text-slate-900">
-                        <div>${al.nombre_completo}</div>
-                        <div class="text-[10px] font-mono text-slate-400">${al.cedula}</div>
-                    </td>
-                    ${inputsHtml}
-                    <td class="p-3 text-center font-extrabold text-slate-900 bg-slate-50 text-sm">
-                        <span id="tot-${al.id}">${notaFinalInicial}</span>
-                    </td>
-                    <td class="p-1">
-                        <textarea id="com-${al.id}" rows="1" class="w-40 border border-slate-200 text-[11px] rounded p-1 outline-none focus:border-blue-400" placeholder="Añadir comentario...">${comentarioInicial}</textarea>
-                    </td>
-                    <td class="p-3 text-right">
-                        <button onclick="guardarFilaReal(${al.id}, '${al.cedula}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded-lg shadow-sm transition">Guardar</button>
-                    </td>
-                `;
-                tbody.appendChild(r);
-            });
-        }
-
-        // Operaciones de cálculo
-        function calcAcad(id) {
-            const cot = parseFloat(document.getElementById(`cot-${id}`).value) || 0;
-            const pru = parseFloat(document.getElementById(`pru-${id}`).value) || 0;
-            const ext = parseFloat(document.getElementById(`ext-${id}`).value) || 0;
-            const asi = parseFloat(document.getElementById(`asi-${id}`).value) || 0;
-            document.getElementById(`tot-${id}`).innerText = ((cot*0.5)+(pru*0.3)+(ext*0.1)+(asi*0.1)).toFixed(1);
-        }
-        function calcArt(id) {
-            const cot = parseFloat(document.getElementById(`cot-${id}`).value) || 0;
-            const asi = parseFloat(document.getElementById(`asi-${id}`).value) || 0;
-            const aut = parseFloat(document.getElementById(`aut-${id}`).value) || 0;
-            const ins = parseFloat(document.getElementById(`ins-${id}`).value) || 0;
-            document.getElementById(`tot-${id}`).innerText = ((cot*0.6)+(asi*0.1)+(aut*0.1)+(ins*0.2)).toFixed(1);
-        }
-        function calcDanza(id) {
-            const d1 = parseFloat(document.getElementById(`d1-${id}`).value) || 0;
-            const d2 = parseFloat(document.getElementById(`d2-${id}`).value) || 0;
-            const d3 = parseFloat(document.getElementById(`d3-${id}`).value) || 0;
-            const d4 = parseFloat(document.getElementById(`d4-${id}`).value) || 0;
-            const d5 = parseFloat(document.getElementById(`d5-${id}`).value) || 0;
-            const d6 = parseFloat(document.getElementById(`d6-${id}`).value) || 0;
-            const d7 = parseFloat(document.getElementById(`d7-${id}`).value) || 0;
-            document.getElementById(`tot-${id}`).innerText = ((d1*0.1)+(d2*0.2)+(d3*0.1)+(d4*0.2)+(d5*0.1)+(d6*0.2)+(d7*0.1)).toFixed(1);
-        }
-        function calcPlast(id) {
-            document.getElementById(`tot-${id}`).innerText = (parseFloat(document.getElementById(`pla-${id}`).value) || 0).toFixed(1);
-        }
-        function calcCond(id) {
-            const c1 = parseFloat(document.getElementById(`c1-${id}`).value) || 0;
-            const c2 = parseFloat(document.getElementById(`c2-${id}`).value) || 0;
-            const c3 = parseFloat(document.getElementById(`c3-${id}`).value) || 0;
-            const c4 = parseFloat(document.getElementById(`c4-${id}`).value) || 0;
-            const c5 = parseFloat(document.getElementById(`c5-${id}`).value) || 0;
-            const c6 = parseFloat(document.getElementById(`c6-${id}`).value) || 0;
-            const c7 = parseFloat(document.getElementById(`c7-${id}`).value) || 0;
-            document.getElementById(`tot-${id}`).innerText = ((c1*0.2)+(c2*0.05)+(c3*0.05)+(c4*0.2)+(c5*0.2)+(c6*0.1)+(c7*0.2)).toFixed(1);
-        }
-
-        async function guardarFilaReal(alumnoId, cedula) {
-            const final = parseFloat(document.getElementById(`tot-${alumnoId}`).innerText);
-            const comentarioText = document.getElementById(`com-${alumnoId}`).value.trim();
-            
-            let cot = 100, pru = 100, asi = 100;
-            if(document.getElementById(`cot-${alumnoId}`)) cot = parseFloat(document.getElementById(`cot-${alumnoId}`).value) || 100;
-            if(document.getElementById(`pru-${alumnoId}`)) pru = parseFloat(document.getElementById(`pru-${alumnoId}`).value) || 100;
-            if(document.getElementById(`asi-${alumnoId}`)) asi = parseFloat(document.getElementById(`asi-${alumnoId}`).value) || 100;
-            if(document.getElementById(`pla-${alumnoId}`)) cot = parseFloat(document.getElementById(`pla-${alumnoId}`).value) || 100;
-
-            const { data: ext } = await supabaseClient
-                .from('calificaciones')
-                .select('id')
-                .eq('estudiante_id', alumnoId)
-                .eq('materia_evaluada', entornoActivo.materia);
-
-            let res;
-            const objData = { nota_asistencia: asi, nota_cotidiano: cot, nota_pruebas: pru, nota_final: final, comentario: comentarioText };
-
-            if(ext && ext.length > 0) {
-                res = await supabaseClient.from('calificaciones').update(objData).eq('id', ext[0].id);
-            } else {
-                res = await supabaseClient.from('calificaciones').insert([{
-                    estudiante_id: alumnoId,
-                    cedula_estudiante: cedula,
-                    materia_evaluada: entornoActivo.materia,
-                    docente_uid: usuarioLogueadoId,
-                    ...objData
-                }]);
-            }
-
-            if(res.error) alert("Error: " + res.error.message);
-            else alert("¡Datos guardados bajo entorno seguro!");
-        }
-    </script>
-</body>
-</html>
+    }
+</script>
