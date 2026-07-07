@@ -40,18 +40,61 @@
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="ml-64 p-10 w-full">
-        <div class="border-b border-slate-200 pb-5 mb-8 flex justify-between items-end">
-            <div>
-                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Registro de Notas y Evidencias</h1>
-                <p class="text-sm text-slate-500 mt-1">Evaluación formativa y sumativa adaptada según materia académica o especialidad.</p>
+        <div class="border-b border-slate-200 pb-5 mb-8">
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Registro de Notas y Evidencias</h1>
+            <p class="text-sm text-slate-500 mt-1">Seleccione el entorno académico o artístico para desplegar la lista de estudiantes correspondientes.</p>
+        </div>
+
+        <!-- SELECTORES DE ENTORNO REORGANIZADOS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Selector para Académicos -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">📚 1. Materias Académicas por Grado</label>
+                <div class="flex gap-2">
+                    <select id="selGradoAcademico" class="w-1/2 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400 bg-white">
+                        <option value="Primero">Primero (1° Año)</option>
+                        <option value="Segundo">Segundo (2° Año)</option>
+                        <option value="Tercero">Tercero (3° Año)</option>
+                        <option value="Cuarto">Cuarto (4° Año)</option>
+                        <option value="Quinto">Quinto (5° Año)</option>
+                        <option value="Sexto">Sexto (6° Año)</option>
+                    </select>
+                    <select id="selMateriaAcademica" class="w-1/2 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400 bg-white">
+                        <option value="Español">Español</option>
+                        <option value="Matemáticas">Matemáticas</option>
+                        <option value="Ciencias">Ciencias</option>
+                        <option value="Estudios Sociales">Estudios Sociales</option>
+                        <option value="Inglés">Inglés</option>
+                    </select>
+                </div>
+                <button onclick="activarEntorno('Academico')" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
+                    Evaluar Materia Académica
+                </button>
+            </div>
+
+            <!-- Selector para Especiales -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">🎵 2. Especialidades Musicales y Talleres</label>
+                <select id="selMateriaEspecial" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400 bg-white mb-3">
+                    <option value="Guitarra">Guitarra</option>
+                    <option value="Piano">Piano</option>
+                    <option value="Flauta">Flauta</option>
+                    <option value="Ukulele">Ukulele</option>
+                    <option value="Bajo Eléctrico">Bajo Eléctrico</option>
+                    <option value="Batería">Batería</option>
+                    <option value="Canto">Canto</option>
+                </select>
+                <button onclick="activarEntorno('Especial')" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
+                    Evaluar Especialidad Musical
+                </button>
             </div>
         </div>
 
-        <!-- ENTORNO INFORMATIVO REAL DEL DOCENTE LOGUEADO -->
-        <div class="bg-slate-900 text-slate-100 p-4 rounded-xl mb-6 shadow-sm flex flex-wrap justify-between items-center gap-4">
+        <!-- PANEL DE PAUTA DE EVALUACIÓN SELECCIONADA -->
+        <div id="panelInformativo" class="hidden bg-slate-900 text-slate-100 p-4 rounded-xl mb-6 shadow-sm flex flex-wrap justify-between items-center gap-4">
             <div>
-                <span class="text-xs font-bold text-blue-400 tracking-wider block uppercase">Docente Autenticado</span>
-                <h2 id="infoDocenteTipo" class="text-lg font-bold text-white">Identificando sesión en Supabase...</h2>
+                <span class="text-xs font-bold text-blue-400 tracking-wider block uppercase" id="lblTipoEntorno">Pauta</span>
+                <h2 id="infoEntornoActivo" class="text-lg font-bold text-white">--</h2>
             </div>
             <div class="flex gap-6 text-xs font-mono bg-slate-950 p-3 rounded-lg border border-slate-800">
                 <div>Asistencia: <span class="text-green-400 font-bold">5%</span></div>
@@ -64,9 +107,9 @@
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <span>📝</span> Planilla de Evaluación Estudiantil
+                    <span>📋</span> Planilla de Alumnos Matriculados
                 </h3>
-                <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium" id="lblFiltro">Filtrando estudiantes...</span>
+                <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium" id="lblFiltro">Por favor seleccione un entorno arriba.</span>
             </div>
             
             <div class="overflow-x-auto">
@@ -84,7 +127,7 @@
                     </thead>
                     <tbody id="tabla-calificaciones-cuerpo" class="divide-y divide-slate-100 text-slate-700">
                         <tr>
-                            <td colspan="7" class="py-6 text-center text-slate-400">Verificando credenciales de acceso...</td>
+                            <td colspan="7" class="py-6 text-center text-slate-400">Ningún grupo seleccionado aún. Elija una opción de los cuadros superiores.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -99,114 +142,91 @@
         const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let docenteConfig = null;
+        let entornoActual = null;
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            await verificarSesionDocenteReal();
-        });
-
-        // 1. Detectar el usuario real logueado en Supabase Auth y cruzarlo con su tabla docentes_niveles
-        async function verificarSesionDocenteReal() {
-            const tbody = document.getElementById('tabla-calificaciones-cuerpo');
+        function activarEntorno(tipo) {
+            document.getElementById('panelInformativo').classList.remove('hidden');
             
-            // Obtener usuario de la sesión de Auth
-            const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-
-            if (authError || !user) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-amber-600 font-medium">⚠️ No se detectó una sesión activa. Por favor, inicia sesión en el portal.</td></tr>`;
-                document.getElementById('infoDocenteTipo').innerText = "Usuario no identificado";
-                return;
-            }
-
-            // Consultar qué materia y nivel tiene este UID en la tabla de docentes
-            const { data: perfilDocente, error: dbError } = await supabaseClient
-                .from('docentes_niveles')
-                .select('*')
-                .eq('perfil_id', user.id)
-                .single();
-
-            if (dbError || !perfilDocente) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-red-500">⚠️ Tu usuario no está registrado aún como docente asignado en la lista de personal.</td></tr>`;
-                document.getElementById('infoDocenteTipo').innerText = "Perfil docente no configurado";
-                return;
-            }
-
-            // Determinar dinámicamente si es especialidad musical o nivel académico básico
-            const esMateriaAcademica = ["Español", "Matemáticas", "Ciencias", "Estudios Sociales", "Inglés"].includes(perfilDocente.materia_especifica);
-
-            if (esMateriaAcademica) {
-                docenteConfig = {
-                    uid: user.id,
+            if (tipo === 'Academico') {
+                const grado = document.getElementById('selGradoAcademico').value;
+                const materia = document.getElementById('selMateriaAcademica').value;
+                
+                entornoActual = {
                     tipo: 'Académico',
-                    materia: perfilDocente.materia_especifica,
-                    grado: perfilDocente.nivel_asignado,
+                    materia: materia,
+                    filtroGrado: grado,
                     pesoAsistencia: 5,
                     pesoCotidiano: 45,
                     pesoPruebas: 50
                 };
+                
+                document.getElementById('lblTipoEntorno').innerText = "Entorno Académico Regular";
+                document.getElementById('infoEntornoActivo').innerText = `${materia} — ${grado} Año`;
                 document.getElementById('thCotidiano').innerText = 'Trabajo Cotidiano (45%)';
                 document.getElementById('thPrueba').innerText = 'Pruebas Escritas (50%)';
+                
             } else {
-                docenteConfig = {
-                    uid: user.id,
+                const materia = document.getElementById('selMateriaEspecial').value;
+                
+                entornoActual = {
                     tipo: 'Especiales / Música',
-                    materia: perfilDocente.materia_especifica,
-                    grado: 'Especialidad',
+                    materia: materia,
+                    filtroGrado: null,
                     pesoAsistencia: 5,
-                    pesoCotidiano: 65, // Enfoque Ruta de Alfabetización Evidencial (RAE)
+                    pesoCotidiano: 65, // Formato RAE
                     pesoPruebas: 30
                 };
-                document.getElementById('thCotidiano').innerText = 'Evidencias RAE Instrumento (65%)';
+                
+                document.getElementById('lblTipoEntorno').innerText = "Ruta de Alfabetización Evidencial (RAE)";
+                document.getElementById('infoEntornoActivo').innerText = `Especialidad Musical: ${materia}`;
+                document.getElementById('thCotidiano').innerText = 'Evidencias RAE (65%)';
                 document.getElementById('thPrueba').innerText = 'Ejecución Práctica (30%)';
             }
 
-            // Renderizar datos del perfil arriba
-            document.getElementById('infoDocenteTipo').innerText = `Materia: ${docenteConfig.materia} | Tipo: ${docenteConfig.tipo} (${docenteConfig.grado})`;
-            document.getElementById('pesoCotidiano').innerText = `${docenteConfig.pesoCotidiano}%`;
-            document.getElementById('pesoPruebas').innerText = `${docenteConfig.pesoPruebas}%`;
-            document.getElementById('lblFiltro').innerText = docenteConfig.tipo === 'Académico' ? `Mostrando alumnos de ${docenteConfig.grado}` : `Mostrando alumnos con ${docenteConfig.materia} asignada`;
+            document.getElementById('pesoCotidiano').innerText = `${entornoActual.pesoCotidiano}%`;
+            document.getElementById('pesoPruebas').innerText = `${entornoActual.pesoPruebas}%`;
+            document.getElementById('lblFiltro').innerText = entornoActual.filtroGrado ? `Filtrando: Alumnos de ${entornoActual.filtroGrado}` : `Filtrando: Alumnos en ${entornoActual.materia}`;
 
-            cargarPlanillaEstudiantesReales();
+            cargarEstudiantesYPlanilla();
         }
 
-        // 2. Cargar los alumnos que te corresponden según tu materia/grado real
-        async function cargarPlanillaEstudiantesReales() {
+        async function cargarEstudiantesYPlanilla() {
             const tbody = document.getElementById('tabla-calificaciones-cuerpo');
+            tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Buscando expedientes en Supabase...</td></tr>`;
 
             let query = supabaseClient.from('estudiantes').select('*');
             
-            if (docenteConfig.tipo === 'Académico') {
-                query = query.eq('nivel_asignado', docenteConfig.grado);
+            if (entornoActual.tipo === 'Académico') {
+                query = query.eq('nivel_asignado', entornoActual.filtroGrado);
             }
 
-            const { data: estudiantes, error } = await query;
+            const { data: alumnos, error } = await query;
 
             if (error) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-red-500">Error al cargar alumnos: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
                 return;
             }
 
-            let alumnosFiltrados = estudiantes || [];
+            let alumnosFiltrados = alumnos || [];
             
-            // Si eres docente musical, te filtra en vivo los alumnos que lleven tu instrumento
-            if (docenteConfig.tipo === 'Especiales / Música') {
-                alumnosFiltrados = estudiantes.filter(a => 
-                    a.instrumento_principal === docenteConfig.materia ||
-                    a.instrumento_opcional_1 === docenteConfig.materia ||
-                    a.instrumento_opcional_2 === docenteConfig.materia
+            if (entornoActual.tipo === 'Especiales / Música') {
+                alumnosFiltrados = alumnos.filter(a => 
+                    a.instrumento_principal === entornoActual.materia ||
+                    a.instrumento_opcional_1 === entornoActual.materia ||
+                    a.instrumento_opcional_2 === entornoActual.materia
                 );
             }
 
             if (alumnosFiltrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No hay estudiantes asignados a tu materia o grado actualmente.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No se encontraron estudiantes matriculados en este nivel o materia.</td></tr>`;
                 return;
             }
 
-            // Descargar notas que ya hayas guardado antes para esta materia
+            // Descargar notas que pertenezcan a este entorno/materia
             const { data: notasExistentes } = await supabaseClient
                 .from('calificaciones')
                 .select('*')
-                .eq('materia_evaluada', docenteConfig.materia);
+                .eq('materia_evaluada', entornoActual.materia);
 
             tbody.innerHTML = '';
 
@@ -233,7 +253,7 @@
                         <input type="number" min="0" max="100" id="prue-${alumno.id}" value="${prueVal}" onchange="calcularNotaFila(${alumno.id})" class="w-20 border rounded px-2 py-1 text-xs font-semibold text-center outline-none focus:border-blue-400">
                     </td>
                     <td class="p-3 text-center font-bold text-slate-900">
-                        <span id="total-${alumnoId = alumno.id}">${parseFloat(totalVal).toFixed(1)}</span>
+                        <span id="total-${alumno.id}">${parseFloat(totalVal).toFixed(1)}</span>
                     </td>
                     <td class="p-3 text-right">
                         <button onclick="guardarCalificacionFila(${alumno.id}, '${alumno.cedula}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-1 px-3 rounded-lg transition shadow-sm">
@@ -250,9 +270,9 @@
             const coti = parseFloat(document.getElementById(`coti-${id}`).value) || 0;
             const prue = parseFloat(document.getElementById(`prue-${id}`).value) || 0;
 
-            const pAsis = (asis * docenteConfig.pesoAsistencia) / 100;
-            const pCoti = (coti * docenteConfig.pesoCotidiano) / 100;
-            const pPrue = (prue * docenteConfig.pesoPruebas) / 100;
+            const pAsis = (asis * entornoActual.pesoAsistencia) / 100;
+            const pCoti = (coti * entornoActual.pesoCotidiano) / 100;
+            const pPrue = (prue * entornoActual.pesoPruebas) / 100;
 
             const final = pAsis + pCoti + pPrue;
             document.getElementById(`total-${id}`).innerText = final.toFixed(1);
@@ -268,7 +288,7 @@
                 .from('calificaciones')
                 .select('id')
                 .eq('estudiante_id', alumnoId)
-                .eq('materia_evaluada', docenteConfig.materia);
+                .eq('materia_evaluada', entornoActual.materia);
 
             let resultado;
             
@@ -288,8 +308,8 @@
                     .insert([{
                         estudiante_id: alumnoId,
                         cedula_estudiante: cedula,
-                        materia_evaluada: docenteConfig.materia,
-                        docente_uid: docenteConfig.uid,
+                        materia_evaluada: entornoActual.materia,
+                        docente_uid: 'ADMIN_DIRECTOR',
                         nota_asistencia: asis,
                         nota_cotidiano: coti,
                         nota_pruebas: prue,
@@ -300,7 +320,7 @@
             if (resultado.error) {
                 alert("Error al guardar: " + resultado.error.message);
             } else {
-                alert("¡Calificación guardada con éxito!");
+                alert("¡Nota registrada con éxito!");
             }
         }
     </script>
