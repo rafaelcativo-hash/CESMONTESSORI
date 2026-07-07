@@ -47,8 +47,6 @@
             <p class="text-sm text-slate-500 mt-1">Registre el ingreso de personal docente y asigne sus correspondientes ambientes o materias especializadas.</p>
         </div>
 
-        <div id="consola-alerta" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 font-mono"></div>
-
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-fit">
                 <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
@@ -93,7 +91,7 @@
                     <table class="w-full text-sm text-left border-collapse">
                         <thead>
                             <tr class="border-b-2 border-slate-100 text-xs font-bold text-slate-400 uppercase">
-                                <th class="pb-3">Docente (Nombre o UID)</th>
+                                <th class="pb-3">Docente (UID o Nombre)</th>
                                 <th class="pb-3">Ambiente Asignado</th>
                                 <th class="pb-3">Especialidad</th>
                                 <th class="pb-3 text-right">Acciones</th>
@@ -121,14 +119,6 @@
             obtenerDocentesReal();
         });
 
-        function mostrarErrorEnPantalla(origen, errorObj) {
-            const msg = errorObj.message || JSON.stringify(errorObj);
-            const alerta = document.getElementById('consola-alerta');
-            alerta.innerText = `Error en [${origen}]: ${msg}`;
-            alerta.classList.remove('hidden');
-            alert(`Atención - Error en ${origen}:\n${msg}`);
-        }
-
         async function registrarDocenteReal() {
             const uid = document.getElementById('docenteUid').value.trim();
             const nivel = document.getElementById('docenteNivel').value;
@@ -139,114 +129,69 @@
                 return;
             }
 
-            try {
-                const { data, error } = await supabase
+            const { data, error } = await supabase
+                .from('docentes_niveles')
+                .insert([{ perfil_id: uid, nivel_asignado: nivel, materia_specifica: materia }]);
+
+            if (error) {
+                // Intentamos con la variante de nombre de columna por si acaso
+                const { error: error2 } = await supabase
                     .from('docentes_niveles')
-                    .insert([
-                        { 
-                            perfil_id: uid, 
-                            nivel_asignado: nivel, 
-                            materia_especifica: materia 
-                        }
-                    ]);
-
-                if (error) throw error;
-
-                alert("¡Docente registrado con éxito!");
-                document.getElementById('docenteUid').value = '';
-                await obtenerDocentesReal();
-
-            } catch (error) {
-                console.error(error);
-                mostrarErrorEnPantalla("Registrar Docente", error);
+                    .insert([{ perfil_id: uid, nivel_assigned: nivel, materia_especifica: materia }]);
+                
+                if (error2) {
+                    alert("Error de inserción en Supabase: " + error2.message);
+                    return;
+                }
             }
+
+            alert("¡Docente registrado con éxito!");
+            document.getElementById('docenteUid').value = '';
+            obtenerDocentesReal();
         }
 
         async function obtenerDocentesReal() {
             const tbody = document.getElementById('tabla-docentes-cuerpo');
-            tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">Cargando docentes...</td></tr>`;
+            
+            const { data: docentes, error } = await supabase
+                .from('docentes_niveles')
+                .select('*');
 
-            try {
-                const { data: docentes, error } = await supabase
-                    .from('docentes_niveles')
-                    .select('*');
-
-                if (error) throw error;
-
-                tbody.innerHTML = ''; 
-
-                if(!docentes || docentes.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">No hay docentes asignados en la base de datos.</td></tr>`;
-                    return;
-                }
-
-                docentes.forEach(docente => {
-                    const nivelMostrar = docente.nivel_asignado || 'No asignado';
-                    const filaId = `docente-fila-${docente.id}`;
-
-                    const nuevaFila = document.createElement('tr');
-                    nuevaFila.id = filaId;
-                    nuevaFila.innerHTML = `
-                        <td class="py-3 font-mono text-xs text-slate-500 segment-nombre">${docente.perfil_id}</td>
-                        <td class="py-3 text-slate-600">${nivelMostrar}</td>
-                        <td class="py-3"><span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-semibold">${docente.materia_especifica}</span></td>
-                        <td class="py-3 text-right">
-                            <button class="text-red-500 hover:text-red-700 text-xs font-bold" onclick="eliminarDocenteReal(${docente.id})">Remover</button>
-                        </td>
-                    `;
-                    tbody.appendChild(nuevaFila);
-
-                    completarNombreDocente(docente.perfil_id, filaId);
-                });
-
-            } catch (error) {
-                console.error(error);
-                mostrarErrorEnPantalla("Cargar Lista Docentes", error);
-                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-500">Error al conectar.</td></tr>`;
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+                return;
             }
-        }
 
-        async function completarNombreDocente(uid, filaId) {
-            try {
-                const { data: perfil, error } = await supabase
-                    .from('perfiles')
-                    .select('nombre_completo')
-                    .eq('id', uid)
-                    .single();
+            tbody.innerHTML = ''; 
 
-                if (error) {
-                    console.log("Aviso de perfil individual:", error.message);
-                    return;
-                }
-
-                if (perfil && perfil.nombre_completo) {
-                    const celda = document.querySelector(`#${filaId} .segment-nombre`);
-                    if(celda) {
-                        celda.innerText = perfil.nombre_completo;
-                        celda.classList.remove('font-mono', 'text-xs', 'text-slate-500');
-                        celda.classList.add('font-medium', 'text-slate-900');
-                    }
-                }
-            } catch (e) {
-                console.log("No se cruzó UID: " + uid);
+            if(!docentes || docentes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">No hay docentes asignados aún.</td></tr>`;
+                return;
             }
+
+            docentes.forEach(docente => {
+                const nivel = docente.nivel_asignado || docente.nivel_assigned || 'General';
+                const materia = docente.materia_especifica || docente.materia_specifica || 'General';
+                const uidCorto = docente.perfil_id;
+
+                const nuevaFila = document.createElement('tr');
+                nuevaFila.innerHTML = `
+                    <td class="py-3 font-mono text-xs text-slate-600">${uidCorto}</td>
+                    <td class="py-3 text-slate-600">${nivel}</td>
+                    <td class="py-3"><span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-semibold">${materia}</span></td>
+                    <td class="py-3 text-right">
+                        <button class="text-red-500 hover:text-red-700 text-xs font-bold" onclick="eliminarDocenteReal(${docente.id})">Remover</button>
+                    </td>
+                `;
+                tbody.appendChild(nuevaFila);
+            });
         }
 
         async function eliminarDocenteReal(id) {
-            if(!confirm("¿Está seguro de que desea remover esta asignación docente?")) return;
-
-            try {
-                const { error } = await supabase
-                    .from('docentes_niveles')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) throw error;
-
-                obtenerDocentesReal();
-            } catch (error) {
-                mostrarErrorEnPantalla("Eliminar Docente", error);
-            }
+            if(!confirm("¿Está seguro?")) return;
+            const { error } = await supabase.from('docentes_niveles').delete().eq('id', id);
+            if (error) alert(error.message);
+            obtenerDocentesReal();
         }
     </script>
 </body>
