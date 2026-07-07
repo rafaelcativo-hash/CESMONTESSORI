@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Montessori - Configuración y Seguridad</title>
+    <title>CES Montessori - Matrícula y Expedientes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
@@ -20,8 +20,11 @@
                 <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
                     <span>🏠</span> <span>Inicio</span>
                 </a>
-                <a href="expedientes.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <a href="expedientes.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-slate-800 text-white transition font-semibold">
                     <span>📋</span> <span>Expedientes</span>
+                </a>
+                <a href="docentes.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <span>👨‍🏫</span> <span>Docentes</span>
                 </a>
                 <a href="calificaciones.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
                     <span>📊</span> <span>Calificaciones</span>
@@ -30,257 +33,201 @@
         </div>
         
         <div>
-            <a href="configuracion.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-slate-800 text-white transition font-semibold border-t border-slate-800 pt-4">
+            <a href="configuracion.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition border-t border-slate-800 pt-4">
                 <span>⚙️</span> <span>Configuración</span>
             </a>
             <div class="mt-4 text-xs text-center text-slate-500 bg-slate-950 p-2 rounded">
-                Rol actual: <span id="rol-badge-lateral" class="font-bold text-blue-400">Administrador</span>
+                Rol actual: <span class="font-bold text-blue-400">Administrador</span>
             </div>
         </div>
     </div>
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="ml-64 p-10 w-full">
-        <!-- Toast de Notificaciones -->
-        <div id="custom-toast" class="fixed top-5 right-5 hidden z-50 bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl border-l-4 border-emerald-500 transition">
-            <div class="flex items-center space-x-3">
-                <span id="toast-icon">✅</span>
-                <p id="toast-message" class="text-sm font-semibold"></p>
-            </div>
+        <div class="border-b border-slate-200 pb-5 mb-8">
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Control de Matrícula y Expedientes</h1>
+            <p class="text-sm text-slate-500 mt-1">Gestione el ingreso de nuevos estudiantes, su ambiente académico y registro de conducta inicial.</p>
         </div>
 
-        <div class="border-b border-slate-200 pb-5 mb-8 flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Seguridad y Configuración</h1>
-                <p class="text-sm text-slate-500 mt-1">Control de accesos por roles, asignación de cobros instrumentales y reporte para padres</p>
-            </div>
-            
-            <!-- SIMULADOR DE ROLES (Para probar la seguridad en vivo) -->
-            <div class="bg-blue-50 border border-blue-200 p-3 rounded-xl flex items-center space-x-3">
-                <span class="text-xs font-bold text-blue-800 uppercase">Simular Usuario:</span>
-                <select id="select-simular-rol" onchange="cambiarRolSimulado(this.value)" class="bg-white border border-blue-300 rounded-lg px-2 py-1 text-xs font-bold text-slate-700 outline-none">
-                    <option value="Administrador">Administrador (Acceso Total)</option>
-                    <option value="Docente">Docente (Bloqueado)</option>
-                    <option value="Padre de Familia">Padre (Bloqueado)</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- CONTROL DE ACCESO DE SEGURIDAD -->
-        <div id="pantalla-bloqueo" class="hidden bg-white border border-red-100 rounded-2xl p-12 text-center max-w-2xl mx-auto my-12 shadow-sm">
-            <span class="text-5xl block mb-4">🔒</span>
-            <h2 class="text-2xl font-bold text-slate-900 mb-2">Acceso Denegado por Seguridad</h2>
-            <p class="text-slate-500 text-sm max-w-md mx-auto mb-6">El engranaje de configuración institucional es exclusivo del personal Administrativo. Los docentes y padres de familia no pueden modificar parámetros ni asignaciones.</p>
-            <span class="inline-block bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-xs font-bold">Consulte con el Administrador del CES Montessori</span>
-        </div>
-
-        <!-- CONFIGURACIONES ADMINISTRATIVAS (Solo visible para Admin) -->
-        <div id="seccion-configuracion" class="space-y-10">
-            
-            <!-- TARJETAS DE CONFIGURACIÓN -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                <!-- PARÁMETROS DEL PROGRAMA INSTRUMENTAL -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <span>🎼</span> Parámetros Instrumentales
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <span class="text-xs font-bold text-slate-500 block mb-1">Cupos e Instrumento Obligatorio</span>
-                            <p class="text-xs text-slate-500">Por defecto todos los alumnos llevan un instrumento del pensum principal. Las materias de Canto y Solfeo están incluidas de forma obligatoria para Casa de Niños.</p>
-                        </div>
-                        <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
-                            <span class="text-xs font-bold text-amber-800 block mb-1">Cobro por Instrumento Adicional</span>
-                            <p class="text-xs text-amber-700 font-medium">Los estudiantes pueden llevar hasta un máximo de 3 instrumentos en total. El 2° y 3° instrumento elegido aplican automáticamente como rubro de "Pago Aparte" en la matrícula.</p>
-                        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- FORMULARIO DE MATRÍCULA -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-fit">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <span>📝</span> Matricular Estudiante
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cédula / Identificación:</label>
+                        <input type="text" id="estudianteCedula" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Ej: 1-1234-5678">
                     </div>
-                </div>
-
-                <!-- GENERACIÓN Y ENVÍO DE REPORTES PDF PARA PADRES -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <span>📄</span> Envío de Boletas en PDF
-                    </h3>
-                    <p class="text-sm text-slate-500 mb-6">Genere y exporte el reporte de calificaciones de los dos periodos (acumulados al 100%) con firma institucional directa al correo electrónico de los padres.</p>
-                    
-                    <div class="space-y-3">
-                        <button onclick="simularGenerarPDF()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl transition text-sm flex items-center justify-center space-x-2">
-                            <span>👁️</span> <span>Generar y Previsualizar Reporte PDF</span>
-                        </button>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo:</label>
+                        <input type="text" id="estudianteNombre" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Nombre del estudiante">
                     </div>
-                </div>
-
-            </div>
-
-            <!-- PREVISUALIZACIÓN DE LA BOLETA PDF DE NOTAS -->
-            <div id="visor-pdf-boleta" class="hidden bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-700 max-w-4xl mx-auto">
-                <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-6">
-                    <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">Previsualización de Documento de Notas Oficial (Formato PDF)</span>
-                    <button onclick="simularEnviarCorreo()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center space-x-1">
-                        <span>✉️</span> <span>Enviar por Correo al Encargado</span>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Ambiente / Nivel Asignado:</label>
+                        <select id="estudianteNivel" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400 transition">
+                            <option value="Casa de Niños">Casa de Niños</option>
+                            <option value="Primer Ciclo (1°, 2°, 3°)">Primer Ciclo (1°, 2°, 3°)</option>
+                            <option value="Segundo Ciclo (4°, 5°, 6°)">Segundo Ciclo (4°, 5°, 6°)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Estado de Conducta Inicial:</label>
+                        <select id="estudianteConducta" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400 transition">
+                            <option value="A (Excelente)">A (Excelente)</option>
+                            <option value="B (Muy Buena)">B (Muy Buena)</option>
+                            <option value="C (Regular)">C (Regular)</option>
+                            <option value="D (Deficiente)">D (Deficiente)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre del Encargado:</label>
+                        <input type="text" id="estudianteEncargado" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Padre, madre o tutor">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Teléfono de Contacto:</label>
+                        <input type="text" id="estudianteTelefono" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Ej: 8888-8888">
+                    </div>
+                    <button type="button" onclick="matricularEstudianteReal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm mt-2">
+                        Completar Matrícula
                     </button>
                 </div>
-                
-                <!-- BOLETA DE NOTAS MONTESSORI (REPRESENTACIÓN PDF) -->
-                <div class="bg-white p-8 rounded shadow-2xl text-slate-900 max-w-2xl mx-auto" style="min-height: 500px;">
-                    <!-- Encabezado de la Boleta -->
-                    <div class="text-center border-b-2 border-slate-900 pb-4 mb-6">
-                        <h2 class="text-xl font-extrabold tracking-wide">CES MONTESSORI</h2>
-                        <p class="text-xs font-semibold text-slate-500">Expediente de Calificaciones del Periodo Anual</p>
-                    </div>
-                    
-                    <!-- Datos del Estudiante -->
-                    <div class="grid grid-cols-2 gap-4 text-xs mb-6 bg-slate-50 p-4 rounded border border-slate-200">
-                        <div>
-                            <p><strong>Estudiante:</strong> Estudiante de Prueba</p>
-                            <p><strong>Nivel:</strong> Taller I (Primer Ciclo)</p>
-                            <p><strong>Año:</strong> 3° Año (Tercero)</p>
-                        </div>
-                        <div>
-                            <p><strong>Padre/Tutor:</strong> Adriana Chaves (Encargada)</p>
-                            <p><strong>Correo asignado:</strong> adriana.chaves@correo.com</p>
-                            <p><strong>Docente de Nivel:</strong> María Elena Solano</p>
-                        </div>
-                    </div>
+            </div>
 
-                    <!-- Cuadro de Notas por Materia -->
-                    <table class="w-full text-xs text-left border-collapse mb-6">
+            <!-- TABLA DE EXPEDIENTES -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <span>📋</span> Estudiantes Registrados
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left border-collapse">
                         <thead>
-                            <tr class="border-b-2 border-slate-900">
-                                <th class="pb-2">Asignatura / Materia</th>
-                                <th class="pb-2 text-center">I Período (50%)</th>
-                                <th class="pb-2 text-center">II Período (50%)</th>
-                                <th class="pb-2 text-center">Nota Anual</th>
-                                <th class="pb-2 text-right">Resultado</th>
+                            <tr class="border-b-2 border-slate-100 text-xs font-bold text-slate-400 uppercase">
+                                <th class="pb-3">Cédula</th>
+                                <th class="pb-3">Estudiante</th>
+                                <th class="pb-3">Ambiente</th>
+                                <th class="pb-3">Conducta</th>
+                                <th class="pb-3">Encargado / Tel</th>
+                                <th class="pb-3 text-right">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-200">
+                        <tbody id="tabla-estudiantes-cuerpo" class="divide-y divide-slate-100 text-slate-700">
                             <tr>
-                                <td class="py-2 font-semibold">Materias Académicas</td>
-                                <td class="py-2 text-center">90.0</td>
-                                <td class="py-2 text-center">93.0</td>
-                                <td class="py-2 text-center font-bold">91.5</td>
-                                <td class="py-2 text-right text-emerald-600 font-bold">APROBADO</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 font-semibold">Danza Especializada</td>
-                                <td class="py-2 text-center">95.0</td>
-                                <td class="py-2 text-center">92.0</td>
-                                <td class="py-2 text-center font-bold">93.5</td>
-                                <td class="py-2 text-right text-emerald-600 font-bold">APROBADO</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 font-semibold">Instrumento: Guitarra (Obligatorio)</td>
-                                <td class="py-2 text-center">85.0</td>
-                                <td class="py-2 text-center">90.0</td>
-                                <td class="py-2 text-center font-bold">87.5</td>
-                                <td class="py-2 text-right text-emerald-600 font-bold">APROBADO</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 font-semibold text-amber-700">Instrumento: Piano (Pago Aparte $)</td>
-                                <td class="py-2 text-center">92.0</td>
-                                <td class="py-2 text-center">95.0</td>
-                                <td class="py-2 text-center font-bold">93.5</td>
-                                <td class="py-2 text-right text-emerald-600 font-bold">APROBADO</td>
+                                <td colspan="6" class="py-4 text-center text-slate-400">Cargando expedientes...</td>
                             </tr>
                         </tbody>
                     </table>
-
-                    <!-- Bitácora de Observaciones Cualitativas -->
-                    <div class="border-t-2 border-slate-900 pt-4 mb-6">
-                        <h4 class="text-xs font-bold mb-2 uppercase">Comentarios y Observaciones del Docente:</h4>
-                        <div class="space-y-2 text-[10px] text-slate-600">
-                            <p><strong>I Periodo:</strong> El estudiante demuestra excelente adaptabilidad y gran soltura en el dominio instrumental de la guitarra. Muestra gran respeto por el espacio de sus iguales.</p>
-                            <p><strong>II Periodo:</strong> Ha mantenido la excelencia académica y un alto nivel de autorregulación. Continúa con excelente rendimiento en las disciplinas artísticas.</p>
-                            <p><strong>Anual:</strong> ¡Felicidades! Excelente año escolar. Ha alcanzado con creces las competencias de Taller I.</p>
-                        </div>
-                    </div>
-
-                    <!-- Firmas de Reporte -->
-                    <div class="flex justify-between items-center text-center text-[10px] pt-8">
-                        <div>
-                            <p class="border-b border-slate-900 w-32 mx-auto"></p>
-                            <p class="mt-1">Firma Docente de Nivel</p>
-                        </div>
-                        <div>
-                            <p class="border-b border-slate-900 w-32 mx-auto"></p>
-                            <p class="mt-1">Sello Administrativo</p>
-                        </div>
-                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 
+    <!-- CONFIGURACIÓN Y LÓGICA DE SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Sistema de Notificaciones sin alertas
-        function lanzarNotificacion(mensaje, exito = true) {
-            const toast = document.getElementById('custom-toast');
-            const icon = document.getElementById('toast-icon');
-            const message = document.getElementById('toast-message');
+        const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-            icon.innerText = exito ? '✅' : '⚠️';
-            message.innerText = mensaje;
+        document.addEventListener('DOMContentLoaded', () => {
+            obtenerEstudiantesReal();
+        });
+
+        async function matricularEstudianteReal() {
+            const cedula = document.getElementById('estudianteCedula').value.trim();
+            const nombre = document.getElementById('estudianteNombre').value.trim();
+            const nivel = document.getElementById('estudianteNivel').value;
+            const conducta = document.getElementById('estudianteConducta').value;
+            const encargado = document.getElementById('estudianteEncargado').value.trim();
+            const telefono = document.getElementById('estudianteTelefono').value.trim();
+
+            if(!cedula || !nombre) {
+                alert("Por favor ingrese al menos la cédula y el nombre completo del estudiante.");
+                return;
+            }
+
+            const { data, error } = await supabaseClient
+                .from('estudiantes')
+                .insert([{ 
+                    cedula: cedula, 
+                    nombre_completo: nombre, 
+                    nivel_asignado: nivel,
+                    conducta: conducta,
+                    nombre_encargado: encargado, 
+                    telefono_contacto: telefono 
+                }]);
+
+            if (error) {
+                alert("Error al matricular: " + error.message);
+                return;
+            }
+
+            alert("¡Estudiante matriculado con éxito!");
             
-            if (exito) {
-                toast.classList.remove('border-red-500');
-                toast.classList.add('border-emerald-500');
-            } else {
-                toast.classList.remove('border-emerald-500');
-                toast.classList.add('border-red-500');
+            // Limpiar formulario
+            document.getElementById('estudianteCedula').value = '';
+            document.getElementById('estudianteNombre').value = '';
+            document.getElementById('estudianteEncargado').value = '';
+            document.getElementById('estudianteTelefono').value = '';
+            
+            obtenerEstudiantesReal();
+        }
+
+        async function obtenerEstudiantesReal() {
+            const tbody = document.getElementById('tabla-estudiantes-cuerpo');
+            
+            const { data: estudiantes, error } = await supabaseClient
+                .from('estudiantes')
+                .select('*')
+                .order('nombre_completo', { ascending: true });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+                return;
             }
 
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 4000);
-        }
+            tbody.innerHTML = ''; 
 
-        // Lógica de seguridad para verificar el rol activo
-        function cambiarRolSimulado(rol) {
-            localStorage.setItem('ces_usuario_rol', rol);
-            document.getElementById('rol-badge-lateral').innerText = rol;
-            aplicarSeguridadRol(rol);
-            lanzarNotificacion(`Rol de usuario cambiado a: ${rol}`);
-        }
-
-        function aplicarSeguridadRol(rol) {
-            const seccionConfig = document.getElementById('seccion-configuracion');
-            const pantallaBloqueo = document.getElementById('pantalla-bloqueo');
-
-            if (rol === 'Administrador') {
-                seccionConfig.classList.remove('hidden');
-                pantallaBloqueo.classList.add('hidden');
-            } else {
-                seccionConfig.classList.add('hidden');
-                pantallaBloqueo.classList.remove('hidden');
+            if(!estudiantes || estudiantes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-slate-400">No hay estudiantes matriculados aún.</td></tr>`;
+                return;
             }
+
+            estudiantes.forEach(estudiante => {
+                // Validación para registros viejos que no tengan el campo conducta aún
+                const notaConducta = estudiante.conducta || 'A (Excelente)';
+                
+                // Color dinámico según la nota de conducta
+                let colorBadge = "bg-green-50 text-green-700 font-semibold";
+                if(notaConducta.startsWith('C')) colorBadge = "bg-amber-50 text-amber-700 font-semibold";
+                if(notaConducta.startsWith('D')) colorBadge = "bg-red-50 text-red-700 font-semibold";
+
+                const nuevaFila = document.createElement('tr');
+                nuevaFila.innerHTML = `
+                    <td class="py-3 font-mono text-xs text-slate-600">${estudiante.cedula}</td>
+                    <td class="py-3 font-medium text-slate-900">${estudiante.nombre_completo}</td>
+                    <td class="py-3 text-slate-600 text-xs">${estudiante.nivel_asignado}</td>
+                    <td class="py-3"><span class="${colorBadge} px-2.5 py-1 rounded-full text-xs">${notaConducta}</span></td>
+                    <td class="py-3 text-xs text-slate-500">
+                        <div>${estudiante.nombre_encargado || '-'}</div>
+                        <div class="text-slate-400 font-mono">${estudiante.telefono_contacto || ''}</div>
+                    </td>
+                    <td class="py-3 text-right">
+                        <button class="text-red-500 hover:text-red-700 text-xs font-bold" onclick="eliminarEstudianteReal(${estudiante.id})">Desmatricular</button>
+                    </td>
+                `;
+                tbody.appendChild(nuevaFila);
+            });
         }
 
-        // Simular la exportación de reporte
-        function simularGenerarPDF() {
-            const visor = document.getElementById('visor-pdf-boleta');
-            visor.classList.remove('hidden');
-            lanzarNotificacion("Documento PDF generado y listo para previsualización.");
-            visor.scrollIntoView({ behavior: 'smooth' });
+        async function eliminarEstudianteReal(id) {
+            if(!confirm("¿Está seguro de eliminar el expediente de este estudiante?")) return;
+            const { error } = await supabaseClient.from('estudiantes').delete().eq('id', id);
+            if (error) alert(error.message);
+            obtenerEstudiantesReal();
         }
-
-        function simularEnviarCorreo() {
-            lanzarNotificacion("El reporte PDF de notas ha sido enviado de forma segura al correo del encargado.");
-            setTimeout(() => {
-                document.getElementById('visor-pdf-boleta').classList.add('hidden');
-            }, 1000);
-        }
-
-        // Carga inicial
-        window.onload = function() {
-            const rolGuardado = localStorage.getItem('ces_usuario_rol') || 'Administrador';
-            document.getElementById('select-simular-rol').value = rolGuardado;
-            document.getElementById('rol-badge-lateral').innerText = rolGuardado;
-            aplicarSeguridadRol(rolGuardado);
-        };
     </script>
 </body>
 </html>
