@@ -2,30 +2,28 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gestión Docente</title>
+    <title>Asignación Docente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-50 p-10">
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border">
-        <h2 class="text-2xl font-bold mb-6">Asignar Materia</h2>
-        <div class="space-y-4">
-            <input type="text" id="perfilId" placeholder="UID del Docente" class="w-full border p-2 rounded">
-            <select id="nivel" class="w-full border p-2 rounded">
-                <option value="Primero">Primero</option><option value="Segundo">Segundo</option>
-            </select>
-            <select id="materia" class="w-full border p-2 rounded">
-                <option value="Batería">Batería</option>
-                <option value="Canto">Canto</option>
-                <option value="Taller de Percusión">Taller de Percusión</option>
-            </select>
-            <button id="btnGuardar" onclick="guardarAsignacion()" class="w-full bg-blue-600 text-white py-3 rounded">Guardar</button>
-        </div>
+<body class="p-10">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow border">
+        <input type="text" id="perfilId" placeholder="UID del Docente" class="w-full border p-2 mb-2">
+        <select id="nivel" class="w-full border p-2 mb-2">
+            <option value="Primero">Primero</option>
+            <option value="Segundo">Segundo</option>
+        </select>
+        <select id="materia" class="w-full border p-2 mb-4">
+            <option value="Batería">Batería</option>
+            <option value="Canto">Canto</option>
+            <option value="Taller de Percusión">Taller de Percusión</option>
+        </select>
+        <button id="btnGuardar" onclick="guardarAsignacion()" class="w-full bg-blue-600 text-white py-2 rounded">Guardar</button>
     </div>
 
     <script>
         const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
-        
+
         async function guardarAsignacion() {
             const btn = document.getElementById('btnGuardar');
             btn.disabled = true;
