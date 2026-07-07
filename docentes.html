@@ -112,13 +112,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // REEMPLAZA ESTOS DATOS CON TUS CREDENCIALES REALES DE SUPABASE
-        const SUPABASE_URL = "TU_SUPABASE_URL_AQUÍ";
-        const SUPABASE_KEY = "TU_SUPABASE_KEY_AQUÍ";
+        // CREDENCIALES ASIGNADAS AUTOMÁTICAMENTE
+        const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
         
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Cargar los datos inmediatamente al abrir la pantalla
         document.addEventListener('DOMContentLoaded', () => {
             obtenerDocentesReal();
         });
@@ -154,8 +153,6 @@
 
                 alert("¡Docente registrado con éxito!");
                 document.getElementById('docenteUid').value = '';
-                
-                // Recargar solo la tabla, sin reiniciar la pantalla entera
                 await obtenerDocentesReal();
 
             } catch (error) {
@@ -191,7 +188,7 @@
                 }
 
                 docentes.forEach(docente => {
-                    const nombreMostrar = docente.perfiles ? docente.perfiles.nombre_completo : `Asignado (UID: ${docente.perfil_id.substring(0,8)}...)`;
+                    const nombreMostrar = docente.perfiles ? docente.perfiles.nombre_completo : `UID: ${docente.perfil_id.substring(0,8)}...`;
                     const nivelMostrar = docente.nivel_asignado || 'No asignado';
 
                     const nuevaFila = document.createElement('tr');
