@@ -1,8 +1,32 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calificaciones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 p-10">
+    <h1 class="text-3xl font-bold mb-6">Mis Materias Asignadas</h1>
+    <div id="gridCargas" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
 
-<script>
-    // SOLO UNA DECLARACIÓN: Si tienes otra línea que diga "const supabase =", bórrala.
-    const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
+    <script>
+        const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
 
-    // Resto de tu lógica...
-</script>
+        async function cargar() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { window.location.href = "index.html"; return; }
+
+            const { data } = await supabase.from('docentes_niveles').select('*').eq('perfil_id', user.id);
+            const grid = document.getElementById('gridCargas');
+            grid.innerHTML = data.map(d => `
+                <div class="bg-white p-6 rounded shadow border">
+                    <h3 class="font-bold text-xl">${d.materia_especifica}</h3>
+                    <p class="text-slate-500">${d.nivel_asignado}</p>
+                </div>
+            `).join('');
+        }
+        cargar();
+    </script>
+</body>
+</html>
