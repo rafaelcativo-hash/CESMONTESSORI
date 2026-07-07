@@ -110,8 +110,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co"; [cite: 1]
-        const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"; [cite: 1]
+        const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -129,7 +129,6 @@
                 return;
             }
 
-            // CORREGIDO: materia_specifica sin la "e" inicial para acoplarse a tu base de datos
             const { data, error } = await supabaseClient
                 .from('docentes_niveles')
                 .insert([{ perfil_id: uid, nivel_asignado: nivel, materia_specifica: materia }]);
@@ -165,7 +164,6 @@
 
             docentes.forEach(docente => {
                 const nivel = docente.nivel_asignado || 'General';
-                // CORREGIDO: Lectura del campo correcto de la base de datos
                 const materia = docente.materia_specifica || 'General';
                 const uidCorto = docente.perfil_id;
 
