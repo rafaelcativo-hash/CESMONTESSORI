@@ -11,19 +11,28 @@
         <h2 class="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
         <input type="email" id="email" class="w-full border p-2 mb-4 rounded" placeholder="Correo">
         <input type="password" id="pass" class="w-full border p-2 mb-6 rounded" placeholder="Contraseña">
-        <button onclick="login()" class="w-full bg-blue-600 text-white py-2 rounded">Entrar</button>
+        <button id="loginBtn" class="w-full bg-blue-600 text-white py-2 rounded">Entrar</button>
     </div>
 
     <script>
+        // Inicialización única
         const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
-        async function login() {
+
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            
             const { error } = await supabase.auth.signInWithPassword({
-                email: document.getElementById('email').value,
-                password: document.getElementById('pass').value
+                email: email,
+                password: pass
             });
-            if (error) alert(error.message);
-            else window.location.href = "calificaciones.html";
-        }
+
+            if (error) {
+                alert("Error: " + error.message);
+            } else {
+                window.location.href = "calificaciones.html";
+            }
+        });
     </script>
 </body>
 </html>
