@@ -13,11 +13,13 @@
         window.db = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
         async function cargar() {
             const { data } = await window.db.from('docentes_niveles').select('*');
-            document.getElementById('gridCargas').innerHTML = data.map(d => `
-                <div class="bg-white p-6 rounded shadow border">
-                    <h3 class="font-bold text-xl">${d.materia_especifica}</h3>
-                    <p class="text-slate-500">${d.nivel_asignado}</p>
-                </div>`).join('');
+            if(data) {
+                document.getElementById('gridCargas').innerHTML = data.map(d => `
+                    <div class="bg-white p-6 rounded shadow border">
+                        <h3 class="font-bold text-xl">${d.materia_especifica || 'Sin nombre'}</h3>
+                        <p class="text-slate-500">${d.nivel_asignado || 'Sin nivel'}</p>
+                    </div>`).join('');
+            }
         }
         cargar();
     </script>
