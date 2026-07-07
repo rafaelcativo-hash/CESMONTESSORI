@@ -15,24 +15,13 @@
     </div>
 
     <script>
-        // Esta es la única conexión en todo tu sitio
-        const db = supabase.createClient(
+        // CONFIGURACIÓN CENTRALIZADA
+        window.db = supabase.createClient(
             "https://vdfxdydbggeoflagznuq.supabase.co", 
             "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
         );
-
-        document.getElementById('loginBtn').addEventListener('click', async () => {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('pass').value;
-            
-            const { error } = await db.auth.signInWithPassword({ email, password: pass });
-
-            if (error) {
-                alert("Error: " + error.message);
-            } else {
-                window.location.href = "calificaciones.html";
-            }
-        });
     </script>
+    
+    <script src="logica.js"></script>
 </body>
 </html>
