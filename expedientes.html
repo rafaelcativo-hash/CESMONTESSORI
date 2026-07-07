@@ -57,16 +57,22 @@
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cédula / Identificación:</label>
                         <input type="text" id="estudianteCedula" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Ej: 1-1234-5678">
                     </div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="col-span-2">
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo:</label>
-                            <input type="text" id="estudianteNombre" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Nombre del estudiante">
-                        </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo:</label>
+                        <input type="text" id="estudianteNombre" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Nombre del estudiante">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">F. Nacimiento:</label>
-                            <input type="date" id="estudianteFechaNacimiento" class="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none focus:border-blue-400 transition">
+                            <input type="date" id="estudianteFechaNacimiento" onchange="autoCalcularEdad()" class="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none focus:border-blue-400 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Edad Manual/Confirmada:</label>
+                            <input type="number" id="estudianteEdad" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Años">
                         </div>
                     </div>
+
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Grado de Matrícula:</label>
                         <select id="estudianteNivel" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400 transition">
@@ -170,9 +176,10 @@
             obtenerEstudiantesReal();
         });
 
-        // Función auxiliar para calcular la edad exacta a partir de la fecha de nacimiento
-        function calcularEdadExacta(fechaNac) {
-            if(!fechaNac) return null;
+        // Función inteligente: si el usuario pone la fecha de nacimiento, le rellena la edad como sugerencia, pero se puede cambiar
+        function autoCalcularEdad() {
+            const fechaNac = document.getElementById('estudianteFechaNacimiento').value;
+            if(!fechaNac) return;
             const hoy = new Date();
             const cumple = new Date(fechaNac);
             let edad = hoy.getFullYear() - cumple.getFullYear();
@@ -180,13 +187,17 @@
             if (mes < 0 || (mes === 0 && hoy.getDate() < cumple.getDate())) {
                 edad--;
             }
-            return edad;
+            document.getElementById('estudianteEdad').value = edad;
         }
 
         async function matricularEstudianteReal() {
             const cedula = document.getElementById('estudianteCedula').value.trim();
             const nombre = document.getElementById('estudianteNombre').value.trim();
             const fechaNacimiento = document.getElementById('estudianteFechaNacimiento').value || null;
+            
+            // Recibe el número digitado o autocalculado en el formulario
+            const edad = document.getElementById('estudianteEdad').value ? parseInt(document.getElementById('estudianteEdad').value) : null;
+            
             const nivel = document.getElementById('estudianteNivel').value;
             const conducta = document.getElementById('estudianteConducta').value;
             const direccion = document.getElementById('estudianteDireccion').value.trim();
@@ -204,16 +215,13 @@
                 return;
             }
 
-            // Calculamos la edad numérica para guardarla también por retrocompatibilidad
-            const edadCalculada = fechaNacimiento ? calcularEdadExacta(fechaNacimiento) : null;
-
             const { data, error } = await supabaseClient
                 .from('estudiantes')
                 .insert([{ 
                     cedula: cedula, 
                     nombre_completo: nombre,
                     fecha_nacimiento: fechaNacimiento,
-                    edad: edadCalculada, 
+                    edad: edad, 
                     nivel_asignado: nivel,
                     conducta: conducta,
                     direccion: direccion,
@@ -236,6 +244,7 @@
             document.getElementById('estudianteCedula').value = '';
             document.getElementById('estudianteNombre').value = '';
             document.getElementById('estudianteFechaNacimiento').value = '';
+            document.getElementById('estudianteEdad').value = '';
             document.getElementById('estudianteDireccion').value = '';
             document.getElementById('estudianteEncargado').value = '';
             document.getElementById('estudianteTelefono').value = '';
@@ -271,17 +280,13 @@
                 const notaConducta = estudiante.conducta || 'A (Excelente)';
                 const direccionTexto = estudiante.direccion || 'Sin dirección';
                 
-                // Formatear visualmente la fecha y calcular la edad actual
+                // Formatear visualmente la fecha y la edad guardada
                 let fechaTexto = 'No indicada';
-                let edadCalculadaTexto = '';
                 if(estudiante.fecha_nacimiento) {
                     const partes = estudiante.fecha_nacimiento.split('-');
                     fechaTexto = `${partes[2]}/${partes[1]}/${partes[0]}`; // DD/MM/AAAA
-                    const edadAnos = calcularEdadExacta(estudiante.fecha_nacimiento);
-                    edadCalculadaTexto = ` (${edadAnos} años)`;
-                } else if (estudiante.edad) {
-                    edadCalculadaTexto = ` (${estudiante.edad} años)`;
                 }
+                const edadTexto = estudiante.edad ? `${estudiante.edad} años` : 'No indicada';
                 
                 let colorBadge = "bg-green-50 text-green-700 font-semibold";
                 if(notaConducta.startsWith('C')) colorBadge = "bg-amber-50 text-amber-700 font-semibold";
@@ -314,7 +319,7 @@
                     <td class="py-3 font-mono text-xs text-slate-600">${estudiante.cedula}</td>
                     <td class="py-3 font-medium text-slate-900">
                         <div>${estudiante.nombre_completo}</div>
-                        <div class="text-xs text-slate-400 font-normal">🎁 ${fechaTexto}${edadCalculadaTexto}</div>
+                        <div class="text-xs text-slate-400 font-normal">🎁 ${fechaTexto} | 👤 ${edadTexto}</div>
                     </td>
                     <td class="py-3 text-slate-600 text-xs font-semibold">${estudiante.nivel_asignado}</td>
                     <td class="py-3"><span class="${colorBadge} px-2.5 py-1 rounded-full text-xs">${notaConducta}</span></td>
