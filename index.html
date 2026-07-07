@@ -15,30 +15,27 @@
     </div>
 
     <script>
-        // CONEXIÓN ÚNICA: Solo una declaración en todo tu proyecto
-        const supabase = supabase.createClient(
-            "https://vdfxdydbggeoflagznuq.supabase.co", 
-            "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
-        );
+        // Declaración protegida: Si ya existe, no intentamos crearla de nuevo
+        if (typeof window.supabase === 'undefined') {
+            window.supabase = supabase.createClient(
+                "https://vdfxdydbggeoflagznuq.supabase.co", 
+                "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
+            );
+        }
 
-        // Usamos un EventListener en lugar de una función global 'login()'
         document.getElementById('loginBtn').addEventListener('click', async () => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
 
-            try {
-                const { error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: pass
-                });
+            const { error } = await window.supabase.auth.signInWithPassword({
+                email: email,
+                password: pass
+            });
 
-                if (error) {
-                    alert("Error: " + error.message);
-                } else {
-                    window.location.href = "calificaciones.html";
-                }
-            } catch (err) {
-                console.error("Error inesperado:", err);
+            if (error) {
+                alert("Error: " + error.message);
+            } else {
+                window.location.href = "calificaciones.html";
             }
         });
     </script>
