@@ -2,27 +2,25 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Acceso Docentes - CES Montessori</title>
+    <title>Login - CES Montessori</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 flex items-center justify-center h-screen">
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-96">
-        <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">Acceso Docente</h2>
-        <input type="email" id="email" placeholder="Correo electrónico" class="w-full border p-3 rounded-lg mb-4">
-        <input type="password" id="pass" placeholder="Contraseña" class="w-full border p-3 rounded-lg mb-6">
-        <button onclick="login()" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold">Ingresar</button>
+    <div class="bg-white p-8 rounded-2xl w-96">
+        <h2 class="text-xl font-bold mb-6 text-center">Acceso CES Montessori</h2>
+        <input type="email" id="email" class="w-full border p-2 mb-4 rounded" placeholder="Correo">
+        <input type="password" id="pass" class="w-full border p-2 mb-6 rounded" placeholder="Contraseña">
+        <button onclick="login()" class="w-full bg-blue-600 text-white py-2 rounded font-bold">Ingresar</button>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
-        
         async function login() {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('pass').value;
-            const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
-            if (error) alert(error.message);
-            else window.location.href = "calificaciones.html"; // Al entrar, los manda directo a sus calificaciones
+            const { error } = await supabase.auth.signInWithPassword({ 
+                email: document.getElementById('email').value, 
+                password: document.getElementById('pass').value 
+            });
+            if(error) alert(error.message); else window.location.href = "calificaciones.html";
         }
     </script>
 </body>
