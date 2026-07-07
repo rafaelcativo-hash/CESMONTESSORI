@@ -47,12 +47,14 @@
             <p class="text-sm text-slate-500 mt-1">Registre el ingreso de personal docente y asigne sus correspondientes ambientes o materias especializadas.</p>
         </div>
 
+        <div id="consola-alerta" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 font-mono"></div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-fit">
                 <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <span>📝</span> Registrar Nuevo Docente
                 </h3>
-                <form id="form-docente" class="space-y-4">
+                <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">UID de Auth (Supabase):</label>
                         <input type="text" id="docenteUid" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Pegar código UUID de perfiles">
@@ -80,7 +82,7 @@
                     <button type="button" onclick="registrarDocenteReal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm mt-2">
                         Registrar Personal Docente
                     </button>
-                </form>
+                </div>
             </div>
 
             <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -116,10 +118,17 @@
         
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Al cargar la pantalla, traer de inmediato la lista de docentes reales
-        document.addEventListener('DOMContentLoaded', obtenerDocentesReal);
+        // Cargar los datos inmediatamente al abrir la pantalla
+        document.addEventListener('DOMContentLoaded', () => {
+            obtenerDocentesReal();
+        });
 
-        // FUNCIÓN REAL: Guardar el docente en la base de datos de Supabase
+        function mostrarErrorEnPantalla(mensaje) {
+            const alerta = document.getElementById('consola-alerta');
+            alerta.innerText = "Detalle del Sistema: " + mensaje;
+            alerta.classList.remove('hidden');
+        }
+
         async function registrarDocenteReal() {
             const uid = document.getElementById('docenteUid').value.trim();
             const nivel = document.getElementById('docenteNivel').value;
@@ -143,19 +152,18 @@
 
                 if (error) throw error;
 
-                alert("¡Docente registrado con éxito en la base de datos!");
-                document.getElementById('form-docente').reset();
+                alert("¡Docente registrado con éxito!");
+                document.getElementById('docenteUid').value = '';
                 
-                // Recargar tabla para ver el nombre real recién insertado
-                obtenerDocentesReal();
+                // Recargar solo la tabla, sin reiniciar la pantalla entera
+                await obtenerDocentesReal();
 
             } catch (error) {
                 console.error("Error al registrar:", error);
-                alert("Hubo un error al guardar: " + error.message);
+                mostrarErrorEnPantalla(error.message || error);
             }
         }
 
-        // FUNCIÓN REAL: Leer los docentes y cruzar datos con la tabla 'perfiles' para traer el nombre
         async function obtenerDocentesReal() {
             const tbody = document.getElementById('tabla-docentes-cuerpo');
             tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">Cargando docentes...</td></tr>`;
@@ -178,13 +186,12 @@
                 tbody.innerHTML = ''; 
 
                 if(!docentes || docentes.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">No hay docentes registrados aún.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">No hay docentes asignados en la base de datos.</td></tr>`;
                     return;
                 }
 
                 docentes.forEach(docente => {
-                    // Si encuentra el perfil, pone el nombre; si no, recorta el UID como respaldo
-                    const nombreMostrar = docente.perfiles ? docente.perfiles.nombre_completo : `UID: ${docente.perfil_id.substring(0,8)}...`;
+                    const nombreMostrar = docente.perfiles ? docente.perfiles.nombre_completo : `Asignado (UID: ${docente.perfil_id.substring(0,8)}...)`;
                     const nivelMostrar = docente.nivel_asignado || 'No asignado';
 
                     const nuevaFila = document.createElement('tr');
@@ -201,11 +208,11 @@
 
             } catch (error) {
                 console.error("Error al obtener datos:", error);
-                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-500">Error al cargar nombres.</td></tr>`;
+                mostrarErrorEnPantalla(error.message || error);
+                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-500">Error al conectar. Ver recuadro superior.</td></tr>`;
             }
         }
 
-        // FUNCIÓN REAL: Eliminar una asignación docente de Supabase
         async function eliminarDocenteReal(id) {
             if(!confirm("¿Está seguro de que desea remover esta asignación docente?")) return;
 
@@ -217,10 +224,9 @@
 
                 if (error) throw error;
 
-                alert("Asignación removida correctamente.");
                 obtenerDocentesReal();
             } catch (error) {
-                alert("Error al eliminar: " + error.message);
+                mostrarErrorEnPantalla(error.message);
             }
         }
     </script>
