@@ -21,7 +21,7 @@
                     nombre_completo: document.getElementById('nombre').value,
                     cedula: document.getElementById('cedula').value
                 }]);
-                if (error) alert(error.message); else alert("Guardado");
+                if (error) alert("Error: " + error.message); else alert("Guardado correctamente");
             });
         });
     </script>
