@@ -129,12 +129,19 @@
                 return;
             }
 
+            // Enviamos una petición simple y capturamos explícitamente el detalle exacto del error 400
             const { data, error } = await supabaseClient
                 .from('docentes_niveles')
-                .insert([{ perfil_id: uid, nivel_asignado: nivel, materia_specifica: materia }]);
+                .insert([{ 
+                    perfil_id: uid, 
+                    nivel_asignado: nivel, 
+                    materia_specifica: materia 
+                }]);
 
             if (error) {
-                alert("Error al guardar en Supabase: " + error.message);
+                // Alerta informativa con los detalles exactos del servidor
+                alert("Detalles del Error 400:\n\nMensaje: " + error.message + "\nDetalle: " + error.details + "\nHint: " + error.hint);
+                console.error(error);
                 return;
             }
 
@@ -163,8 +170,8 @@
             }
 
             docentes.forEach(docente => {
-                const nivel = docente.nivel_asignado || 'General';
-                const materia = docente.materia_specifica || 'General';
+                const nivel = docente.nivel_asignado || docente.nivel_assigned || 'General';
+                const materia = docente.materia_specifica || docente.materia_especifica || 'General';
                 const uidCorto = docente.perfil_id;
 
                 const nuevaFila = document.createElement('tr');
@@ -189,4 +196,3 @@
     </script>
 </body>
 </html>
-
