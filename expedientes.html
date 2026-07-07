@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CES Montessori - Matrícula y Expedientes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
@@ -104,7 +104,7 @@
                     <input type="text" id="estudianteDireccion" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Ubicación y señas">
                 </div>
 
-                <!-- NUEVA SECCIÓN: CONTROL DE INSTRUMENTOS MUSICALES -->
+                <!-- SECCIÓN CORREGIDA: INSTRUMENTOS MUSICALES CON BATERÍA Y CANTO -->
                 <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 space-y-3">
                     <span class="text-xs font-bold text-blue-800 block uppercase tracking-wider">🎵 Especialidad e Instrumentos</span>
                     <div>
@@ -116,7 +116,8 @@
                             <option value="Flauta">Flauta</option>
                             <option value="Ukulele">Ukulele</option>
                             <option value="Bajo Eléctrico">Bajo Eléctrico</option>
-                            <option value="Taller de Percusión">Taller de Percusión</option>
+                            <option value="Batería">Batería</option>
+                            <option value="Canto">Canto</option>
                         </select>
                     </div>
                     <div>
@@ -128,7 +129,8 @@
                             <option value="Flauta">Flauta (Adicional)</option>
                             <option value="Ukulele">Ukulele (Adicional)</option>
                             <option value="Bajo Eléctrico">Bajo Eléctrico (Adicional)</option>
-                            <option value="Taller de Percusión">Taller de Percusión (Adicional)</option>
+                            <option value="Batería">Batería (Adicional)</option>
+                            <option value="Canto">Canto (Adicional)</option>
                         </select>
                     </div>
                     <div>
@@ -140,7 +142,8 @@
                             <option value="Flauta">Flauta (Adicional)</option>
                             <option value="Ukulele">Ukulele (Adicional)</option>
                             <option value="Bajo Eléctrico">Bajo Eléctrico (Adicional)</option>
-                            <option value="Taller de Percusión">Taller de Percusión (Adicional)</option>
+                            <option value="Batería">Batería (Adicional)</option>
+                            <option value="Canto">Canto (Adicional)</option>
                         </select>
                     </div>
                 </div>
@@ -176,7 +179,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase">Correo:</label>
-                            <input type="email" id="estudianteEmail2" class="w-full border border-slate-200 bg-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-blue-400 transition mt-1" placeholder="Email">
+                            <input type="email" id="emailEncargado2" class="w-full border border-slate-200 bg-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-blue-400 transition mt-1" placeholder="Email">
                         </div>
                     </div>
                 </div>
@@ -222,7 +225,6 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
-        // Variable para guardar la lista global de docentes y cruzarlos dinámicamente
         let listaDocentesGlobal = [];
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -230,7 +232,6 @@
             obtenerEstudiantesReal();
         });
 
-        // Carga en memoria los docentes registrados en la otra tabla
         async function cargarDocentesGlobal() {
             const { data, error } = await supabaseClient.from('docentes_niveles').select('*');
             if (!error && data) {
@@ -238,7 +239,6 @@
             }
         }
 
-        // Busca qué docente (UID corto) da cierta materia específica
         function buscarDocenteDeMateria(materia) {
             if(!materia || materia === 'Ninguno' || materia === 'General') return 'No asignado';
             const encontrado = listaDocentesGlobal.find(d => d.materia_specifica === materia || d.materia_especifica === materia);
@@ -267,7 +267,6 @@
             const conducta = document.getElementById('estudianteConducta').value;
             const direccion = document.getElementById('estudianteDireccion').value.trim();
             
-            // Nuevos campos de instrumentos
             const instPrincipal = document.getElementById('instPrincipal').value;
             const instOpcional1 = document.getElementById('instOpcional1').value;
             const instOpcional2 = document.getElementById('instOpcional2').value;
@@ -278,7 +277,7 @@
             
             const encargado2 = document.getElementById('estudianteEncargado2').value.trim();
             const telefono2 = document.getElementById('estudianteTelefono2').value.trim();
-            const email2 = document.getElementById('estudianteEmail2').value.trim();
+            const email2 = document.getElementById('emailEncargado2').value.trim();
 
             if(!cedula || !nombre) {
                 alert("Por favor ingrese al menos la cédula y el nombre completo del estudiante.");
@@ -327,7 +326,7 @@
             document.getElementById('estudianteEmail').value = '';
             document.getElementById('estudianteEncargado2').value = '';
             document.getElementById('estudianteTelefono2').value = '';
-            document.getElementById('estudianteEmail2').value = '';
+            document.getElementById('emailEncargado2').value = '';
             
             obtenerEstudiantesReal();
         }
@@ -367,7 +366,6 @@
                 if(notaConducta.startsWith('C')) colorBadge = "bg-amber-50 text-amber-700 font-semibold";
                 if(notaConducta.startsWith('D')) colorBadge = "bg-red-50 text-red-700 font-semibold";
 
-                // INTERFAZ: Ligar y mostrar instrumentos y docentes a cargo
                 const instP = estudiante.instrumento_principal || 'Ninguno';
                 const docP = buscarDocenteDeMateria(instP);
                 
@@ -384,12 +382,20 @@
                 }
                 programaMusicalHtml += `</div>`;
 
-                let infoEncargadosHtml = `<div class="space-y-1">`;
+                let infoEncargadosHtml = `<div class="space-y-1.5">`;
                 if (estudiante.nombre_encargado) {
-                    infoEncargadosHtml += `<div class="text-slate-700 text-[11px] font-medium">#1: ${estudiante.nombre_encargado} <span class="text-slate-400 font-mono">(${estudiante.telefono_contacto || ''})</span></div>`;
+                    infoEncargadosHtml += `
+                        <div class="text-slate-700 text-xs">
+                            <span class="text-slate-400 font-bold">#1:</span> <span class="font-medium">${estudiante.nombre_encargado}</span>
+                            <div class="pl-5 text-[11px] text-slate-500 font-mono">📞 ${estudiante.telefono_contacto || 'Sin cel'} | ✉️ ${estudiante.email_encargado || 'Sin correo'}</div>
+                        </div>`;
                 }
                 if (estudiante.nombre_encargado_2) {
-                    infoEncargadosHtml += `<div class="text-slate-700 text-[11px] font-medium">#2: ${estudiante.nombre_encargado_2} <span class="text-slate-400 font-mono">(${estudiante.telefono_contacto_2 || ''})</span></div>`;
+                    infoEncargadosHtml += `
+                        <div class="text-slate-700 text-xs mt-1">
+                            <span class="text-slate-400 font-bold">#2:</span> <span class="font-medium">${estudiante.nombre_encargado_2}</span>
+                            <div class="pl-5 text-[11px] text-slate-500 font-mono">📞 ${estudiante.telefono_contacto_2 || 'Sin cel'} | ✉️ ${estudiante.email_encargado_2 || 'Sin correo'}</div>
+                        </div>`;
                 }
                 infoEncargadosHtml += `</div>`;
 
