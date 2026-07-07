@@ -1,43 +1,102 @@
-<!-- Agrega este script dentro de tu archivo calificaciones.html -->
-<script>
-    // Esta función vincula al docente con sus grupos automáticamente
-    async function obtenerCargaDocenteExclusiva() {
-        const grid = document.getElementById('gridCargasDocente');
-        
-        // 1. Identificar quién está entrando
-        const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CES Montessori - Calificaciones Seguras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 flex min-h-screen">
+    <!-- BARRA LATERAL -->
+    <div class="w-64 bg-slate-900 text-white p-6 fixed h-screen">
+        <h2 class="text-xl font-bold mb-8 text-blue-400">CES MONTESSORI</h2>
+        <nav class="space-y-2">
+            <a href="dashboard.html" class="block py-2 text-slate-300">🏠 Inicio</a>
+            <a href="expedientes.html" class="block py-2 text-slate-300">📋 Expedientes</a>
+            <a href="calificaciones.html" class="block py-2 text-white font-bold">📊 Calificaciones</a>
+        </nav>
+    </div>
 
-        if (authError || !user) {
-            window.location.href = "index.html"; // Si no hay sesión, regresa al login
-            return;
+    <!-- CONTENIDO -->
+    <div class="ml-64 p-10 w-full">
+        <div id="vistaEntrada" class="space-y-6">
+            <h1 class="text-3xl font-bold">Mis Cargas Académicas</h1>
+            <div id="gridCargasDocente" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <p class="text-slate-400">Cargando tus grupos asignados...</p>
+            </div>
+        </div>
+
+        <div id="vistaPlanilla" class="hidden space-y-6">
+            <button onclick="regresarAlMenu()" class="bg-slate-200 px-4 py-2 rounded-lg font-bold text-sm">⬅️ Volver</button>
+            <h2 id="lblTituloPlanilla" class="text-2xl font-bold">--</h2>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border overflow-x-auto">
+                <table class="w-full text-xs">
+                    <thead><tr id="filaCabeceraTabla" class="border-b uppercase text-slate-400"></tr></thead>
+                    <tbody id="cuerpoTablaCalificaciones"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
+        let usuarioLogueadoId = null, entornoActivo = null;
+
+        document.addEventListener('DOMContentLoaded', obtenerCargaDocente);
+
+        async function obtenerCargaDocente() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { window.location.href = "index.html"; return; }
+            usuarioLogueadoId = user.id;
+
+            const { data: cargas } = await supabase.from('docentes_niveles').select('*').eq('perfil_id', user.id);
+            const grid = document.getElementById('gridCargasDocente');
+            grid.innerHTML = '';
+            cargas.forEach(c => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-6 rounded-xl border shadow-sm cursor-pointer hover:border-blue-500";
+                div.innerHTML = `<h4 class="font-bold text-lg">${c.materia_especifica}</h4><p class="text-sm">Nivel: ${c.nivel_asignado}</p>`;
+                div.onclick = () => abrirPlanilla(c.materia_especifica, c.nivel_asignado);
+                grid.appendChild(div);
+            });
         }
 
-        // 2. Consultar la tabla de docentes_niveles para traer su carga actual
-        // Al usar el ID del usuario logueado, la vinculación se actualiza sola al cambiar datos en la tabla
-        const { data: cargas, error: dbError } = await supabaseClient
-            .from('docentes_niveles')
-            .select('*')
-            .eq('perfil_id', user.id); // Vínculo directo por ID de usuario
-
-        if (dbError || !cargas || cargas.length === 0) {
-            grid.innerHTML = `<div class="col-span-full text-center p-4 text-red-500">No tienes grupos asignados. Contacta al administrador.</div>`;
-            return;
+        function abrirPlanilla(mat, niv) {
+            document.getElementById('vistaEntrada').classList.add('hidden');
+            document.getElementById('vistaPlanilla').classList.remove('hidden');
+            entornoActivo = { mat, niv };
+            document.getElementById('lblTituloPlanilla').innerText = `${mat} (${niv})`;
+            armarCabecera(mat);
+            cargarAlumnos(mat, niv);
         }
 
-        grid.innerHTML = '';
+        function armarCabecera(mat) {
+            let cols = '<th class="p-3">Estudiante</th>';
+            if(mat === 'Danza') cols += '<th class="p-3">Puntualidad(10%)</th><th class="p-3">Coreografía(20%)</th><th class="p-3">Prep.Previa(10%)</th><th class="p-3">Participación(20%)</th><th class="p-3">Concentración(10%)</th><th class="p-3">Aportes(20%)</th><th class="p-3">Asistencia(10%)</th>';
+            else if(mat === 'Conducta') cols += '<th class="p-3">Asertividad(20%)</th><th class="p-3">Cooperación(5%)</th><th class="p-3">Pres.Personal(5%)</th><th class="p-3">Esp.Físico(20%)</th><th class="p-3">Esp.Verbal(20%)</th><th class="p-3">NoVerbal(10%)</th><th class="p-3">Esp.Psicológico(20%)</th>';
+            else if(['Español','Matemáticas','Ciencias','Estudios Sociales','Inglés'].includes(mat)) cols += '<th class="p-3">Cotidiano(50%)</th><th class="p-3">Pruebas(30%)</th><th class="p-3">Extraclase(10%)</th><th class="p-3">Asistencia(10%)</th>';
+            else cols += '<th class="p-3">Cotidiano(60%)</th><th class="p-3">Asistencia(10%)</th><th class="p-3">Autorregulación(10%)</th><th class="p-3">Instrumento(20%)</th>';
+            document.getElementById('filaCabeceraTabla').innerHTML = cols + '<th class="p-3">Nota Final</th><th class="p-3">Comentario</th><th class="p-3">Acción</th>';
+        }
 
-        // 3. Generar las tarjetas de acceso automáticamente
-        cargas.forEach(carga => {
-            const card = document.createElement('div');
-            card.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-blue-500 transition cursor-pointer";
-            card.onclick = () => abrirPlanillaSegura(carga.materia_especifica, carga.nivel_asignado);
-            
-            card.innerHTML = `
-                <h4 class="text-lg font-bold text-slate-900">${carga.materia_especifica}</h4>
-                <p class="text-xs text-slate-500">Nivel: ${carga.nivel_asignado}</p>
-                <div class="mt-4 text-blue-600 text-xs font-bold">Acceder al registro ➔</div>
-            `;
-            grid.appendChild(card);
-        });
-    }
-</script>
+        async function cargarAlumnos(mat, niv) {
+            const { data: est } = await supabase.from('estudiantes').select('*').eq('nivel_asignado', niv);
+            const tbody = document.getElementById('cuerpoTablaCalificaciones');
+            tbody.innerHTML = '';
+            est.forEach(al => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="p-3">${al.nombre_completo}</td>
+                <td colspan="7" class="p-3 text-center">...inputs...</td>
+                <td class="p-3"><textarea id="com-${al.id}" class="border rounded p-1 text-xs"></textarea></td>
+                <td class="p-3"><button onclick="guardar(${al.id},'${al.cedula}')" class="bg-blue-600 text-white px-2 py-1 rounded">Guardar</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function regresarAlMenu() {
+            document.getElementById('vistaPlanilla').classList.add('hidden');
+            document.getElementById('vistaEntrada').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
