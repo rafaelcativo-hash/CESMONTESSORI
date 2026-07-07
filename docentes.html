@@ -1,21 +1,78 @@
-async function guardarAsignacion() {
-    const btn = event.target;
-    btn.disabled = true; // Deshabilita el botón para evitar doble clic mientras procesa
-    btn.innerText = "Procesando...";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión Docente - CES Montessori</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 p-10">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border">
+        <h2 class="text-2xl font-bold mb-6">Asignar Materia a Docente</h2>
+        
+        <div class="space-y-4">
+            <input type="text" id="perfilId" placeholder="UID del Docente (de Auth)" class="w-full border p-2 rounded">
+            
+            <select id="nivel" class="w-full border p-2 rounded">
+                <option value="Primero">Primero</option>
+                <option value="Segundo">Segundo</option>
+                <option value="Tercero">Tercero</option>
+                <option value="Cuarto">Cuarto</option>
+                <option value="Quinto">Quinto</option>
+                <option value="Sexto">Sexto</option>
+            </select>
+            
+            <select id="materia" class="w-full border p-2 rounded">
+                <optgroup label="Materias Académicas">
+                    <option value="Español">Español</option>
+                    <option value="Matemáticas">Matemáticas</option>
+                    <option value="Ciencias">Ciencias</option>
+                    <option value="Estudios Sociales">Estudios Sociales</option>
+                    <option value="Inglés">Inglés</option>
+                    <option value="Conducta">Conducta</option>
+                </optgroup>
+                <optgroup label="Materias Artísticas">
+                    <option value="Guitarra">Guitarra</option>
+                    <option value="Piano">Piano</option>
+                    <option value="Flauta">Flauta</option>
+                    <option value="Ukulele">Ukulele</option>
+                    <option value="Bajo Eléctrico">Bajo Eléctrico</option>
+                    <option value="Batería">Batería</option>
+                    <option value="Taller de Percusión">Taller de Percusión</option>
+                    <option value="Canto">Canto</option>
+                    <option value="Danza">Danza</option>
+                    <option value="Artes Plásticas">Artes Plásticas</option>
+                </optgroup>
+            </select>
+            
+            <button onclick="guardarAsignacion()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Guardar Asignación</button>
+            <a href="calificaciones.html" class="block text-center text-sm text-slate-500 underline mt-4">Ir a Calificaciones</a>
+        </div>
+    </div>
 
-    const { error } = await supabase.from('docentes_niveles').insert([{
-        perfil_id: document.getElementById('perfilId').value,
-        nivel_asignado: document.getElementById('nivel').value,
-        materia_especifica: document.getElementById('materia').value
-    }]);
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
+        
+        async function guardarAsignacion() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerText = "Procesando...";
 
-    if(error) {
-        alert("Error: " + error.message);
-        btn.disabled = false;
-        btn.innerText = "Guardar Asignación";
-    } else {
-        alert("Asignado correctamente");
-        // Forzar navegación limpia al registro después de guardar
-        window.location.href = "calificaciones.html"; 
-    }
-}
+            const { error } = await supabase.from('docentes_niveles').insert([{
+                perfil_id: document.getElementById('perfilId').value,
+                nivel_asignado: document.getElementById('nivel').value,
+                materia_especifica: document.getElementById('materia').value
+            }]);
+
+            if (error) {
+                alert("Error: " + error.message);
+                btn.disabled = false;
+                btn.innerText = "Guardar Asignación";
+            } else {
+                alert("Asignado correctamente");
+                window.location.href = "calificaciones.html";
+            }
+        }
+    </script>
+</body>
+</html>
