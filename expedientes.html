@@ -46,7 +46,7 @@
     <div class="ml-64 p-10 w-full">
         <div class="border-b border-slate-200 pb-5 mb-8">
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Control de Matrícula y Expedientes</h1>
-            <p class="text-sm text-slate-500 mt-1">Gestione el ingreso de nuevos estudiantes, su ambiente académico y registro de conducta inicial.</p>
+            <p class="text-sm text-slate-500 mt-1">Gestione el ingreso de nuevos estudiantes, su información personal, de contacto y académica.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -60,16 +60,26 @@
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cédula / Identificación:</label>
                         <input type="text" id="estudianteCedula" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Ej: 1-1234-5678">
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo:</label>
-                        <input type="text" id="estudianteNombre" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Nombre del estudiante">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo:</label>
+                            <input type="text" id="estudianteNombre" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Nombre del estudiante">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Edad:</label>
+                            <input type="number" id="estudianteEdad" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Años">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Ambiente / Nivel Asignado:</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Ambiente / Grado Asignado:</label>
                         <select id="estudianteNivel" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400 transition">
                             <option value="Casa de Niños">Casa de Niños</option>
-                            <option value="Primer Ciclo (1°, 2°, 3°)">Primer Ciclo (1°, 2°, 3°)</option>
-                            <option value="Segundo Ciclo (4°, 5°, 6°)">Segundo Ciclo (4°, 5°, 6°)</option>
+                            <option value="Primero">Primero (1°)</option>
+                            <option value="Segundo">Segundo (2°)</option>
+                            <option value="Tercero">Tercero (3°)</option>
+                            <option value="Cuarto">Cuarto (4°)</option>
+                            <option value="Quinto">Quinto (5°)</option>
+                            <option value="Sexto">Sexto (6°)</option>
                         </select>
                     </div>
                     <div>
@@ -80,6 +90,10 @@
                             <option value="C (Regular)">C (Regular)</option>
                             <option value="D (Deficiente)">D (Deficiente)</option>
                         </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Dirección de Residencia:</label>
+                        <input type="text" id="estudianteDireccion" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Provincia, cantón, distrito y señas">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre del Encargado:</label>
@@ -106,9 +120,9 @@
                             <tr class="border-b-2 border-slate-100 text-xs font-bold text-slate-400 uppercase">
                                 <th class="pb-3">Cédula</th>
                                 <th class="pb-3">Estudiante</th>
-                                <th class="pb-3">Ambiente</th>
+                                <th class="pb-3">Grado</th>
                                 <th class="pb-3">Conducta</th>
-                                <th class="pb-3">Encargado / Tel</th>
+                                <th class="pb-3">Detalles / Ubicación</th>
                                 <th class="pb-3 text-right">Acciones</th>
                             </tr>
                         </thead>
@@ -138,8 +152,10 @@
         async function matricularEstudianteReal() {
             const cedula = document.getElementById('estudianteCedula').value.trim();
             const nombre = document.getElementById('estudianteNombre').value.trim();
+            const edad = document.getElementById('estudianteEdad').value ? parseInt(document.getElementById('estudianteEdad').value) : null;
             const nivel = document.getElementById('estudianteNivel').value;
             const conducta = document.getElementById('estudianteConducta').value;
+            const direccion = document.getElementById('estudianteDireccion').value.trim();
             const encargado = document.getElementById('estudianteEncargado').value.trim();
             const telefono = document.getElementById('estudianteTelefono').value.trim();
 
@@ -152,9 +168,11 @@
                 .from('estudiantes')
                 .insert([{ 
                     cedula: cedula, 
-                    nombre_completo: nombre, 
+                    nombre_completo: nombre,
+                    edad: edad, 
                     nivel_asignado: nivel,
                     conducta: conducta,
+                    direccion: direccion,
                     nombre_encargado: encargado, 
                     telefono_contacto: telefono 
                 }]);
@@ -169,6 +187,8 @@
             // Limpiar formulario
             document.getElementById('estudianteCedula').value = '';
             document.getElementById('estudianteNombre').value = '';
+            document.getElementById('estudianteEdad').value = '';
+            document.getElementById('estudianteDireccion').value = '';
             document.getElementById('estudianteEncargado').value = '';
             document.getElementById('estudianteTelefono').value = '';
             
@@ -196,10 +216,10 @@
             }
 
             estudiantes.forEach(estudiante => {
-                // Validación para registros viejos que no tengan el campo conducta aún
                 const notaConducta = estudiante.conducta || 'A (Excelente)';
+                const edadTexto = estudiante.edad ? `${estudiante.edad} años` : 'No indicada';
+                const direccionTexto = estudiante.direccion || 'Sin dirección';
                 
-                // Color dinámico según la nota de conducta
                 let colorBadge = "bg-green-50 text-green-700 font-semibold";
                 if(notaConducta.startsWith('C')) colorBadge = "bg-amber-50 text-amber-700 font-semibold";
                 if(notaConducta.startsWith('D')) colorBadge = "bg-red-50 text-red-700 font-semibold";
@@ -207,12 +227,15 @@
                 const nuevaFila = document.createElement('tr');
                 nuevaFila.innerHTML = `
                     <td class="py-3 font-mono text-xs text-slate-600">${estudiante.cedula}</td>
-                    <td class="py-3 font-medium text-slate-900">${estudiante.nombre_completo}</td>
-                    <td class="py-3 text-slate-600 text-xs">${estudiante.nivel_asignado}</td>
+                    <td class="py-3 font-medium text-slate-900">
+                        <div>${estudiante.nombre_completo}</div>
+                        <div class="text-xs text-slate-400 font-normal">${edadTexto}</div>
+                    </td>
+                    <td class="py-3 text-slate-600 text-xs font-semibold">${estudiante.nivel_asignado}</td>
                     <td class="py-3"><span class="${colorBadge} px-2.5 py-1 rounded-full text-xs">${notaConducta}</span></td>
                     <td class="py-3 text-xs text-slate-500">
-                        <div>${estudiante.nombre_encargado || '-'}</div>
-                        <div class="text-slate-400 font-mono">${estudiante.telefono_contacto || ''}</div>
+                        <div class="font-medium text-slate-700">Enc: ${estudiante.nombre_encargado || '-'} (${estudiante.telefono_contacto || ''})</div>
+                        <div class="text-slate-400 italic truncate max-w-[200px]" title="${direccionTexto}">${direccionTexto}</div>
                     </td>
                     <td class="py-3 text-right">
                         <button class="text-red-500 hover:text-red-700 text-xs font-bold" onclick="eliminarEstudianteReal(${estudiante.id})">Desmatricular</button>
