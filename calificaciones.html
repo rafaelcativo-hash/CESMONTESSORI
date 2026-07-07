@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Montessori - Registro de Calificaciones</title>
+    <title>CES Montessori - Control de Calificaciones</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -33,106 +33,118 @@
         </div>
         <div>
             <div class="text-xs text-center text-slate-500 bg-slate-950 p-2 rounded">
-                Estructura: <span class="font-bold text-blue-400">Pauta RAE</span>
+                Estructura: <span class="font-bold text-blue-400">CES Evaluaciones</span>
             </div>
         </div>
     </div>
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="ml-64 p-10 w-full">
-        <div class="border-b border-slate-200 pb-5 mb-8">
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Registro de Notas y Evidencias</h1>
-            <p class="text-sm text-slate-500 mt-1">Seleccione el entorno académico o artístico para desplegar la lista de estudiantes correspondientes.</p>
-        </div>
+        
+        <!-- VISTA 1: INTERFAZ DE ENTRADA POR SECCIONES (ACADÉMICAS VS ESPECIALES) -->
+        <div id="vistaEntrada" class="space-y-8">
+            <div class="border-b border-slate-200 pb-5">
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Registro de Calificaciones</h1>
+                <p class="text-sm text-slate-500 mt-1">Seleccione el área académica o especialidad artística correspondiente.</p>
+            </div>
 
-        <!-- SELECTORES DE ENTORNO REORGANIZADOS -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <!-- Selector para Académicos -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">📚 1. Materias Académicas por Grado</label>
-                <div class="flex gap-2">
-                    <select id="selGradoAcademico" class="w-1/2 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400 bg-white">
-                        <option value="Primero">Primero (1° Año)</option>
-                        <option value="Segundo">Segundo (2° Año)</option>
-                        <option value="Tercero">Tercero (3° Año)</option>
-                        <option value="Cuarto">Cuarto (4° Año)</option>
-                        <option value="Quinto">Quinto (5° Año)</option>
-                        <option value="Sexto">Sexto (6° Año)</option>
-                    </select>
-                    <select id="selMateriaAcademica" class="w-1/2 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400 bg-white">
-                        <option value="Español">Español</option>
-                        <option value="Matemáticas">Matemáticas</option>
-                        <option value="Ciencias">Ciencias</option>
-                        <option value="Estudios Sociales">Estudios Sociales</option>
-                        <option value="Inglés">Inglés</option>
-                    </select>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- BLOQUE ACADÉMICAS -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2 border-b pb-3 text-blue-600">
+                        <span>📚</span> Materias Académicas
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Ciclo / Grado:</label>
+                            <select id="academicoGrado" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400">
+                                <optgroup label="Primer Ciclo">
+                                    <option value="Primero">Primero (1°)</option>
+                                    <option value="Segundo">Segundo (2°)</option>
+                                    <option value="Tercero">Tercero (3°)</option>
+                                </optgroup>
+                                <optgroup label="Segundo Ciclo">
+                                    <option value="Cuarto">Cuarto (4°)</option>
+                                    <option value="Quinto">Quinto (5°)</option>
+                                    <option value="Sexto">Sexto (6°)</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Asignatura:</label>
+                            <select id="academicoMateria" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400">
+                                <option value="Español">Español</option>
+                                <option value="Matemáticas">Matemáticas</option>
+                                <option value="Ciencias">Ciencias</option>
+                                <option value="Estudios Sociales">Estudios Sociales</option>
+                                <option value="Inglés">Inglés</option>
+                                <option value="Conducta">Conducta Institucional</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="ingresarRegistro('Academico')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm shadow-sm mt-2">
+                        Ingresar al Registro Académico
+                    </button>
                 </div>
-                <button onclick="activarEntorno('Academico')" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
-                    Evaluar Materia Académica
-                </button>
-            </div>
 
-            <!-- Selector para Especiales -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">🎵 2. Especialidades Musicales y Talleres</label>
-                <select id="selMateriaEspecial" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400 bg-white mb-3">
-                    <option value="Guitarra">Guitarra</option>
-                    <option value="Piano">Piano</option>
-                    <option value="Flauta">Flauta</option>
-                    <option value="Ukulele">Ukulele</option>
-                    <option value="Bajo Eléctrico">Bajo Eléctrico</option>
-                    <option value="Batería">Batería</option>
-                    <option value="Canto">Canto</option>
-                </select>
-                <button onclick="activarEntorno('Especial')" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
-                    Evaluar Especialidad Musical
-                </button>
+                <!-- BLOQUE MATERIAS ESPECIALES -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2 border-b pb-3 text-purple-600">
+                        <span>🎵</span> Materias Especiales / Artísticas
+                    </h3>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Seleccionar Especialidad:</label>
+                        <select id="especialMateria" onchange="actualizarResponsableEspecialidad()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400">
+                            <option value="Guitarra">Guitarra</option>
+                            <option value="Piano">Piano</option>
+                            <option value="Flauta">Flauta</option>
+                            <option value="Ukulele">Ukulele</option>
+                            <option value="Bajo Eléctrico">Bajo Eléctrico</option>
+                            <option value="Batería">Batería</option>
+                            <option value="Canto">Canto</option>
+                            <option value="Danza">Danza</option>
+                            <option value="Artes Plásticas">Artes Plásticas</option>
+                        </select>
+                    </div>
+                    <!-- RESPONSABLE VISIBLE EN LA INTERFAZ DE ENTRADA -->
+                    <div class="bg-purple-50 border border-purple-100 rounded-xl p-3 flex items-center justify-between">
+                        <span class="text-xs font-medium text-purple-800">Profesor Responsable:</span>
+                        <span id="txtResponsable" class="text-xs font-bold text-purple-900 font-mono">Buscando...</span>
+                    </div>
+                    <button onclick="ingresarRegistro('Especial')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm shadow-sm mt-1">
+                        Ingresar al Registro Especial
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- PANEL DE PAUTA DE EVALUACIÓN SELECCIONADA -->
-        <div id="panelInformativo" class="hidden bg-slate-900 text-slate-100 p-4 rounded-xl mb-6 shadow-sm flex flex-wrap justify-between items-center gap-4">
-            <div>
-                <span class="text-xs font-bold text-blue-400 tracking-wider block uppercase" id="lblTipoEntorno">Pauta</span>
-                <h2 id="infoEntornoActivo" class="text-lg font-bold text-white">--</h2>
+        <!-- VISTA 2: PLANILLA DETALLADA DE CALIFICACIÓN (OCULTA POR DEFECTO) -->
+        <div id="vistaPlanilla" class="hidden space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <div>
+                    <button onclick="regresarAlMenu()" class="text-xs font-bold text-slate-500 hover:text-slate-800 bg-slate-200 px-3 py-1.5 rounded-lg transition mb-2 block">
+                        ⬅️ Volver a Selección
+                    </button>
+                    <h2 id="lblTituloPlanilla" class="text-2xl font-extrabold text-slate-900">--</h2>
+                    <p id="lblSubtituloPlanilla" class="text-xs text-slate-500 mt-0.5">--</p>
+                </div>
+                <div id="badgePauta" class="text-xs px-4 py-2 bg-slate-900 text-slate-100 font-mono rounded-xl tracking-tight">--</div>
             </div>
-            <div class="flex gap-6 text-xs font-mono bg-slate-950 p-3 rounded-lg border border-slate-800">
-                <div>Asistencia: <span class="text-green-400 font-bold">5%</span></div>
-                <div>Cotidiano (RAE): <span id="pesoCotidiano" class="text-blue-400 font-bold">--</span></div>
-                <div>Pruebas/Ejecución: <span id="pesoPruebas" class="text-purple-400 font-bold">--</span></div>
-            </div>
-        </div>
 
-        <!-- CUADRO DE REGISTRO DE CALIFICACIONES -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <span>📋</span> Planilla de Alumnos Matriculados
-                </h3>
-                <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium" id="lblFiltro">Por favor seleccione un entorno arriba.</span>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left border-collapse">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
+                <table class="w-full text-xs text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase bg-slate-50">
-                            <th class="p-3">Cédula</th>
-                            <th class="p-3">Estudiante</th>
-                            <th class="p-3">Asistencia (5%)</th>
-                            <th class="p-3" id="thCotidiano">Trabajo Cotidiano</th>
-                            <th class="p-3" id="thPrueba">Prueba / Ejecución</th>
-                            <th class="p-3 text-center">Nota Final</th>
-                            <th class="p-3 text-right">Acción</th>
+                        <tr id="filaCabeceraTabla" class="border-b border-slate-200 font-bold text-slate-400 uppercase bg-slate-50">
+                            <!-- Columnas dinámicas por JS -->
                         </tr>
                     </thead>
-                    <tbody id="tabla-calificaciones-cuerpo" class="divide-y divide-slate-100 text-slate-700">
-                        <tr>
-                            <td colspan="7" class="py-6 text-center text-slate-400">Ningún grupo seleccionado aún. Elija una opción de los cuadros superiores.</td>
-                        </tr>
+                    <tbody id="cuerpoTablaCalificaciones" class="divide-y divide-slate-100 text-slate-700">
+                        <!-- Filas de estudiantes por JS -->
                     </tbody>
                 </table>
             </div>
         </div>
+
     </div>
 
     <!-- CONFIGURACIÓN DE SUPABASE -->
@@ -142,186 +154,338 @@
         const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let entornoActual = null;
+        let listaDocentesGlobal = [];
+        let entornoActivo = null;
 
-        function activarEntorno(tipo) {
-            document.getElementById('panelInformativo').classList.remove('hidden');
-            
-            if (tipo === 'Academico') {
-                const grado = document.getElementById('selGradoAcademico').value;
-                const materia = document.getElementById('selMateriaAcademica').value;
-                
-                entornoActual = {
-                    tipo: 'Académico',
-                    materia: materia,
-                    filtroGrado: grado,
-                    pesoAsistencia: 5,
-                    pesoCotidiano: 45,
-                    pesoPruebas: 50
-                };
-                
-                document.getElementById('lblTipoEntorno').innerText = "Entorno Académico Regular";
-                document.getElementById('infoEntornoActivo').innerText = `${materia} — ${grado} Año`;
-                document.getElementById('thCotidiano').innerText = 'Trabajo Cotidiano (45%)';
-                document.getElementById('thPrueba').innerText = 'Pruebas Escritas (50%)';
-                
-            } else {
-                const materia = document.getElementById('selMateriaEspecial').value;
-                
-                entornoActual = {
-                    tipo: 'Especiales / Música',
-                    materia: materia,
-                    filtroGrado: null,
-                    pesoAsistencia: 5,
-                    pesoCotidiano: 65, // Formato RAE
-                    pesoPruebas: 30
-                };
-                
-                document.getElementById('lblTipoEntorno').innerText = "Ruta de Alfabetización Evidencial (RAE)";
-                document.getElementById('infoEntornoActivo').innerText = `Especialidad Musical: ${materia}`;
-                document.getElementById('thCotidiano').innerText = 'Evidencias RAE (65%)';
-                document.getElementById('thPrueba').innerText = 'Ejecución Práctica (30%)';
+        document.addEventListener('DOMContentLoaded', async () => {
+            await cargarDocentes();
+            actualizarResponsableEspecialidad();
+        });
+
+        async function cargarDocentes() {
+            const { data, error } = await supabaseClient.from('docentes_niveles').select('*');
+            if(!error && data) {
+                listaDocentesGlobal = data;
             }
-
-            document.getElementById('pesoCotidiano').innerText = `${entornoActual.pesoCotidiano}%`;
-            document.getElementById('pesoPruebas').innerText = `${entornoActual.pesoPruebas}%`;
-            document.getElementById('lblFiltro').innerText = entornoActual.filtroGrado ? `Filtrando: Alumnos de ${entornoActual.filtroGrado}` : `Filtrando: Alumnos en ${entornoActual.materia}`;
-
-            cargarEstudiantesYPlanilla();
         }
 
-        async function cargarEstudiantesYPlanilla() {
-            const tbody = document.getElementById('tabla-calificaciones-cuerpo');
-            tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Buscando expedientes en Supabase...</td></tr>`;
+        // Muestra dinámicamente quién imparte la especialidad elegida en el bloque derecho
+        function actualizarResponsableEspecialidad() {
+            const materia = document.getElementById('especialMateria').value;
+            const docente = listaDocentesGlobal.find(d => d.materia_especifica === materia || d.materia_specifica === materia);
+            document.getElementById('txtResponsable').innerText = docente ? `ID: ${docente.perfil_id.substring(0,10)}...` : 'Por asignar';
+        }
 
-            let query = supabaseClient.from('estudiantes').select('*');
-            
-            if (entornoActual.tipo === 'Académico') {
-                query = query.eq('nivel_asignado', entornoActual.filtroGrado);
+        function regresarAlMenu() {
+            document.getElementById('vistaPlanilla').classList.add('hidden');
+            document.getElementById('vistaEntrada').classList.remove('hidden');
+        }
+
+        // Configuración y despliegue del entorno solicitado
+        async function ingresarRegistro(tipo) {
+            document.getElementById('vistaEntrada').classList.add('hidden');
+            document.getElementById('vistaPlanilla').classList.remove('hidden');
+
+            if(tipo === 'Academico') {
+                const grado = document.getElementById('academicoGrado').value;
+                const materia = document.getElementById('academicoMateria').value;
+                
+                entornoActivo = { tipo: tipo, materia: materia, grado: grado };
+                document.getElementById('lblTituloPlanilla').innerText = `Registro de ${materia}`;
+                document.getElementById('lblSubtituloPlanilla').innerText = `Nivel: ${grado} Año Académico`;
+                
+                if (materia === 'Conducta') {
+                    document.getElementById('badgePauta').innerText = "Pauta de Conducta Institucional";
+                    armarCabeceraConducta();
+                } else {
+                    document.getElementById('badgePauta').innerText = "Pauta Académica Básica (10% Asis)";
+                    armarCabeceraAcademica();
+                }
+            } else {
+                const materia = document.getElementById('especialMateria').value;
+                const docente = listaDocentesGlobal.find(d => d.materia_especifica === materia || d.materia_specifica === materia);
+                const nombreProf = docente ? `Docente Responsable ID: ${docente.perfil_id.substring(0,12)}...` : 'Sin docente asignado';
+                
+                entornoActivo = { tipo: tipo, materia: materia, grado: 'Especial' };
+                document.getElementById('lblTituloPlanilla').innerText = `Registro de Especialidad: ${materia}`;
+                document.getElementById('lblSubtituloPlanilla').innerText = nombreProf;
+                
+                if(materia === 'Danza') {
+                    document.getElementById('badgePauta').innerText = "Pauta Sumativa Danza (10% Asis)";
+                    armarCabeceraDanza();
+                } else if(materia === 'Artes Plásticas') {
+                    document.getElementById('badgePauta').innerText = "Pauta Simplificada: Plásticas";
+                    armarCabeceraPlasticas();
+                } else {
+                    document.getElementById('badgePauta').innerText = "Pauta Especialidades Artísticas RAE";
+                    armarCabeceraArtisticasMusica();
+                }
             }
 
+            await desplegarPlanillaAlumnos();
+        }
+
+        // ==========================================
+        // DISEÑOS DE CABECERAS SEGÚN COMPONENTES
+        // ==========================================
+        function armarCabeceraAcademica() {
+            document.getElementById('filaCabeceraTabla').innerHTML = `
+                <th class="p-3">Estudiante</th>
+                <th class="p-3 text-center">Cotidiano (50%)</th>
+                <th class="p-3 text-center">Pruebas (30%)</th>
+                <th class="p-3 text-center">Extraclase (10%)</th>
+                <th class="p-3 text-center">Asistencia (10%)</th>
+                <th class="p-3 text-center">Nota Final</th>
+                <th class="p-3 text-right">Acción</th>
+            `;
+        }
+
+        function armarCabeceraArtisticasMusica() {
+            document.getElementById('filaCabeceraTabla').innerHTML = `
+                <th class="p-3">Estudiante</th>
+                <th class="p-3 text-center">Cotidiano (60%)</th>
+                <th class="p-3 text-center">Asistencia (10%)</th>
+                <th class="p-3 text-center">Autorregulación (10%)</th>
+                <th class="p-3 text-center">Instrumento (20%)</th>
+                <th class="p-3 text-center">Promedio Final</th>
+                <th class="p-3 text-right">Acción</th>
+            `;
+        }
+
+        function armarCabeceraDanza() {
+            document.getElementById('filaCabeceraTabla').innerHTML = `
+                <th class="p-3">Estudiante</th>
+                <th class="p-3 text-center">Puntualidad (10%)</th>
+                <th class="p-3 text-center">Coreografía (20%)</th>
+                <th class="p-3 text-center">Prep. Previa (10%)</th>
+                <th class="p-3 text-center">Participación (20%)</th>
+                <th class="p-3 text-center">Concentración (10%)</th>
+                <th class="p-3 text-center">Aportes (20%)</th>
+                <th class="p-3 text-center">Asistencia (10%)</th>
+                <th class="p-3 text-center">Nota Final</th>
+                <th class="p-3 text-right">Acción</th>
+            `;
+        }
+
+        function armarCabeceraPlasticas() {
+            document.getElementById('filaCabeceraTabla').innerHTML = `
+                <th class="p-3">Estudiante</th>
+                <th class="p-3 text-center">Asistencia y Trabajo en Clase (100%)</th>
+                <th class="p-3 text-center">Nota Final</th>
+                <th class="p-3 text-right">Acción</th>
+            `;
+        }
+
+        function armarCabeceraConducta() {
+            document.getElementById('filaCabeceraTabla').innerHTML = `
+                <th class="p-3">Estudiante</th>
+                <th class="p-3 text-center">Asertividad (20%)</th>
+                <th class="p-3 text-center">Cooperación (5%)</th>
+                <th class="p-3 text-center">Pres. Personal (5%)</th>
+                <th class="p-3 text-center">Esp. Físico (20%)</th>
+                <th class="p-3 text-center">Esp. Verbal (20%)</th>
+                <th class="p-3 text-center">No Verbal (10%)</th>
+                <th class="p-3 text-center">Esp. Psicológico (20%)</th>
+                <th class="p-3 text-center">Nota Conducta</th>
+                <th class="p-3 text-right">Acción</th>
+            `;
+        }
+
+        // ==========================================
+        // CONSULTA Y CONSTRUCCIÓN DE LAS FILAS DE ALUMNOS
+        // ==========================================
+        async function desplegarPlanillaAlumnos() {
+            const tbody = document.getElementById('cuerpoTablaCalificaciones');
+            tbody.innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-400">Consultando estudiantes matriculados...</td></tr>`;
+
+            let query = supabaseClient.from('estudiantes').select('*');
+            if(entornoActivo.tipo === 'Academico') {
+                query = query.eq('nivel_asignado', entornoActivo.grado);
+            }
             const { data: alumnos, error } = await query;
 
-            if (error) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+            if(error) {
+                tbody.innerHTML = `<tr><td colspan="12" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
                 return;
             }
 
-            let alumnosFiltrados = alumnos || [];
-            
-            if (entornoActual.tipo === 'Especiales / Música') {
-                alumnosFiltrados = alumnos.filter(a => 
-                    a.instrumento_principal === entornoActual.materia ||
-                    a.instrumento_opcional_1 === entornoActual.materia ||
-                    a.instrumento_opcional_2 === entornoActual.materia
+            let filtrados = alumnos || [];
+            if(entornoActivo.tipo === 'Especial') {
+                filtrados = alumnos.filter(a => 
+                    a.instrumento_principal === entornoActivo.materia ||
+                    a.instrumento_opcional_1 === entornoActivo.materia ||
+                    a.instrumento_opcional_2 === entornoActivo.materia ||
+                    (entornoActivo.materia === 'Danza' && a.nivel_asignado !== '') || 
+                    (entornoActivo.materia === 'Artes Plásticas' && a.nivel_asignado !== '')
                 );
             }
 
-            if (alumnosFiltrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No se encontraron estudiantes matriculados en este nivel o materia.</td></tr>`;
+            if(filtrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" class="py-6 text-center text-slate-400">No hay alumnos asignados a este nivel o materia especial.</td></tr>`;
                 return;
             }
 
-            // Descargar notas que pertenezcan a este entorno/materia
-            const { data: notasExistentes } = await supabaseClient
-                .from('calificaciones')
-                .select('*')
-                .eq('materia_evaluada', entornoActual.materia);
+            // Descargar registros de notas existentes
+            const { data: notas } = await supabaseClient.from('calificaciones').select('*').eq('materia_evaluada', entornoActivo.materia);
 
             tbody.innerHTML = '';
 
-            alumnosFiltrados.forEach(alumno => {
-                const notaGuardada = notasExistentes ? notasExistentes.find(n => n.estudiante_id === alumno.id) : null;
+            filtrados.forEach(al => {
+                const n = notas ? notas.find(x => x.estudiante_id === al.id) : null;
+                const r = document.createElement('tr');
+                r.className = "hover:bg-slate-50 transition border-b border-slate-100";
                 
-                const asisVal = notaGuardada ? notaGuardada.nota_asistencia : 100;
-                const cotiVal = notaGuardada ? notaGuardada.nota_cotidiano : 100;
-                const prueVal = notaGuardada ? notaGuardada.nota_pruebas : 100;
-                const totalVal = notaGuardada ? notaGuardada.nota_final : 100;
+                let inputsHtml = '';
+                let notaFinalInicial = n ? parseFloat(n.nota_final).toFixed(1) : "100.0";
 
-                const fila = document.createElement('tr');
-                fila.className = "hover:bg-slate-50 transition";
-                fila.innerHTML = `
-                    <td class="p-3 font-mono text-xs text-slate-500">${alumno.cedula}</td>
-                    <td class="p-3 font-medium text-slate-900">${alumno.nombre_completo}</td>
-                    <td class="p-3">
-                        <input type="number" min="0" max="100" id="asis-${alumno.id}" value="${asisVal}" onchange="calcularNotaFila(${alumno.id})" class="w-16 border rounded px-2 py-1 text-xs font-semibold text-center outline-none focus:border-blue-400">
+                // Inyectar inputs numéricos personalizados según los nuevos componentes
+                if (entornoActivo.materia === 'Conducta') {
+                    inputsHtml = `
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="c1-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="c2-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="c3-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="c4-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="c5-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="c6-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="c7-${al.id}" value="100" onchange="calcCond(${al.id})"></td>
+                    `;
+                } else if(entornoActivo.tipo === 'Academico') {
+                    inputsHtml = `
+                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded font-semibold" id="cot-${al.id}" value="${n ? n.nota_cotidiano:100}" onchange="calcAcad(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded font-semibold" id="pru-${al.id}" value="${n ? n.nota_pruebas:100}" onchange="calcAcad(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded font-semibold" id="ext-${al.id}" value="100" onchange="calcAcad(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-14 text-center border rounded font-semibold" id="asi-${al.id}" value="${n ? n.nota_asistencia:100}" onchange="calcAcad(${al.id})"></td>
+                    `;
+                } else if(entornoActivo.materia === 'Danza') {
+                    inputsHtml = `
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="d1-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="d2-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="d3-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="d4-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="d5-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="d6-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-12 text-center border rounded" id="d7-${al.id}" value="100" onchange="calcDanza(${al.id})"></td>
+                    `;
+                } else if(entornoActivo.materia === 'Artes Plásticas') {
+                    inputsHtml = `<td class="p-2 text-center"><input type="number" class="w-24 text-center border rounded font-bold" id="pla-${al.id}" value="100" onchange="calcPlast(${al.id})"></td>`;
+                } else {
+                    // Especialidades artísticas regulares (Música) con campo de Comentario integrado
+                    inputsHtml = `
+                        <td class="p-2 text-center"><input type="number" class="w-16 text-center border rounded" id="cot-${al.id}" value="${n ? n.nota_cotidiano:100}" onchange="calcArt(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-16 text-center border rounded" id="asi-${al.id}" value="${n ? n.nota_asistencia:100}" onchange="calcArt(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-16 text-center border rounded" id="aut-${al.id}" value="100" onchange="calcArt(${al.id})"></td>
+                        <td class="p-2 text-center"><input type="number" class="w-16 text-center border rounded" id="ins-${al.id}" value="${n ? n.nota_pruebas:100}" onchange="calcArt(${al.id})"></td>
+                    `;
+                }
+
+                r.innerHTML = `
+                    <td class="p-3 font-medium text-slate-900">
+                        <div>${al.nombre_completo}</div>
+                        <div class="text-[10px] font-mono text-slate-400">${al.cedula}</div>
                     </td>
-                    <td class="p-3">
-                        <input type="number" min="0" max="100" id="coti-${alumno.id}" value="${cotiVal}" onchange="calcularNotaFila(${alumno.id})" class="w-20 border rounded px-2 py-1 text-xs font-semibold text-center outline-none focus:border-blue-400">
-                    </td>
-                    <td class="p-3">
-                        <input type="number" min="0" max="100" id="prue-${alumno.id}" value="${prueVal}" onchange="calcularNotaFila(${alumno.id})" class="w-20 border rounded px-2 py-1 text-xs font-semibold text-center outline-none focus:border-blue-400">
-                    </td>
-                    <td class="p-3 text-center font-bold text-slate-900">
-                        <span id="total-${alumno.id}">${parseFloat(totalVal).toFixed(1)}</span>
+                    ${inputsHtml}
+                    <td class="p-3 text-center font-extrabold text-slate-900 bg-slate-50 text-sm">
+                        <span id="tot-${al.id}">${notaFinalInicial}</span>
                     </td>
                     <td class="p-3 text-right">
-                        <button onclick="guardarCalificacionFila(${alumno.id}, '${alumno.cedula}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-1 px-3 rounded-lg transition shadow-sm">
-                            Guardar
-                        </button>
+                        <button onclick="guardarFilaReal(${al.id}, '${al.cedula}')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-1 px-3 rounded-lg shadow-sm transition">Guardar</button>
                     </td>
                 `;
-                tbody.appendChild(fila);
+                tbody.appendChild(r);
             });
         }
 
-        function calcularNotaFila(id) {
-            const asis = parseFloat(document.getElementById(`asis-${id}`).value) || 0;
-            const coti = parseFloat(document.getElementById(`coti-${id}`).value) || 0;
-            const prue = parseFloat(document.getElementById(`prue-${id}`).value) || 0;
-
-            const pAsis = (asis * entornoActual.pesoAsistencia) / 100;
-            const pCoti = (coti * entornoActual.pesoCotidiano) / 100;
-            const pPrue = (prue * entornoActual.pesoPruebas) / 100;
-
-            const final = pAsis + pCoti + pPrue;
-            document.getElementById(`total-${id}`).innerText = final.toFixed(1);
+        // ==========================================
+        // OPERACIONES MATEMÁTICAS EN VIVO POR FILA
+        // ==========================================
+        function calcAcad(id) {
+            const cot = parseFloat(document.getElementById(`cot-${id}`).value) || 0;
+            const pru = parseFloat(document.getElementById(`pru-${id}`).value) || 0;
+            const ext = parseFloat(document.getElementById(`ext-${id}`).value) || 0;
+            const asi = parseFloat(document.getElementById(`asi-${id}`).value) || 0;
+            const total = (cot * 0.50) + (pru * 0.30) + (ext * 0.10) + (asi * 0.10);
+            document.getElementById(`tot-${id}`).innerText = total.toFixed(1);
         }
 
-        async function guardarCalificacionFila(alumnoId, cedula) {
-            const asis = parseFloat(document.getElementById(`asis-${alumnoId}`).value) || 0;
-            const coti = parseFloat(document.getElementById(`coti-${alumnoId}`).value) || 0;
-            const prue = parseFloat(document.getElementById(`prue-${alumnoId}`).value) || 0;
-            const final = parseFloat(document.getElementById(`total-${alumnoId}`).innerText);
+        function calcArt(id) {
+            const cot = parseFloat(document.getElementById(`cot-${id}`).value) || 0;
+            const asi = parseFloat(document.getElementById(`asi-${id}`).value) || 0;
+            const aut = parseFloat(document.getElementById(`aut-${id}`).value) || 0;
+            const ins = parseFloat(document.getElementById(`ins-${id}`).value) || 0;
+            const total = (cot * 0.60) + (asi * 0.10) + (aut * 0.10) + (ins * 0.20);
+            document.getElementById(`tot-${id}`).innerText = total.toFixed(1);
+        }
 
-            const { data: existente } = await supabaseClient
+        function calcDanza(id) {
+            const d1 = parseFloat(document.getElementById(`d1-${id}`).value) || 0;
+            const d2 = parseFloat(document.getElementById(`d2-${id}`).value) || 0;
+            const d3 = parseFloat(document.getElementById(`d3-${id}`).value) || 0;
+            const d4 = parseFloat(document.getElementById(`d4-${id}`).value) || 0;
+            const d5 = parseFloat(document.getElementById(`d5-${id}`).value) || 0;
+            const d6 = parseFloat(document.getElementById(`d6-${id}`).value) || 0;
+            const d7 = parseFloat(document.getElementById(`d7-${id}`).value) || 0;
+            const total = (d1*0.10) + (d2*0.20) + (d3*0.10) + (d4*0.20) + (d5*0.10) + (d6*0.20) + (d7*0.10);
+            document.getElementById(`tot-${id}`).innerText = total.toFixed(1);
+        }
+
+        function calcPlast(id) {
+            const val = parseFloat(document.getElementById(`pla-${id}`).value) || 0;
+            document.getElementById(`tot-${id}`).innerText = val.toFixed(1);
+        }
+
+        function calcCond(id) {
+            const c1 = parseFloat(document.getElementById(`c1-${id}`).value) || 0;
+            const c2 = parseFloat(document.getElementById(`c2-${id}`).value) || 0;
+            const c3 = parseFloat(document.getElementById(`c3-${id}`).value) || 0;
+            const c4 = parseFloat(document.getElementById(`c4-${id}`).value) || 0;
+            const c5 = parseFloat(document.getElementById(`c5-${id}`).value) || 0;
+            const c6 = parseFloat(document.getElementById(`c6-${id}`).value) || 0;
+            const c7 = parseFloat(document.getElementById(`c7-${id}`).value) || 0;
+            const total = (c1*0.20) + (c2*0.05) + (c3*0.05) + (c4*0.20) + (c5*0.20) + (c6*0.10) + (c7*0.20);
+            document.getElementById(`tot-${id}`).innerText = total.toFixed(1);
+        }
+
+        // ==========================================
+        // PERSISTENCIA DE CALIFICACIONES EN SUPABASE
+        // ==========================================
+        async function guardarFilaReal(alumnoId, cedula) {
+            const final = parseFloat(document.getElementById(`tot-${alumnoId}`).innerText);
+            
+            // Valores de respaldo estándar para la tabla relacional
+            let cot = 100, pru = 100, asi = 100;
+            if(document.getElementById(`cot-${alumnoId}`)) cot = parseFloat(document.getElementById(`cot-${alumnoId}`).value) || 100;
+            if(document.getElementById(`pru-${alumnoId}`)) pru = parseFloat(document.getElementById(`pru-${alumnoId}`).value) || 100;
+            if(document.getElementById(`asi-${alumnoId}`)) asi = parseFloat(document.getElementById(`asi-${alumnoId}`).value) || 100;
+            if(document.getElementById(`pla-${alumnoId}`)) cot = parseFloat(document.getElementById(`pla-${alumnoId}`).value) || 100;
+
+            const { data: ext } = await supabaseClient
                 .from('calificaciones')
                 .select('id')
                 .eq('estudiante_id', alumnoId)
-                .eq('materia_evaluada', entornoActual.materia);
+                .eq('materia_evaluada', entornoActivo.materia);
 
-            let resultado;
-            
-            if (existente && existente.length > 0) {
-                resultado = await supabaseClient
-                    .from('calificaciones')
-                    .update({
-                        nota_asistencia: asis,
-                        nota_cotidiano: coti,
-                        nota_pruebas: prue,
-                        nota_final: final
-                    })
-                    .eq('id', existente[0].id);
+            let res;
+            const objData = {
+                nota_asistencia: asi,
+                nota_cotidiano: cot,
+                nota_pruebas: pru,
+                nota_final: final
+            };
+
+            if(ext && ext.length > 0) {
+                res = await supabaseClient.from('calificaciones').update(objData).eq('id', ext[0].id);
             } else {
-                resultado = await supabaseClient
-                    .from('calificaciones')
-                    .insert([{
-                        estudiante_id: alumnoId,
-                        cedula_estudiante: cedula,
-                        materia_evaluada: entornoActual.materia,
-                        docente_uid: 'ADMIN_DIRECTOR',
-                        nota_asistencia: asis,
-                        nota_cotidiano: coti,
-                        nota_pruebas: prue,
-                        nota_final: final
-                    }]);
+                res = await supabaseClient.from('calificaciones').insert([{
+                    estudiante_id: alumnoId,
+                    cedula_estudiante: cedula,
+                    materia_evaluada: entornoActivo.materia,
+                    docente_uid: 'DIRECTOR_ADMIN',
+                    ...objData
+                }]);
             }
 
-            if (resultado.error) {
-                alert("Error al guardar: " + resultado.error.message);
-            } else {
-                alert("¡Nota registrada con éxito!");
-            }
+            if(res.error) alert("Error: " + res.error.message);
+            else alert("¡Calificación asentada con éxito!");
         }
     </script>
 </body>
