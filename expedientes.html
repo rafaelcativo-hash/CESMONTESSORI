@@ -44,7 +44,7 @@
     <div class="ml-64 p-10 w-full">
         <div class="border-b border-slate-200 pb-5 mb-8">
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Control de Matrícula y Expedientes</h1>
-            <p class="text-sm text-slate-500 mt-1">Gestione el ingreso de nuevos estudiantes de CES MONTESSORI, su información personal, ubicación y el registro de sus encargados.</p>
+            <p class="text-sm text-slate-500 mt-1">Gestione el ingreso de nuevos estudiantes, su información personal, ubicación y el registro de sus encargados.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -97,9 +97,15 @@
                             <label class="block text-xs font-bold text-slate-700 uppercase">Encargado #1:</label>
                             <input type="text" id="estudianteEncargado" class="w-full border border-slate-200 bg-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-blue-400 transition mt-1" placeholder="Nombre completo">
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Celular:</label>
-                            <input type="text" id="estudianteTelefono" class="w-full border border-slate-200 bg-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-blue-400 transition mt-1" placeholder="Número de celular">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Celular:</label>
+                                <input type="text" id="estudianteTelefono" class="w-full border border-slate-200 bg-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-blue-400 transition mt-1" placeholder="Celular">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Correo:</label>
+                                <input type="email" id="estudianteEmail" class="w-full border border-slate-200 bg-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-blue-400 transition mt-1" placeholder="Email">
+                            </div>
                         </div>
                     </div>
 
@@ -108,9 +114,15 @@
                             <label class="block text-xs font-bold text-slate-700 uppercase">Encargado #2:</label>
                             <input type="text" id="estudianteEncargado2" class="w-full border border-slate-200 bg-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-blue-400 transition mt-1" placeholder="Nombre completo">
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Celular:</label>
-                            <input type="text" id="estudianteTelefono2" class="w-full border border-slate-200 bg-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-blue-400 transition mt-1" placeholder="Número de celular">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Celular:</label>
+                                <input type="text" id="estudianteTelefono2" class="w-full border border-slate-200 bg-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-blue-400 transition mt-1" placeholder="Celular">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Correo:</label>
+                                <input type="email" id="estudianteEmail2" class="w-full border border-slate-200 bg-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-blue-400 transition mt-1" placeholder="Email">
+                            </div>
                         </div>
                     </div>
 
@@ -132,7 +144,7 @@
                                 <th class="pb-3">Estudiante</th>
                                 <th class="pb-3">Grado</th>
                                 <th class="pb-3">Conducta</th>
-                                <th class="pb-3">Encargados y Celulares</th>
+                                <th class="pb-3">Encargados, Contactos y Correos</th>
                                 <th class="pb-3 text-right">Acciones</th>
                             </tr>
                         </thead>
@@ -168,8 +180,11 @@
             
             const encargado = document.getElementById('estudianteEncargado').value.trim();
             const telefono = document.getElementById('estudianteTelefono').value.trim();
+            const email = document.getElementById('estudianteEmail').value.trim();
+            
             const encargado2 = document.getElementById('estudianteEncargado2').value.trim();
             const telefono2 = document.getElementById('estudianteTelefono2').value.trim();
+            const email2 = document.getElementById('estudianteEmail2').value.trim();
 
             if(!cedula || !nombre) {
                 alert("Por favor ingrese al menos la cédula y el nombre completo del estudiante.");
@@ -187,8 +202,10 @@
                     direccion: direccion,
                     nombre_encargado: encargado, 
                     telefono_contacto: telefono,
+                    email_encargado: email,
                     nombre_encargado_2: encargado2,
-                    telefono_contacto_2: telefono2
+                    telefono_contacto_2: telefono2,
+                    email_encargado_2: email2
                 }]);
 
             if (error) {
@@ -205,8 +222,10 @@
             document.getElementById('estudianteDireccion').value = '';
             document.getElementById('estudianteEncargado').value = '';
             document.getElementById('estudianteTelefono').value = '';
+            document.getElementById('estudianteEmail').value = '';
             document.getElementById('estudianteEncargado2').value = '';
             document.getElementById('estudianteTelefono2').value = '';
+            document.getElementById('estudianteEmail2').value = '';
             
             obtenerEstudiantesReal();
         }
@@ -240,16 +259,25 @@
                 if(notaConducta.startsWith('C')) colorBadge = "bg-amber-50 text-amber-700 font-semibold";
                 if(notaConducta.startsWith('D')) colorBadge = "bg-red-50 text-red-700 font-semibold";
 
-                // CORREGIDO: Mapeo y visualización explícita de Encargado 1, Celular 1, Encargado 2 y Celular 2 en la tabla
-                let infoEncargadosHtml = `<div class="space-y-1">`;
+                // Mapeo detallado de Encargados, Celulares y Correos para la Tabla
+                let infoEncargadosHtml = `<div class="space-y-1.5">`;
+                
                 if (estudiante.nombre_encargado) {
-                    infoEncargadosHtml += `<div class="text-slate-700 text-xs font-medium"><span class="text-slate-400 font-bold">#1:</span> ${estudiante.nombre_encargado} <span class="text-blue-600 font-mono">(${estudiante.telefono_contacto || 'Sin cel'})</span></div>`;
+                    infoEncargadosHtml += `
+                        <div class="text-slate-700 text-xs">
+                            <span class="text-slate-400 font-bold">#1:</span> <span class="font-medium">${estudiante.nombre_encargado}</span>
+                            <div class="pl-5 text-[11px] text-slate-500 font-mono">📞 ${estudiante.telefono_contacto || 'Sin cel'} | ✉️ ${estudiante.email_encargado || 'Sin correo'}</div>
+                        </div>`;
                 } else {
                     infoEncargadosHtml += `<div class="text-slate-400 text-xs italic">#1: No asignado</div>`;
                 }
                 
                 if (estudiante.nombre_encargado_2) {
-                    infoEncargadosHtml += `<div class="text-slate-700 text-xs font-medium"><span class="text-slate-400 font-bold">#2:</span> ${estudiante.nombre_encargado_2} <span class="text-blue-600 font-mono">(${estudiante.telefono_contacto_2 || 'Sin cel'})</span></div>`;
+                    infoEncargadosHtml += `
+                        <div class="text-slate-700 text-xs mt-1">
+                            <span class="text-slate-400 font-bold">#2:</span> <span class="font-medium">${estudiante.nombre_encargado_2}</span>
+                            <div class="pl-5 text-[11px] text-slate-500 font-mono">📞 ${estudiante.telefono_contacto_2 || 'Sin cel'} | ✉️ ${estudiante.email_encargado_2 || 'Sin correo'}</div>
+                        </div>`;
                 } else {
                     infoEncargadosHtml += `<div class="text-slate-400 text-xs italic">#2: No asignado</div>`;
                 }
