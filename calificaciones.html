@@ -1,32 +1,30 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Calificaciones</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="bg-gray-50 p-10">
-    <h1 class="text-3xl font-bold mb-6">Mis Materias Asignadas</h1>
-    <div id="gridCargas" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+<script>
+    // 1. Declaramos la variable globalmente UNA SOLA VEZ
+    // Si ya tienes una línea que dice 'const supabase =', borra la otra.
+    const supabase = supabase.createClient(
+        "https://vdfxdydbggeoflagznuq.supabase.co", 
+        "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
+    );
 
-    <script>
-        const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
+    // 2. Lógica para el botón (usa el ID 'loginBtn')
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('loginBtn');
+        if (btn) {
+            btn.addEventListener('click', async () => {
+                const email = document.getElementById('email').value;
+                const pass = document.getElementById('pass').value;
 
-        async function cargar() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) { window.location.href = "index.html"; return; }
+                const { error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: pass
+                });
 
-            const { data } = await supabase.from('docentes_niveles').select('*').eq('perfil_id', user.id);
-            const grid = document.getElementById('gridCargas');
-            grid.innerHTML = data.map(d => `
-                <div class="bg-white p-6 rounded shadow border">
-                    <h3 class="font-bold text-xl">${d.materia_especifica}</h3>
-                    <p class="text-slate-500">${d.nivel_asignado}</p>
-                </div>
-            `).join('');
+                if (error) {
+                    alert("Error: " + error.message);
+                } else {
+                    window.location.href = "calificaciones.html";
+                }
+            });
         }
-        cargar();
-    </script>
-</body>
-</html>
+    });
+</script>
