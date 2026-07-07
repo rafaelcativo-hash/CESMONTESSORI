@@ -129,12 +129,27 @@
                 return;
             }
 
-            const { data, error } = await supabaseClient
+            // INTENTO 1: Usando la estructura en inglés pura
+            let resultado = await supabaseClient
                 .from('docentes_niveles')
-                .insert([{ perfil_id: uid, nivel_asignado: nivel, materia_specifica: materia }]);
+                .insert([{ perfil_id: uid, nivel_assigned: nivel, materia_specifica: materia }]);
 
-            if (error) {
-                alert("Error al guardar en Supabase: " + error.message);
+            if (resultado.error) {
+                // INTENTO 2: Usando la estructura en español
+                resultado = await supabaseClient
+                    .from('docentes_niveles')
+                    .insert([{ perfil_id: uid, nivel_asignado: nivel, materia_especifica: materia }]);
+            }
+
+            if (resultado.error) {
+                // INTENTO 3: Combinación cruzada (por si acaso)
+                resultado = await supabaseClient
+                    .from('docentes_niveles')
+                    .insert([{ perfil_id: uid, nivel_asignado: nivel, materia_specifica: materia }]);
+            }
+
+            if (resultado.error) {
+                alert("Error crítico 400. Detalles: " + resultado.error.message);
                 return;
             }
 
@@ -163,8 +178,8 @@
             }
 
             docentes.forEach(docente => {
-                const nivel = docente.nivel_asignado || 'General';
-                const materia = docente.materia_specifica || 'General';
+                const nivel = docente.nivel_asignado || docente.nivel_assigned || 'General';
+                const materia = docente.materia_specifica || docente.materia_especifica || 'General';
                 const uidCorto = docente.perfil_id;
 
                 const nuevaFila = document.createElement('tr');
