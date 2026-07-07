@@ -64,12 +64,7 @@
                             <option value="Taller I">Taller I</option>
                             <option value="Taller II">Taller II</option>
                             <option value="Taller III">Taller III</option>
-                            <option value="Especialidades">Especialidades</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Materia Asignada (Si aplica):</label>
-                        <input type="text" id="docenteMateria" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Ej: Guitarra, Piano, General" value="General">
                     </div>
                     <button type="button" onclick="registrarDocenteReal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm mt-2">
                         Registrar Personal Docente
@@ -87,13 +82,12 @@
                             <tr class="border-b-2 border-slate-100 text-xs font-bold text-slate-400 uppercase">
                                 <th class="pb-3">Docente (UID)</th>
                                 <th class="pb-3">Ambiente Asignado</th>
-                                <th class="pb-3">Materia / Info</th>
                                 <th class="pb-3 text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-docentes-cuerpo" class="divide-y divide-slate-100 text-slate-700">
                             <tr>
-                                <td colspan="4" class="py-4 text-center text-slate-400">Cargando docentes...</td>
+                                <td colspan="3" class="py-4 text-center text-slate-400">Cargando docentes...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -108,7 +102,6 @@
         const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        let columnasDisponibles = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             obtenerDocentesReal();
@@ -117,38 +110,19 @@
         async function registrarDocenteReal() {
             const uid = document.getElementById('docenteUid').value.trim();
             const nivel = document.getElementById('docenteNivel').value;
-            const materia = document.getElementById('docenteMateria').value.trim();
 
             if(!uid) {
                 alert("Por favor ingrese el código UID del perfil del docente.");
                 return;
             }
 
-            // Armamos el objeto dinámicamente según las columnas reales detectadas en tu Supabase
-            let payload = {};
-            
-            // Evaluar columna de identificación del perfil
-            if (columnasDisponibles.includes('perfil_id')) payload['perfil_id'] = uid;
-            else if (columnasDisponibles.includes('user_id')) payload['user_id'] = uid;
-            else payload['perfil_id'] = uid; // fallback
-
-            // Evaluar columna de nivel
-            if (columnasDisponibles.includes('nivel_asignado')) payload['nivel_asignado'] = nivel;
-            else if (columnasDisponibles.includes('nivel_assigned')) payload['nivel_assigned'] = nivel;
-            else payload['nivel_asignado'] = nivel; // fallback
-
-            // Evaluar de forma exhaustiva cómo se llama tu columna de materias en Supabase
-            if (columnasDisponibles.includes('materia')) payload['materia'] = materia;
-            else if (columnasDisponibles.includes('materia_especifica')) payload['materia_especifica'] = materia;
-            else if (columnasDisponibles.includes('materia_specifica')) payload['materia_specifica'] = materia;
-            else if (columnasDisponibles.includes('especialidad')) payload['especialidad'] = materia;
-
+            // AJUSTE PRE_CONFIRMADO: Enviamos estrictamente los dos campos reales existentes
             const { data, error } = await supabaseClient
                 .from('docentes_niveles')
-                .insert([payload]);
+                .insert([{ perfil_id: uid, nivel_asignado: nivel }]);
 
             if (error) {
-                alert("Error detallado de Supabase:\n\nMensaje: " + error.message + "\nDetalle: " + error.details);
+                alert("Error de guardado: " + error.message);
                 return;
             }
 
@@ -165,35 +139,25 @@
                 .select('*');
 
             if (error) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
                 return;
-            }
-
-            // Guardamos las llaves/columnas existentes en la base de datos para usarlas al guardar
-            if(docentes && docentes.length > 0) {
-                columnasDisponibles = Object.keys(docentes[0]);
-            } else {
-                // Si está vacía, intentamos forzar una lectura de columnas básica
-                columnasDisponibles = ['perfil_id', 'nivel_asignado', 'materia_especifica', 'materia_specifica', 'materia'];
             }
 
             tbody.innerHTML = ''; 
 
             if(!docentes || docentes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">No hay docentes asignados aún.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400">No hay docentes asignados aún.</td></tr>`;
                 return;
             }
 
             docentes.forEach(docente => {
-                const nivel = docente.nivel_asignado || docente.nivel_assigned || 'General';
-                const materia = docente.materia || docente.materia_especifica || docente.materia_specifica || docente.especialidad || 'General';
-                const uidCorto = docente.perfil_id || docente.user_id;
+                const nivel = docente.nivel_asignado || 'Asignado';
+                const uidCorto = docente.perfil_id;
 
                 const nuevaFila = document.createElement('tr');
                 nuevaFila.innerHTML = `
                     <td class="py-3 font-mono text-xs text-slate-600">${uidCorto}</td>
-                    <td class="py-3 text-slate-600">${nivel}</td>
-                    <td class="py-3"><span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-semibold">${materia}</span></td>
+                    <td class="py-3"><span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-semibold">${nivel}</span></td>
                     <td class="py-3 text-right">
                         <button class="text-red-500 hover:text-red-700 text-xs font-bold" onclick="eliminarDocenteReal(${docente.id})">Remover</button>
                     </td>
@@ -203,7 +167,7 @@
         }
 
         async function eliminarDocenteReal(id) {
-            if(!confirm("¿Está seguro?")) return;
+            if(!confirm("¿Está seguro de remover este docente?")) return;
             const { error } = await supabaseClient.from('docentes_niveles').delete().eq('id', id);
             if (error) alert(error.message);
             obtenerDocentesReal();
