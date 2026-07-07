@@ -1,38 +1,24 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Mis Materias</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="bg-gray-50 p-10">
-    <h1 class="text-3xl font-bold mb-6">Mis Materias</h1>
-    <div id="grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-
-    <script>
-        // ÚNICA DECLARACIÓN DE CONEXIÓN
-        const db = supabase.createClient(
-            "https://vdfxdydbggeoflagznuq.supabase.co", 
-            "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
-        );
-
+<script>
+        const db = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
+        
         async function cargarDatos() {
-            // Nota: Cambié 'docentes_niveles' por 'estudiantes' para probar conexión segura
-            const { data, error } = await db.from('estudiantes').select('*').limit(5);
-            
-            if (error) {
-                console.error("Error al cargar:", error);
-                document.getElementById('grid').innerHTML = "<p>Error al cargar los datos.</p>";
-            } else {
-                document.getElementById('grid').innerHTML = data.map(e => `
-                    <div class='bg-white p-4 shadow rounded'>
-                        <h3 class='font-bold'>${e.nombre_completo || 'Sin nombre'}</h3>
-                        <p class='text-sm text-gray-500'>Cédula: ${e.cedula || 'N/A'}</p>
-                    </div>`).join('');
+            try {
+                // Probamos con una tabla que sabemos que existe: 'estudiantes'
+                const { data, error } = await db.from('estudiantes').select('*');
+                
+                if (error) {
+                    alert("Error de Supabase: " + error.message);
+                } else if (!data || data.length === 0) {
+                    alert("Conexión exitosa, pero la tabla 'estudiantes' está vacía.");
+                } else {
+                    document.getElementById('grid').innerHTML = data.map(e => `
+                        <div class='bg-white p-4 shadow rounded'>
+                            <h3 class='font-bold'>${e.nombre_completo || 'Sin nombre'}</h3>
+                        </div>`).join('');
+                }
+            } catch (e) {
+                alert("Error fatal: " + e.message);
             }
         }
         cargarDatos();
     </script>
-</body>
-</html>
