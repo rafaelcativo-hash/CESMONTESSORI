@@ -3,54 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración General - CES Montessori</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <title>CES Montessori - Configuración</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f4f6f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        .card { border: none; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card-header { font-weight: bold; font-size: 1.1rem; border-bottom: 1px solid rgba(0,0,0,0.08); }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
-    <div class="container my-5">
-        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-            <div>
-                <h2 class="text-dark font-weight-bold mb-0">📍 Panel de Control Absoluto</h2>
-                <p class="text-muted mb-0">Centro Educativo Shkénuk Montessori — Ciclo 2026</p>
-            </div>
-            <span class="badge badge-secondary p-2">Módulo Administrativo</span>
-        </div>
+<body class="bg-slate-50 text-slate-800 flex min-h-screen">
 
-        <div class="card">
-            <div class="card-header bg-primary text-white">📅 Curso Lectivo y Vacaciones</div>
-            <div class="card-body">
-                <div class="form-row">
-                    <div class="form-group col-md-3">
-                        <label class="font-weight-bold">Inicio de Curso:</label>
-                        <input type="date" id="calInicioCurso" class="form-control">
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label class="font-weight-bold">Finalización de Curso:</label>
-                        <input type="date" id="calFinCurso" class="form-control">
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label class="font-weight-bold">Inicio de Vacaciones:</label>
-                        <input type="date" id="calInicioVacaciones" class="form-control">
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label class="font-weight-bold">Fin de Vacaciones:</label>
-                        <input type="date" id="calFinVacaciones" class="form-control">
-                    </div>
-                </div>
-                <div class="text-right">
-                    <button class="btn btn-primary px-4" id="btnGuardarCalendario">Establecer Fechas del Curso</button>
-                </div>
+    <div class="w-64 bg-slate-900 text-white flex flex-col justify-between p-6 fixed h-screen z-10">
+        <div>
+            <h2 class="text-xl font-bold mb-8 text-center tracking-wide text-blue-400">CES Montessori</h2>
+            <nav class="space-y-2">
+                <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <span>🏠</span> <span>Inicio</span>
+                </a>
+                <a href="expedientes.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <span>📋</span> <span>Expedientes</span>
+                </a>
+                <a href="docentes.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <span>👨‍🏫</span> <span>Docentes</span>
+                </a>
+                <a href="calificaciones.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <span>📊</span> <span>Calificaciones</span>
+                </a>
+            </nav>
+        </div>
+        
+        <div>
+            <a href="configuracion.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-slate-800 text-white transition font-semibold border-t border-slate-800 pt-4">
+                <span>⚙️</span> <span>Configuración</span>
+            </a>
+            <div class="mt-4 text-xs text-center text-slate-500 bg-slate-950 p-2 rounded">
+                Rol actual: <span class="font-bold text-blue-400">Administrador</span>
             </div>
         </div>
+    </div>
 
-        <div class="card">
-            <div class="card-header bg-success text-white">👥 Registro y Gestión de Docentes</div>
-            <div class="card-body">
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        <label class
+    <div class="ml-64 p-10 w-full">
+        <div class="border-b border-slate-200 pb-5 mb-8">
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Ajustes del Sistema</h1>
+            <p class="text-sm text-slate-500 mt-1">Configure parámetros institucionales, periodos de matrícula y textos de las boletas oficiales.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <span>🏫</span> Datos y Límites de Matrícula
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre de la Institución:</label>
+                            <input type="text" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" value="Escuela CES Montessori" disabled>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cupo Límite por Ambiente:</label>
+                            <input type="number" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" value="25">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <span>📝</span> Textos Oficiales de Reportes
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Leyenda Informativa de Evaluación:</label>
+                            <textarea class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition h-24" placeholder="Ej: La evaluación sigue los lineamientos del desarrollo cualitativo Montessori..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
