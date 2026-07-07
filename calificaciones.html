@@ -1,38 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Calificaciones</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="bg-slate-50 p-10">
-    <h1 class="text-2xl font-bold mb-6">Mis Materias</h1>
-    <div id="gridCargas" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <p id="mensaje">Cargando...</p>
-    </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script>
-        const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
+<script>
+    // SOLO UNA DECLARACIÓN: Si tienes otra línea que diga "const supabase =", bórrala.
+    const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
 
-        async function cargarDatos() {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) { window.location.href = "index.html"; return; }
-
-                const { data, error } = await supabase.from('docentes_niveles').select('*').eq('perfil_id', user.id);
-                if (error) throw error;
-
-                document.getElementById('mensaje').innerText = "";
-                const grid = document.getElementById('gridCargas');
-                data.forEach(item => {
-                    grid.innerHTML += `<div class="bg-white p-6 rounded shadow border">${item.materia_especifica} - ${item.nivel_asignado}</div>`;
-                });
-            } catch (err) {
-                document.getElementById('mensaje').innerText = "Error: " + err.message;
-            }
-        }
-        cargarDatos();
-    </script>
-</body>
-</html>
+    // Resto de tu lógica...
+</script>
