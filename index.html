@@ -15,34 +15,28 @@
     </div>
 
     <script>
+        // ÚNICA DECLARACIÓN
         const supabase = supabase.createClient(
             "https://vdfxdydbggeoflagznuq.supabase.co", 
             "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
         );
 
-        // FORMA SEGURA: Se ejecuta solo cuando el DOM está listo
-        window.onload = function() {
-            const btn = document.getElementById('loginBtn');
-            if (btn) {
-                btn.addEventListener('click', async () => {
-                    const email = document.getElementById('email').value;
-                    const pass = document.getElementById('pass').value;
+        // Lógica de acceso
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
 
-                    const { error } = await supabase.auth.signInWithPassword({
-                        email: email,
-                        password: pass
-                    });
+            const { error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: pass
+            });
 
-                    if (error) {
-                        alert("Error: " + error.message);
-                    } else {
-                        window.location.href = "calificaciones.html";
-                    }
-                });
+            if (error) {
+                alert("Error: " + error.message);
             } else {
-                console.error("El botón loginBtn no se encontró en el HTML.");
+                window.location.href = "calificaciones.html";
             }
-        };
+        });
     </script>
 </body>
 </html>
