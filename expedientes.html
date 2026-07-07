@@ -12,7 +12,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 flex min-h-screen">
 
-    <!-- BARRA LATERAL -->
     <div class="w-64 bg-slate-900 text-white flex flex-col justify-between p-6 fixed h-screen z-10">
         <div>
             <h2 class="text-xl font-bold mb-8 text-center tracking-wide text-blue-400">CES MONTESSORI</h2>
@@ -42,20 +41,25 @@
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <div class="ml-64 p-10 w-full">
         <div class="border-b border-slate-200 pb-5 mb-8">
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Control de Matrícula y Expedientes</h1>
-            <p class="text-sm text-slate-500 mt-1">Gestione el ingreso de nuevos estudiantes, su información personal, encargados y asignaciones de especialidad musical.</p>
+            <p class="text-sm text-slate-500 mt-1">Gestione el ingreso y edición de estudiantes de CES MONTESSORI, su información personal, encargados y asignaciones de especialidad musical.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- FORMULARIO DE MATRÍCULA -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-fit max-h-[85vh] overflow-y-auto space-y-4">
-                <h3 class="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
-                    <span>📝</span> Matricular Estudiante
-                </h3>
+                <div class="flex justify-between items-center mb-2">
+                    <h3 id="formTitulo" class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <span>📝</span> Matricular Estudiante
+                    </h3>
+                    <button id="btnCancelarEdicion" onclick="cancelarEdicionModo()" class="hidden text-xs bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1 rounded font-semibold transition">
+                        Cancelar Edición
+                    </button>
+                </div>
                 
+                <input type="hidden" id="editandoEstudianteId" value="">
+
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cédula / Identificación:</label>
                     <input type="text" id="estudianteCedula" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Ej: 1-1234-5678">
@@ -104,7 +108,6 @@
                     <input type="text" id="estudianteDireccion" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-400 transition" placeholder="Ubicación y señas">
                 </div>
 
-                <!-- SECCIÓN CORREGIDA: INSTRUMENTOS MUSICALES CON BATERÍA Y CANTO -->
                 <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 space-y-3">
                     <span class="text-xs font-bold text-blue-800 block uppercase tracking-wider">🎵 Especialidad e Instrumentos</span>
                     <div>
@@ -148,7 +151,6 @@
                     </div>
                 </div>
                 
-                <!-- ENCARGADO 1 -->
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                     <div class="mb-2">
                         <label class="block text-xs font-bold text-slate-700 uppercase">Encargado #1:</label>
@@ -166,7 +168,6 @@
                     </div>
                 </div>
 
-                <!-- ENCARGADO 2 -->
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                     <div class="mb-2">
                         <label class="block text-xs font-bold text-slate-700 uppercase">Encargado #2:</label>
@@ -184,12 +185,11 @@
                     </div>
                 </div>
 
-                <button type="button" onclick="matricularEstudianteReal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm mt-2">
+                <button type="button" id="btnGuardarForm" onclick="matricularEstudianteReal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm mt-2">
                     Completar Matrícula
                 </button>
             </div>
 
-            <!-- TABLA DE EXPEDIENTES -->
             <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <span>📋</span> Estudiantes Registrados (CES MONTESSORI)
@@ -217,7 +217,6 @@
         </div>
     </div>
 
-    <!-- CONFIGURACIÓN Y LÓGICA DE SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
@@ -226,6 +225,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         let listaDocentesGlobal = [];
+        let listaEstudiantesGlobal = []; // Para almacenar localmente y rellenar al editar
 
         document.addEventListener('DOMContentLoaded', async () => {
             await cargarDocentesGlobal();
@@ -258,7 +258,68 @@
             document.getElementById('estudianteEdad').value = edad;
         }
 
+        // NUEVA FUNCIÓN: Pasa el formulario a modo edición cargando los datos del alumno
+        function prepararEdicionEstudiante(id) {
+            const alumno = listaEstudiantesGlobal.find(e => e.id === id);
+            if(!alumno) return;
+
+            // Cambiar textos visuales del formulario
+            document.getElementById('formTitulo').innerHTML = "<span>✏️</span> Editar Expediente";
+            document.getElementById('btnGuardarForm').innerText = "Actualizar Datos";
+            document.getElementById('btnCancelarEdicion').classList.remove('hidden');
+            
+            // Rellenar las casillas
+            document.getElementById('editandoEstudianteId').value = alumno.id;
+            document.getElementById('estudianteCedula').value = alumno.cedula;
+            document.getElementById('estudianteNombre').value = alumno.nombre_completo;
+            document.getElementById('estudianteFechaNacimiento').value = alumno.fecha_nacimiento || '';
+            document.getElementById('estudianteEdad').value = alumno.edad || '';
+            document.getElementById('estudianteNivel').value = alumno.nivel_asignado;
+            document.getElementById('estudianteConducta').value = alumno.conducta || 'A (Excelente)';
+            document.getElementById('estudianteDireccion').value = alumno.direccion || '';
+            document.getElementById('instPrincipal').value = alumno.instrumento_principal || 'Ninguno';
+            document.getElementById('instOpcional1').value = alumno.instrumento_opcional_1 || 'Ninguno';
+            document.getElementById('instOpcional2').value = alumno.instrumento_opcional_2 || 'Ninguno';
+            document.getElementById('estudianteEncargado').value = alumno.nombre_encargado || '';
+            document.getElementById('estudianteTelefono').value = alumno.telefono_contacto || '';
+            document.getElementById('estudianteEmail').value = alumno.email_encargado || '';
+            document.getElementById('estudianteEncargado2').value = alumno.nombre_encargado_2 || '';
+            document.getElementById('estudianteTelefono2').value = alumno.telefono_contacto_2 || '';
+            document.getElementById('emailEncargado2').value = alumno.email_encargado_2 || '';
+
+            // Hacer scroll suave hacia el formulario
+            document.getElementById('formTitulo').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelarEdicionModo() {
+            document.getElementById('formTitulo').innerHTML = "<span>📝</span> Matricular Estudiante";
+            document.getElementById('btnGuardarForm').innerText = "Completar Matrícula";
+            document.getElementById('btnCancelarEdicion').classList.add('hidden');
+            document.getElementById('editandoEstudianteId').value = "";
+            
+            // Limpiar formulario
+            limpiarFormularioMatricula();
+        }
+
+        function limpiarFormularioMatricula() {
+            document.getElementById('estudianteCedula').value = '';
+            document.getElementById('estudianteNombre').value = '';
+            document.getElementById('estudianteFechaNacimiento').value = '';
+            document.getElementById('estudianteEdad').value = '';
+            document.getElementById('estudianteDireccion').value = '';
+            document.getElementById('instPrincipal').value = 'Ninguno';
+            document.getElementById('instOpcional1').value = 'Ninguno';
+            document.getElementById('instOpcional2').value = 'Ninguno';
+            document.getElementById('estudianteEncargado').value = '';
+            document.getElementById('estudianteTelefono').value = '';
+            document.getElementById('estudianteEmail').value = '';
+            document.getElementById('estudianteEncargado2').value = '';
+            document.getElementById('estudianteTelefono2').value = '';
+            document.getElementById('emailEncargado2').value = '';
+        }
+
         async function matricularEstudianteReal() {
+            const idEditando = document.getElementById('editandoEstudianteId').value;
             const cedula = document.getElementById('estudianteCedula').value.trim();
             const nombre = document.getElementById('estudianteNombre').value.trim();
             const fechaNacimiento = document.getElementById('estudianteFechaNacimiento').value || null;
@@ -284,50 +345,48 @@
                 return;
             }
 
-            const { data, error } = await supabaseClient
-                .from('estudiantes')
-                .insert([{ 
-                    cedula: cedula, 
-                    nombre_completo: nombre,
-                    fecha_nacimiento: fechaNacimiento,
-                    edad: edad, 
-                    nivel_asignado: nivel,
-                    conducta: conducta,
-                    direccion: direccion,
-                    instrumento_principal: instPrincipal,
-                    instrumento_opcional_1: instOpcional1,
-                    instrumento_opcional_2: instOpcional2,
-                    nombre_encargado: encargado, 
-                    telefono_contacto: telefono,
-                    email_encargado: email,
-                    nombre_encargado_2: encargado2,
-                    telefono_contacto_2: telefono2,
-                    email_encargado_2: email2
-                }]);
+            const datosObjeto = { 
+                cedula: cedula, 
+                nombre_completo: nombre,
+                fecha_nacimiento: fechaNacimiento,
+                edad: edad, 
+                nivel_asignado: nivel,
+                conducta: conducta,
+                direccion: direccion,
+                instrumento_principal: instPrincipal,
+                instrumento_opcional_1: instOpcional1,
+                instrumento_opcional_2: instOpcional2,
+                nombre_encargado: encargado, 
+                telefono_contacto: telefono,
+                email_encargado: email,
+                nombre_encargado_2: encargado2,
+                telefono_contacto_2: telefono2,
+                email_encargado_2: email2
+            };
 
-            if (error) {
-                alert("Error al matricular: " + error.message);
+            let resultado;
+            
+            if(idEditando) {
+                // MODO EDICIÓN: Ejecuta una actualización (.update)
+                resultado = await supabaseClient
+                    .from('estudiantes')
+                    .update(datosObjeto)
+                    .eq('id', idEditando);
+            } else {
+                // MODO NUEVO: Ejecuta una inserción (.insert)
+                resultado = await supabaseClient
+                    .from('estudiantes')
+                    .insert([datosObjeto]);
+            }
+
+            if (resultado.error) {
+                alert("Error al procesar: " + resultado.error.message);
                 return;
             }
 
-            alert("¡Estudiante matriculado con éxito!");
+            alert(idEditando ? "¡Expediente actualizado con éxito!" : "¡Estudiante matriculado con éxito!");
             
-            // Limpiar formulario
-            document.getElementById('estudianteCedula').value = '';
-            document.getElementById('estudianteNombre').value = '';
-            document.getElementById('estudianteFechaNacimiento').value = '';
-            document.getElementById('estudianteEdad').value = '';
-            document.getElementById('estudianteDireccion').value = '';
-            document.getElementById('instPrincipal').value = 'Ninguno';
-            document.getElementById('instOpcional1').value = 'Ninguno';
-            document.getElementById('instOpcional2').value = 'Ninguno';
-            document.getElementById('estudianteEncargado').value = '';
-            document.getElementById('estudianteTelefono').value = '';
-            document.getElementById('estudianteEmail').value = '';
-            document.getElementById('estudianteEncargado2').value = '';
-            document.getElementById('estudianteTelefono2').value = '';
-            document.getElementById('emailEncargado2').value = '';
-            
+            cancelarEdicionModo();
             obtenerEstudiantesReal();
         }
 
@@ -344,14 +403,15 @@
                 return;
             }
 
+            listaEstudiantesGlobal = estudiantes || []; // Guardar en caché global para edición
             tbody.innerHTML = ''; 
 
-            if(!estudiantes || estudiantes.length === 0) {
+            if(listaEstudiantesGlobal.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-slate-400">No hay estudiantes matriculados aún.</td></tr>`;
                 return;
             }
 
-            estudiantes.forEach(estudiante => {
+            listaEstudiantesGlobal.forEach(estudiante => {
                 const notaConducta = estudiante.conducta || 'A (Excelente)';
                 const direccionTexto = estudiante.direccion || 'Sin dirección';
                 
@@ -413,8 +473,9 @@
                         ${infoEncargadosHtml}
                         <div class="text-slate-400 italic truncate max-w-[180px] text-[11px]" title="${direccionTexto}">📍 ${direccionTexto}</div>
                     </td>
-                    <td class="py-3 text-right">
-                        <button class="text-red-500 hover:text-red-700 text-xs font-bold" onclick="eliminarEstudianteReal(${estudiante.id})">Desmatricular</button>
+                    <td class="py-3 text-right space-x-2 whitespace-nowrap">
+                        <button class="text-blue-600 hover:text-blue-800 text-xs font-bold bg-blue-50 px-2 py-1 rounded" onclick="prepararEdicionEstudiante(${estudiante.id})">Editar</button>
+                        <button class="text-red-500 hover:text-red-700 text-xs font-bold bg-red-50 px-2 py-1 rounded" onclick="eliminarEstudianteReal(${estudiante.id})">Remover</button>
                     </td>
                 `;
                 tbody.appendChild(nuevaFila);
