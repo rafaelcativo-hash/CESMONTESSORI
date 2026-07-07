@@ -91,7 +91,7 @@
                     <table class="w-full text-sm text-left border-collapse">
                         <thead>
                             <tr class="border-b-2 border-slate-100 text-xs font-bold text-slate-400 uppercase">
-                                <th class="pb-3">Docente (UID o Nombre)</th>
+                                <th class="pb-3">Docente (UID)</th>
                                 <th class="pb-3">Ambiente Asignado</th>
                                 <th class="pb-3">Especialidad</th>
                                 <th class="pb-3 text-right">Acciones</th>
@@ -110,10 +110,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // CONFIGURACIÓN CON NOMBRE UNIFICADO PARA EVITAR CONFLICTOS
         const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
         const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Aquí cambiamos el nombre a supabaseClient para solucionar el error de la consola
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         document.addEventListener('DOMContentLoaded', () => {
             obtenerDocentesReal();
@@ -129,20 +131,14 @@
                 return;
             }
 
-            const { data, error } = await supabase
+            // Usamos el cliente corregido
+            const { data, error } = await supabaseClient
                 .from('docentes_niveles')
-                .insert([{ perfil_id: uid, nivel_asignado: nivel, materia_specifica: materia }]);
+                .insert([{ perfil_id: uid, nivel_asignado: nivel, materia_especifica: materia }]);
 
             if (error) {
-                // Intentamos con la variante de nombre de columna por si acaso
-                const { error: error2 } = await supabase
-                    .from('docentes_niveles')
-                    .insert([{ perfil_id: uid, nivel_assigned: nivel, materia_especifica: materia }]);
-                
-                if (error2) {
-                    alert("Error de inserción en Supabase: " + error2.message);
-                    return;
-                }
+                alert("Error al guardar en Supabase: " + error.message);
+                return;
             }
 
             alert("¡Docente registrado con éxito!");
@@ -153,7 +149,7 @@
         async function obtenerDocentesReal() {
             const tbody = document.getElementById('tabla-docentes-cuerpo');
             
-            const { data: docentes, error } = await supabase
+            const { data: docentes, error } = await supabaseClient
                 .from('docentes_niveles')
                 .select('*');
 
@@ -170,8 +166,8 @@
             }
 
             docentes.forEach(docente => {
-                const nivel = docente.nivel_asignado || docente.nivel_assigned || 'General';
-                const materia = docente.materia_especifica || docente.materia_specifica || 'General';
+                const nivel = docente.nivel_asignado || 'General';
+                const materia = docente.materia_especifica || 'General';
                 const uidCorto = docente.perfil_id;
 
                 const nuevaFila = document.createElement('tr');
@@ -189,7 +185,7 @@
 
         async function eliminarDocenteReal(id) {
             if(!confirm("¿Está seguro?")) return;
-            const { error } = await supabase.from('docentes_niveles').delete().eq('id', id);
+            const { error } = await supabaseClient.from('docentes_niveles').delete().eq('id', id);
             if (error) alert(error.message);
             obtenerDocentesReal();
         }
