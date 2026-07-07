@@ -2,77 +2,35 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>CES Montessori - Control de Calificaciones</title>
+    <title>Calificaciones - CES Montessori</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 flex min-h-screen">
-
-    <!-- BARRA LATERAL (IDÉNTICA A ANTERIOR) -->
-    <div class="w-64 bg-slate-900 text-white p-6 fixed h-screen">
-        <h2 class="text-xl font-bold mb-8 text-blue-400">CES MONTESSORI</h2>
-        <nav class="space-y-2">
-            <a href="dashboard.html" class="block py-2 text-slate-300">🏠 Inicio</a>
-            <a href="expedientes.html" class="block py-2 text-slate-300">📋 Expedientes</a>
-            <a href="calificaciones.html" class="block py-2 text-white font-bold">📊 Calificaciones</a>
-        </nav>
+<body class="bg-slate-50 p-10">
+    <div id="vistaEntrada" class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Mis Materias Asignadas</h1>
+        <div id="gridCargas" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
     </div>
 
-    <div class="ml-64 p-10 w-full">
-        <div id="vistaEntrada" class="space-y-8">
-            <h1 class="text-3xl font-bold border-b pb-4">Registro de Calificaciones</h1>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- MATERIAS ACADÉMICAS -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border">
-                    <h3 class="text-xl font-bold mb-4 text-blue-600">📚 Materias Académicas</h3>
-                    <select id="academicoMateria" class="w-full border p-2 rounded mb-4">
-                        <option value="Español">Español</option>
-                        <option value="Matemáticas">Matemáticas</option>
-                        <option value="Ciencias">Ciencias</option>
-                        <option value="Estudios Sociales">Estudios Sociales</option>
-                        <option value="Inglés">Inglés</option>
-                        <option value="Conducta">Conducta</option>
-                    </select>
-                    <button onclick="ingresarRegistro('Academico')" class="w-full bg-blue-600 text-white py-2 rounded">Entrar</button>
-                </div>
-
-                <!-- MATERIAS ARTÍSTICAS -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border">
-                    <h3 class="text-xl font-bold mb-4 text-purple-600">🎨 Materias Artísticas</h3>
-                    <select id="artisticaMateria" class="w-full border p-2 rounded mb-4">
-                        <option value="Guitarra">Guitarra</option>
-                        <option value="Piano">Piano</option>
-                        <option value="Flauta">Flauta</option>
-                        <option value="Ukulele">Ukulele</option>
-                        <option value="Bajo Eléctrico">Bajo Eléctrico</option>
-                        <option value="Batería">Batería</option>
-                        <option value="Taller de Percusión">Taller de Percusión</option>
-                        <option value="Canto">Canto</option>
-                        <option value="Danza">Danza</option>
-                        <option value="Artes Plásticas">Artes Plásticas</option>
-                    </select>
-                    <button onclick="ingresarRegistro('Artistica')" class="w-full bg-purple-600 text-white py-2 rounded">Entrar</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA PLANILLA (MISMA LÓGICA ANTERIOR) -->
-        <div id="vistaPlanilla" class="hidden space-y-6">
-            <button onclick="regresarAlMenu()" class="bg-slate-200 px-4 py-2 rounded text-sm">⬅️ Volver</button>
-            <h2 id="lblTituloPlanilla" class="text-2xl font-bold">--</h2>
-            <div class="bg-white p-6 rounded-2xl border overflow-x-auto">
-                <table class="w-full text-xs text-left">
-                    <thead><tr id="filaCabeceraTabla" class="border-b uppercase text-slate-400"></tr></thead>
-                    <tbody id="cuerpoTablaCalificaciones"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <div id="vistaPlanilla" class="hidden">...</div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ... (Misma lógica de carga de alumnos y guardado que tenías, asegurando usar 'entornoActivo.materia')
-        // Asegúrate de que al guardar, la materia se registre bajo la nueva categoría 'Materias Artísticas'
+        const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
+
+        async function obtenerCargaDocente() {
+            const { data: { user } } = await supabase.auth.getUser();
+            const { data: cargas } = await supabase.from('docentes_niveles').select('*').eq('perfil_id', user.id);
+            const grid = document.getElementById('gridCargas');
+            grid.innerHTML = '';
+            cargas.forEach(c => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-xl border shadow cursor-pointer";
+                card.innerHTML = `<h4 class="font-bold">${c.materia_especifica}</h4><p class="text-sm text-slate-500">${c.nivel_asignado}</p>`;
+                card.onclick = () => alert("Abriendo registro de: " + c.materia_especifica); // Aquí conectas con tu vistaPlanilla
+                grid.appendChild(card);
+            });
+        }
+        obtenerCargaDocente();
     </script>
 </body>
 </html>
