@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CES Montessori - Administración de Docentes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
@@ -44,7 +44,7 @@
     <div class="ml-64 p-10 w-full">
         <div class="border-b border-slate-200 pb-5 mb-8">
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Administración de Docentes</h1>
-            <p class="text-sm text-slate-500 mt-1">Registre el ingreso de personal docente y asigne sus correspondientes ambientes académicos.</p>
+            <p class="text-sm text-slate-500 mt-1">Registre el ingreso de personal docente y asigne sus correspondientes ambientes o materias especializadas.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -66,6 +66,16 @@
                             <option value="Taller III">Taller III</option>
                         </select>
                     </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Materia Específica:</label>
+                        <select id="docenteMateria" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-blue-400 transition">
+                            <option value="General">General (Tutor de Ambiente)</option>
+                            <option value="Guitarra">Guitarra</option>
+                            <option value="Piano">Piano</option>
+                            <option value="Flauta y Percusión">Flauta y Percusión</option>
+                            <option value="Canto y Solfeo">Canto y Solfeo</option>
+                        </select>
+                    </div>
                     <button type="button" onclick="registrarDocenteReal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm mt-2">
                         Registrar Personal Docente
                     </button>
@@ -82,12 +92,13 @@
                             <tr class="border-b-2 border-slate-100 text-xs font-bold text-slate-400 uppercase">
                                 <th class="pb-3">Docente (UID)</th>
                                 <th class="pb-3">Ambiente Asignado</th>
+                                <th class="pb-3">Materia / Especialidad</th>
                                 <th class="pb-3 text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-docentes-cuerpo" class="divide-y divide-slate-100 text-slate-700">
                             <tr>
-                                <td colspan="3" class="py-4 text-center text-slate-400">Cargando docentes...</td>
+                                <td colspan="4" class="py-4 text-center text-slate-400">Cargando docentes...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -110,16 +121,17 @@
         async function registrarDocenteReal() {
             const uid = document.getElementById('docenteUid').value.trim();
             const nivel = document.getElementById('docenteNivel').value;
+            const materia = document.getElementById('docenteMateria').value;
 
             if(!uid) {
                 alert("Por favor ingrese el código UID del perfil del docente.");
                 return;
             }
 
-            // AJUSTE PRE_CONFIRMADO: Enviamos estrictamente los dos campos reales existentes
+            // Enviamos los tres campos aprovechando la nueva columna de la base de datos
             const { data, error } = await supabaseClient
                 .from('docentes_niveles')
-                .insert([{ perfil_id: uid, nivel_asignado: nivel }]);
+                .insert([{ perfil_id: uid, nivel_asignado: nivel, materia_especifica: materia }]);
 
             if (error) {
                 alert("Error de guardado: " + error.message);
@@ -139,25 +151,27 @@
                 .select('*');
 
             if (error) {
-                tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = ''; 
 
             if(!docentes || docentes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400">No hay docentes asignados aún.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">No hay docentes asignados aún.</td></tr>`;
                 return;
             }
 
             docentes.forEach(docente => {
                 const nivel = docente.nivel_asignado || 'Asignado';
+                const materia = docente.materia_especifica || 'General';
                 const uidCorto = docente.perfil_id;
 
                 const nuevaFila = document.createElement('tr');
                 nuevaFila.innerHTML = `
                     <td class="py-3 font-mono text-xs text-slate-600">${uidCorto}</td>
-                    <td class="py-3"><span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-semibold">${nivel}</span></td>
+                    <td class="py-3 text-slate-600">${nivel}</td>
+                    <td class="py-3"><span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-semibold">${materia}</span></td>
                     <td class="py-3 text-right">
                         <button class="text-red-500 hover:text-red-700 text-xs font-bold" onclick="eliminarDocenteReal(${docente.id})">Remover</button>
                     </td>
@@ -167,7 +181,7 @@
         }
 
         async function eliminarDocenteReal(id) {
-            if(!confirm("¿Está seguro de remover este docente?")) return;
+            if(!confirm("¿Está seguro?")) return;
             const { error } = await supabaseClient.from('docentes_niveles').delete().eq('id', id);
             if (error) alert(error.message);
             obtenerDocentesReal();
