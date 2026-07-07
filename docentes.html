@@ -47,7 +47,7 @@
             <p class="text-sm text-slate-500 mt-1">Registre el ingreso de personal docente y asigne sus correspondientes ambientes o materias especializadas.</p>
         </div>
 
-        <div id="consola-alerta" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 font-mono"></div>
+        <div id="consola-alerta" class="hidden mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-700 font-mono"></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-fit">
@@ -93,7 +93,7 @@
                     <table class="w-full text-sm text-left border-collapse">
                         <thead>
                             <tr class="border-b-2 border-slate-100 text-xs font-bold text-slate-400 uppercase">
-                                <th class="pb-3">Nombre del Docente</th>
+                                <th class="pb-3">Docente (Nombre o UID)</th>
                                 <th class="pb-3">Ambiente Asignado</th>
                                 <th class="pb-3">Especialidad</th>
                                 <th class="pb-3 text-right">Acciones</th>
@@ -112,7 +112,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // CREDENCIALES ASIGNADAS AUTOMÁTICAMENTE
+        // CREDENCIALES FIJAS
         const SUPABASE_URL = "https://vdfxdydbggeoflagznuq.supabase.co";
         const SUPABASE_KEY = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
         
@@ -122,9 +122,9 @@
             obtenerDocentesReal();
         });
 
-        function mostrarErrorEnPantalla(mensaje) {
+        function mostrarAvisoEnPantalla(mensaje) {
             const alerta = document.getElementById('consola-alerta');
-            alerta.innerText = "Detalle del Sistema: " + mensaje;
+            alerta.innerText = "Aviso del Sistema: " + mensaje;
             alerta.classList.remove('hidden');
         }
 
@@ -156,8 +156,8 @@
                 await obtenerDocentesReal();
 
             } catch (error) {
-                console.error("Error al registrar:", error);
-                mostrarErrorEnPantalla(error.message || error);
+                console.error(error);
+                alert("Error al guardar: " + error.message);
             }
         }
 
@@ -165,18 +165,11 @@
             const tbody = document.getElementById('tabla-docentes-cuerpo');
             tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">Cargando docentes...</td></tr>`;
 
+            // MÉTODO SEGURO: Traer primero los datos de asignación directamente sin forzar el cruce problemático
             try {
                 const { data: docentes, error } = await supabase
                     .from('docentes_niveles')
-                    .select(`
-                        id,
-                        perfil_id,
-                        nivel_asignado,
-                        materia_especifica,
-                        perfiles (
-                            nombre_completo
-                        )
-                    `);
+                    .select('*');
 
                 if (error) throw error;
 
@@ -187,13 +180,15 @@
                     return;
                 }
 
+                // Dibujar filas de inmediato para que la pantalla NUNCA se quede colgada
                 docentes.forEach(docente => {
-                    const nombreMostrar = docente.perfiles ? docente.perfiles.nombre_completo : `UID: ${docente.perfil_id.substring(0,8)}...`;
                     const nivelMostrar = docente.nivel_asignado || 'No asignado';
+                    const filaId = `docente-fila-${docente.id}`;
 
                     const nuevaFila = document.createElement('tr');
+                    nuevaFila.id = filaId;
                     nuevaFila.innerHTML = `
-                        <td class="py-3 font-medium text-slate-900">${nombreMostrar}</td>
+                        <td class="py-3 font-mono text-xs text-slate-500 segment-nombre">${docente.perfil_id}</td>
                         <td class="py-3 text-slate-600">${nivelMostrar}</td>
                         <td class="py-3"><span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-semibold">${docente.materia_especifica}</span></td>
                         <td class="py-3 text-right">
@@ -201,12 +196,37 @@
                         </td>
                     `;
                     tbody.appendChild(nuevaFila);
+
+                    // Intentar buscar el nombre de forma asíncrona en segundo plano sin trabar el sistema
+                    completarNombreDocente(docente.perfil_id, filaId);
                 });
 
             } catch (error) {
-                console.error("Error al obtener datos:", error);
-                mostrarErrorEnPantalla(error.message || error);
-                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-500">Error al conectar. Ver recuadro superior.</td></tr>`;
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-500">Error al conectar con las tablas.</td></tr>`;
+            }
+        }
+
+        // Busca el nombre en la tabla perfiles individualmente sin romper la interfaz
+        async function completarNombreDocente(uid, filaId) {
+            try {
+                const { data: perfil, error } = await supabase
+                    .from('perfiles')
+                    .select('nombre_completo')
+                    .eq('id', uid)
+                    .single();
+
+                if (perfil && perfil.nombre_completo) {
+                    const celda = document.querySelector(`#${filaId} .segment-nombre`);
+                    if(celda) {
+                        celda.innerText = perfil.nombre_completo;
+                        celda.classList.remove('font-mono', 'text-xs', 'text-slate-500');
+                        celda.classList.add('font-medium', 'text-slate-900');
+                    }
+                }
+            } catch (e) {
+                // Si falla por políticas de Supabase, deja el UID visible de forma elegante
+                console.log("No se pudo cruzar el nombre del UID: " + uid);
             }
         }
 
@@ -223,7 +243,7 @@
 
                 obtenerDocentesReal();
             } catch (error) {
-                mostrarErrorEnPantalla(error.message);
+                alert("Error al eliminar: " + error.message);
             }
         }
     </script>
