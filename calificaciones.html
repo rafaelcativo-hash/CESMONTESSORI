@@ -2,35 +2,37 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Calificaciones - CES Montessori</title>
+    <title>Calificaciones</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-50 p-10">
-    <div id="vistaEntrada" class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8">Mis Materias Asignadas</h1>
-        <div id="gridCargas" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+    <h1 class="text-2xl font-bold mb-6">Mis Materias</h1>
+    <div id="gridCargas" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <p id="mensaje">Cargando...</p>
     </div>
 
-    <div id="vistaPlanilla" class="hidden">...</div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const supabase = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
 
-        async function obtenerCargaDocente() {
-            const { data: { user } } = await supabase.auth.getUser();
-            const { data: cargas } = await supabase.from('docentes_niveles').select('*').eq('perfil_id', user.id);
-            const grid = document.getElementById('gridCargas');
-            grid.innerHTML = '';
-            cargas.forEach(c => {
-                const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-xl border shadow cursor-pointer";
-                card.innerHTML = `<h4 class="font-bold">${c.materia_especifica}</h4><p class="text-sm text-slate-500">${c.nivel_asignado}</p>`;
-                card.onclick = () => alert("Abriendo registro de: " + c.materia_especifica); // Aquí conectas con tu vistaPlanilla
-                grid.appendChild(card);
-            });
+        async function cargarDatos() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) { window.location.href = "index.html"; return; }
+
+                const { data, error } = await supabase.from('docentes_niveles').select('*').eq('perfil_id', user.id);
+                if (error) throw error;
+
+                document.getElementById('mensaje').innerText = "";
+                const grid = document.getElementById('gridCargas');
+                data.forEach(item => {
+                    grid.innerHTML += `<div class="bg-white p-6 rounded shadow border">${item.materia_especifica} - ${item.nivel_asignado}</div>`;
+                });
+            } catch (err) {
+                document.getElementById('mensaje').innerText = "Error: " + err.message;
+            }
         }
-        obtenerCargaDocente();
+        cargarDatos();
     </script>
 </body>
 </html>
