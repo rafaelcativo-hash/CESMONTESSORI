@@ -3,171 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Montessori - Panel de Control</title>
+    <title>CES Montessori - Panel Principal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f4f6f8;
-            color: #1e293b;
-            display: flex;
-        }
-        
-        /* Barra Lateral (Menú Oscuro de la Izquierda) */
-        .sidebar {
-            width: 250px;
-            background-color: #1e293b;
-            height: 100vh;
-            padding: 20px;
-            color: white;
-            position: fixed;
-        }
-        .sidebar h2 {
-            font-size: 18px;
-            margin-bottom: 30px;
-            text-align: center;
-            color: #ffffff;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            color: #cbd5e1;
-            padding: 12px 15px;
-            text-decoration: none;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 15px;
-            transition: background 0.2s, color 0.2s;
-        }
-        .sidebar a:hover, .sidebar a.active {
-            background-color: #334155;
-            color: white;
-        }
-        .sidebar a span {
-            margin-right: 12px;
-            font-size: 18px;
-        }
-
-        /* Contenido Principal de la Derecha */
-        .main-content {
-            margin-left: 250px;
-            padding: 40px;
-            width: calc(100% - 250px);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 20px;
-        }
-        .header h1 {
-            font-size: 28px;
-            color: #0f172a;
-            font-weight: 700;
-        }
-        .btn-logout {
-            background-color: #ef4444;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 14px;
-            transition: background 0.2s;
-        }
-        .btn-logout:hover {
-            background-color: #dc2626;
-        }
-
-        /* Tarjetas de Acceso Rápido del Panel */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            border-left: 5px solid #cbd5e1;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .card-estudiantes { border-color: #3b82f6; }
-        .card-asistencia { border-color: #10b981; }
-        .card-reportes { border-color: #8b5cf6; }
-
-        .card h3 {
-            font-size: 20px;
-            color: #0f172a;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        .card p {
-            font-size: 14px;
-            color: #64748b;
-            line-height: 1.5;
-        }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 flex min-h-screen">
 
-    <!-- MENÚ LATERAL (Estructura conectada con archivos reales) -->
-    <div class="sidebar">
-        <h2>CES Montessori</h2>
-        <a href="dashboard.html" class="active"><span>🏠</span> Inicio</a>
-        <a href="expedientes.html"><span>📋</span> Expedientes</a>
-        <a href="calificaciones.html"><span>📊</span> Calificaciones</a>
-        <a href="#"><span>⚙️</span> Configuración</a>
+    <div class="w-64 bg-slate-900 text-white flex flex-col justify-between p-6 fixed h-screen z-10">
+        <div>
+            <h2 class="text-xl font-bold mb-8 text-center tracking-wide text-blue-400">CES Montessori</h2>
+            <nav class="space-y-2">
+                <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-slate-800 text-white transition font-semibold">
+                    <span>🏠</span> <span>Inicio</span>
+                </a>
+                <a href="expedientes.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <span>📋</span> <span>Expedientes</span>
+                </a>
+                <a href="docentes.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <span>👨‍🏫</span> <span>Docentes</span>
+                </a>
+                <a href="calificaciones.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <span>📊</span> <span>Calificaciones</span>
+                </a>
+            </nav>
+        </div>
+        
+        <div>
+            <a href="configuracion.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition border-t border-slate-800 pt-4">
+                <span>⚙️</span> <span>Configuración</span>
+            </a>
+            <div class="mt-4 text-xs text-center text-slate-500 bg-slate-950 p-2 rounded">
+                Rol actual: <span class="font-bold text-blue-400">Administrador</span>
+            </div>
+        </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <div class="main-content">
-        <div class="header">
-            <h1>Bienvenido al Sistema de Gestión</h1>
-            <!-- Botón de Cerrar Sesión apunta a index.html (Login) -->
-            <a href="index.html" class="btn-logout">Cerrar Sesión</a>
+    <div class="ml-64 p-10 w-full">
+        <div class="border-b border-slate-200 pb-5 mb-8">
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Panel de Control Escolar</h1>
+            <p class="text-sm text-slate-500 mt-1">Bienvenido al sistema de administración académica de la Escuela CES Montessori.</p>
         </div>
 
-        <!-- TARJETAS DE ACCESO DIRECTO -->
-        <div class="cards-grid">
-            
-            <!-- Tarjeta 1: Estudiantes (Abre Expedientes) -->
-            <a href="expedientes.html" class="card card-estudiantes">
-                <h3>Estudiantes</h3>
-                <p>Gestione el registro, niveles Montessori y datos de los alumnos.</p>
-            </a>
-
-            <!-- Tarjeta 2: Control de Asistencia (Lleva a Calificaciones para registrar asistencia) -->
-            <a href="calificaciones.html" class="card card-asistencia">
-                <h3>Control de Asistencia</h3>
-                <p>Monitoree el ingreso diario de la comunidad estudiantil y su asistencia a clases.</p>
-            </a>
-
-            <!-- Tarjeta 3: Reportes Pedagógicos (Lleva a Calificaciones donde están los resúmenes y notas) -->
-            <a href="calificaciones.html" class="card card-reportes">
-                <h3>Reportes Pedagógicos</h3>
-                <p>Consulte y descargue minutas e informes cualitativos de avance.</p>
-            </a>
-
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Control de Matrícula</div>
+                <div class="text-2xl font-black text-slate-900 mt-2">Estudiantes</div>
+                <p class="text-xs text-slate-500 mt-1">Gestión activa de expedientes.</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cuerpo Docente</div>
+                <div class="text-2xl font-black text-slate-900 mt-2">Personal Activo</div>
+                <p class="text-xs text-slate-500 mt-1">Asignación por ambientes de trabajo.</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Evaluaciones</div>
+                <div class="text-2xl font-black text-slate-900 mt-2">Calificaciones</div>
+                <p class="text-xs text-slate-500 mt-1">Registro cualitativo de logros.</p>
+            </div>
         </div>
     </div>
 
