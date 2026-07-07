@@ -15,22 +15,17 @@
     </div>
 
     <script>
-        // Declaración protegida: Si ya existe, no intentamos crearla de nuevo
-        if (typeof window.supabase === 'undefined') {
-            window.supabase = supabase.createClient(
-                "https://vdfxdydbggeoflagznuq.supabase.co", 
-                "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
-            );
-        }
+        // Esta es la única conexión en todo tu sitio
+        const db = supabase.createClient(
+            "https://vdfxdydbggeoflagznuq.supabase.co", 
+            "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
+        );
 
         document.getElementById('loginBtn').addEventListener('click', async () => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
-
-            const { error } = await window.supabase.auth.signInWithPassword({
-                email: email,
-                password: pass
-            });
+            
+            const { error } = await db.auth.signInWithPassword({ email, password: pass });
 
             if (error) {
                 alert("Error: " + error.message);
