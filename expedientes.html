@@ -1,14 +1,34 @@
-async function guardarRegistro() {
-    const datos = {
-        nombre_completo: document.getElementById('nombre').value,
-        cedula: document.getElementById('cedula').value,
-        nivel_asignado: document.getElementById('nivel').value,
-        // ESTOS NOMBRES DEBEN COINCIDIR CON LOS DE TU TABLA:
-        correo_encargado1: document.getElementById('correo_enc1').value, 
-        nombre_encargado_1: document.getElementById('nombre_enc1').value,
-        // ... etc
-    };
-
-    const { error } = await supabase.from('estudiantes').insert([datos]);
-    // ... resto del código
-}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro CES MONTESSORI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-xl font-bold mb-4">Registro de Estudiantes</h1>
+        <div class="grid grid-cols-2 gap-4">
+            <input id="nombre" type="text" placeholder="Nombre completo" class="col-span-2 border p-2 rounded">
+            <input id="cedula" type="text" placeholder="Cédula" class="border p-2 rounded">
+            <input id="nivel" type="text" placeholder="Nivel asignado" class="border p-2 rounded">
+            <input id="correo1" type="text" placeholder="Correo encargado 1" class="col-span-2 border p-2 rounded">
+            <button onclick="guardar()" class="col-span-2 bg-blue-600 text-white p-2 rounded font-bold">GUARDAR REGISTRO</button>
+        </div>
+    </div>
+    <script>
+        const supabase = supabase.createClient('https://vdfxdydbggeoflagznuq.supabase.co', 'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz');
+        async function guardar() {
+            const { error } = await supabase.from('estudiantes').insert([{
+                nombre_completo: document.getElementById('nombre').value,
+                cedula: document.getElementById('cedula').value,
+                nivel_asignado: document.getElementById('nivel').value,
+                correo_encargado1: document.getElementById('correo1').value
+            }]);
+            if(error) { alert("Error: " + error.message); } 
+            else { alert("¡Guardado correctamente!"); }
+        }
+    </script>
+</body>
+</html>
