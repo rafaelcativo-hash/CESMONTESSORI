@@ -1,47 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Lista - CES MONTESSORI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-100 p-8">
-    <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
-        <h1 class="text-xl font-bold mb-4">Listado de Estudiantes</h1>
-        <table class="w-full border">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="p-2 border">Nombre</th>
-                    <th class="p-2 border">Cédula</th>
-                    <th class="p-2 border">Nivel</th>
-                </tr>
-            </thead>
-            <tbody id="tabla"></tbody>
-        </table>
-    </div>
+<body class="p-10">
+    <table class="w-full border" id="tabla"></table>
     <script>
-        const supabase = supabase.createClient(
-            'https://vdfxdydbggeoflagznuq.supabase.co', 
-            'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz'
-        );
-
+        const supabase = supabase.createClient('TU_URL', 'TU_KEY');
         async function cargar() {
-            // El asterisco (*) trae todo automáticamente y evita errores de nombre
-            const { data, error } = await supabase.from('estudiantes').select('*');
-            
-            if(error) {
-                alert("Error al cargar: " + error.message);
-                return;
-            }
-            
+            const { data } = await supabase.from('estudiantes').select('*');
             document.getElementById('tabla').innerHTML = data.map(e => 
-                `<tr>
-                    <td class="p-2 border">${e.nombre_completo || '-'}</td>
-                    <td class="p-2 border">${e.cedula || '-'}</td>
-                    <td class="p-2 border">${e.nivel_asignado || '-'}</td>
-                </tr>`
-            ).join('');
+                `<tr><td class="border p-2">${e.nombre_completo}</td></tr>`).join('');
         }
         cargar();
     </script>
