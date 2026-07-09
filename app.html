@@ -1,34 +1,40 @@
-<script>
-    // ... (dentro de tu función render(vista) en app.html)
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Administrativo CES Montessori</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    
+    <nav class="bg-blue-900 text-white p-4 shadow-md">
+        <div class="max-w-5xl mx-auto flex gap-6">
+            <button onclick="render('docentes')" class="font-bold hover:text-blue-200">Docentes</button>
+            <button onclick="render('matricula')" class="font-bold hover:text-blue-200">Matrícula</button>
+            <button onclick="render('notas')" class="font-bold hover:text-blue-200">Notas</button>
+        </div>
+    </nav>
 
-    } else if (vista === 'matricula') {
-        app.innerHTML = `
-            <h2 class="text-xl font-bold mb-4">Matrícula de Materias</h2>
-            <div class="space-y-4">
-                <input id="est_id" placeholder="ID del Estudiante" class="border p-2 w-full">
-                <select id="materia" class="border p-2 w-full">
-                    <option value="Espanol">Español</option>
-                    <option value="Danza">Danza (Pago)</option>
-                    <option value="Guitarra">Guitarra (Pago)</option>
-                </select>
-                <label><input type="checkbox" id="es_obligatoria"> ¿Es obligatoria?</label>
-                <button onclick="guardarMatricula()" class="bg-green-600 text-white p-2 w-full rounded">Matricular</button>
-            </div>`;
-    }
+    <main id="app" class="p-6 max-w-5xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800">Bienvenido al Panel CES Montessori</h1>
+        <p class="text-gray-600">Selecciona una opción del menú superior para comenzar.</p>
+    </main>
 
-    // Nueva función para guardar la relación
-    async function guardarMatricula() {
-        const estId = document.getElementById('est_id').value;
-        const mat = document.getElementById('materia').value;
-        const obligatoria = document.getElementById('es_obligatoria').checked;
+    <script>
+        const db = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
 
-        const { error } = await db.from('matriculas').insert([{ 
-            estudiante_id: estId, 
-            materia_nombre: mat, 
-            es_obligatoria: obligatoria 
-        }]);
-        
-        if(error) alert("Error: " + error.message);
-        else alert("Matrícula guardada con éxito");
-    }
-</script>
+        function render(vista) {
+            const app = document.getElementById('app');
+            
+            if (vista === 'docentes') {
+                app.innerHTML = `<h2 class="text-2xl font-bold">Listado de Docentes</h2><div class="mt-4 bg-white p-4 shadow rounded">Contenido Docentes aquí...</div>`;
+            } else if (vista === 'matricula') {
+                app.innerHTML = `<h2 class="text-2xl font-bold">Registro de Matrícula</h2><div class="mt-4 bg-white p-4 shadow rounded">Formulario de Matrícula aquí...</div>`;
+            } else if (vista === 'notas') {
+                app.innerHTML = `<h2 class="text-2xl font-bold">Registro de Notas</h2><div class="mt-4 bg-white p-4 shadow rounded">Criterios de evaluación aquí...</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
