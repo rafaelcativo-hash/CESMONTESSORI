@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Expedientes - CES Montessori</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-slate-900">Listado de Estudiantes</h1>
+            <a href="expedientes.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Nuevo Expediente</a>
+        </div>
+
+        <div class="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold">
+                    <tr>
+                        <th class="px-6 py-4">Nombre</th>
+                        <th class="px-6 py-4">Cédula</th>
+                        <th class="px-6 py-4">Nivel</th>
+                        <th class="px-6 py-4">Instrumento</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-estudiantes" class="divide-y divide-slate-100">
+                    <tr><td colspan="4" class="px-6 py-4 text-center text-slate-400">Cargando datos...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // CONFIGURA TUS CREDENCIALES
+        const supabase = supabase.createClient('TU_URL', 'TU_KEY');
+
+        async function cargarEstudiantes() {
+            const { data, error } = await supabase.from('estudiantes').select('*');
+            const tabla = document.getElementById('tabla-estudiantes');
+            
+            if (error) {
+                tabla.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-red-500">Error: ${error.message}</td></tr>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                tabla.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-slate-400">No hay estudiantes registrados</td></tr>`;
+                return;
+            }
+
+            tabla.innerHTML = data.map(est => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 font-medium text-slate-900">${est.nombre_completo}</td>
+                    <td class="px-6 py-4 text-slate-600">${est.cedula}</td>
+                    <td class="px-6 py-4 text-slate-600">${est.nivel_asignado}</td>
+                    <td class="px-6 py-4 text-blue-600 font-medium">${est.instrumento_musical || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        cargarEstudiantes();
+    </script>
+</body>
+</html>
