@@ -2,44 +2,64 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>CES Montessori - Panel</title>
+    <title>Matrícula CES Montessori</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-50 p-6">
-    <h1 class="text-3xl font-bold mb-6">Lista de Estudiantes</h1>
-    <div id="lista" class="grid gap-4">
-        <p>Cargando...</p>
-    </div>
+<body class="bg-gray-100 p-6">
+    <nav class="bg-blue-800 p-4 text-white flex gap-4 mb-6 rounded">
+        <button onclick="mostrar('estudiantes')" class="font-bold">Ver Estudiantes</button>
+        <button onclick="mostrar('matricula')" class="font-bold">Nueva Matrícula</button>
+    </nav>
+
+    <div id="contenido" class="bg-white p-6 rounded shadow max-w-2xl mx-auto">
+        </div>
 
     <script>
-        const supabaseUrl = "https://vdfxdydbggeoflagznuq.supabase.co";
-        const supabaseKey = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
-        window.db = supabase.createClient(supabaseUrl, supabaseKey);
+        const db = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
 
-        async function cargar() {
-            const listaDiv = document.getElementById('lista');
-            
-            // Hacemos la consulta
-            const { data, error } = await window.db.from('estudiantes').select('*');
-            
-            // Esto es para que tú veas qué pasa en la consola (F12)
-            console.log("Datos recibidos:", data);
-            console.log("Error recibido:", error);
-
-            if (error) {
-                listaDiv.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
-            } else if (!data || data.length === 0) {
-                listaDiv.innerHTML = `<p class="text-gray-500">La tabla está vacía. Ve a Supabase e inserta un registro.</p>`;
+        function mostrar(seccion) {
+            const div = document.getElementById('contenido');
+            if(seccion === 'matricula') {
+                div.innerHTML = `
+                    <h2 class="text-xl font-bold mb-4">Formulario de Matrícula</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="nombre" placeholder="Nombre completo" class="border p-2 col-span-2">
+                        <input id="fecha" type="date" class="border p-2">
+                        <input id="edad" placeholder="Edad" class="border p-2">
+                        <input id="nivel" placeholder="Nivel" class="border p-2 col-span-2">
+                        <input id="encargado1" placeholder="Encargado 1" class="border p-2">
+                        <input id="tel1" placeholder="Teléfono 1" class="border p-2">
+                        <input id="email1" placeholder="Correo 1" class="border p-2 col-span-2">
+                        <input id="encargado2" placeholder="Encargado 2" class="border p-2">
+                        <input id="tel2" placeholder="Teléfono 2" class="border p-2">
+                        <input id="email2" placeholder="Correo 2" class="border p-2 col-span-2">
+                        <button onclick="guardarMatricula()" class="bg-green-600 text-white p-2 col-span-2 font-bold">Registrar Matrícula</button>
+                    </div>`;
             } else {
-                listaDiv.innerHTML = data.map(e => `
-                    <div class="bg-white p-4 shadow rounded border">
-                        <h3 class="font-bold">${e.nombre_completo || 'Sin nombre'}</h3>
-                    </div>
-                `).join('');
+                div.innerHTML = "<p>Cargando lista...</p>";
+                // Aquí iría tu lógica de db.from('estudiantes').select('*')
             }
         }
-        cargar();
+
+        async function guardarMatricula() {
+            const dataToSave = {
+                nombre_completo: document.getElementById('nombre').value,
+                fecha_nacimiento: document.getElementById('fecha').value,
+                edad: document.getElementById('edad').value,
+                nivel: document.getElementById('nivel').value,
+                encargado_1: document.getElementById('encargado1').value,
+                telefono_1: document.getElementById('tel1').value,
+                correo_1: document.getElementById('email1').value,
+                encargado_2: document.getElementById('encargado2').value,
+                telefono_2: document.getElementById('tel2').value,
+                correo_2: document.getElementById('email2').value
+            };
+
+            const { error } = await db.from('estudiantes').insert([dataToSave]);
+            if (error) alert("Error: " + error.message);
+            else alert("¡Matrícula exitosa!");
+        }
     </script>
 </body>
 </html>
