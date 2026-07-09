@@ -1,69 +1,14 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - CES Montessori</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="bg-slate-50 p-6">
+async function guardarRegistro() {
+    const datos = {
+        nombre_completo: document.getElementById('nombre').value,
+        cedula: document.getElementById('cedula').value,
+        nivel_asignado: document.getElementById('nivel').value,
+        // ESTOS NOMBRES DEBEN COINCIDIR CON LOS DE TU TABLA:
+        correo_encargado1: document.getElementById('correo_enc1').value, 
+        nombre_encargado_1: document.getElementById('nombre_enc1').value,
+        // ... etc
+    };
 
-<div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-    <h1 class="text-2xl font-bold text-slate-900 mb-6 border-b pb-4">Escuela CES Montessori: Matrícula</h1>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" id="nombre" placeholder="Nombre completo del estudiante" class="col-span-1 md:col-span-2 p-3 border rounded-xl">
-        <input type="text" id="cedula" placeholder="Cédula" class="p-3 border rounded-xl">
-        <input type="date" id="fecha_nacimiento" class="p-3 border rounded-xl">
-        <input type="text" id="direccion" placeholder="Dirección exacta" class="col-span-1 md:col-span-2 p-3 border rounded-xl">
-        
-        <div class="col-span-1 md:col-span-2 font-semibold text-slate-700 mt-2">Información de Encargados</div>
-        <input type="text" id="nombre_enc1" placeholder="Nombre Encargado 1" class="p-3 border rounded-xl">
-        <input type="email" id="correo_enc1" placeholder="Correo Encargado 1" class="p-3 border rounded-xl">
-        <input type="text" id="nombre_enc2" placeholder="Nombre Encargado 2" class="p-3 border rounded-xl">
-        <input type="email" id="correo_enc2" placeholder="Correo Encargado 2" class="p-3 border rounded-xl">
-        
-        <div class="col-span-1 md:col-span-2 font-semibold text-slate-700 mt-2">Detalles de Matrícula</div>
-        <select id="nivel" class="p-3 border rounded-xl">
-            <option value="Casa de Niños">Casa de Niños</option>
-            <option value="Primer Ciclo">Primer Ciclo</option>
-            <option value="Segundo Ciclo">Segundo Ciclo</option>
-        </select>
-        <input type="text" id="instrumento" placeholder="Instrumento Musical" class="p-3 border rounded-xl">
-        
-        <div class="col-span-1 md:col-span-2 flex gap-6 p-4 bg-slate-50 rounded-xl">
-            <label class="flex items-center"><input type="checkbox" id="pago1" class="mr-2"> Pago Opcional 1</label>
-            <label class="flex items-center"><input type="checkbox" id="pago2" class="mr-2"> Pago Opcional 2</label>
-        </div>
-        
-        <button onclick="guardarRegistro()" class="col-span-1 md:col-span-2 bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition">GUARDAR MATRÍCULA</button>
-    </div>
-</div>
-
-<script>
-    const supabase = supabase.createClient('TU_URL', 'TU_KEY');
-
-    async function guardarRegistro() {
-        const datos = {
-            nombre_completo: document.getElementById('nombre').value,
-            cedula: document.getElementById('cedula').value,
-            fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
-            direccion: document.getElementById('direccion').value,
-            nivel_asignado: document.getElementById('nivel').value,
-            instrumento_musical: document.getElementById('instrumento').value,
-            nombre_encargado_1: document.getElementById('nombre_enc1').value,
-            correo_encargado_1: document.getElementById('correo_enc1').value,
-            nombre_encargado_2: document.getElementById('nombre_enc2').value,
-            correo_encargado_2: document.getElementById('correo_enc2').value,
-            pago_opcional_1: document.getElementById('pago1').checked,
-            pago_opcional_2: document.getElementById('pago2').checked
-        };
-
-        const { error } = await supabase.from('estudiantes').insert([datos]);
-        if (error) alert("Error: " + error.message);
-        else { alert("¡Guardado correctamente!"); location.reload(); }
-    }
-</script>
-</body>
-</html>
+    const { error } = await supabase.from('estudiantes').insert([datos]);
+    // ... resto del código
+}
