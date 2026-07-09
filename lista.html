@@ -10,19 +10,37 @@
     <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
         <h1 class="text-xl font-bold mb-4">Listado de Estudiantes</h1>
         <table class="w-full border">
-            <thead><tr class="bg-gray-200"><th class="p-2 border">Nombre</th><th class="p-2 border">Cédula</th></tr></thead>
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="p-2 border">Nombre</th>
+                    <th class="p-2 border">Cédula</th>
+                    <th class="p-2 border">Nivel</th>
+                </tr>
+            </thead>
             <tbody id="tabla"></tbody>
         </table>
     </div>
     <script>
-        const supabase = supabase.createClient('https://vdfxdydbggeoflagznuq.supabase.co', 'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz');
+        const supabase = supabase.createClient(
+            'https://vdfxdydbggeoflagznuq.supabase.co', 
+            'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz'
+        );
+
         async function cargar() {
-            // El asterisco (*) trae todas las columnas automáticamente
+            // El asterisco (*) trae todo, evitando errores de nombres de columnas
             const { data, error } = await supabase.from('estudiantes').select('*');
-            if(error) { alert("Error al cargar: " + error.message); return; }
+            
+            if(error) {
+                alert("Error al cargar: " + error.message);
+                return;
+            }
             
             document.getElementById('tabla').innerHTML = data.map(e => 
-                `<tr><td class="p-2 border">${e.nombre_completo || 'Sin nombre'}</td><td class="p-2 border">${e.cedula || 'Sin cédula'}</td></tr>`
+                `<tr>
+                    <td class="p-2 border">${e.nombre_completo || '-'}</td>
+                    <td class="p-2 border">${e.cedula || '-'}</td>
+                    <td class="p-2 border">${e.nivel_asignado || '-'}</td>
+                </tr>`
             ).join('');
         }
         cargar();
