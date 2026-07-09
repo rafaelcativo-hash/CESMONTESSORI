@@ -27,7 +27,7 @@
         );
 
         async function cargar() {
-            // El asterisco (*) trae todo, evitando errores de nombres de columnas
+            // El asterisco (*) trae todo automáticamente y evita errores de nombre
             const { data, error } = await supabase.from('estudiantes').select('*');
             
             if(error) {
