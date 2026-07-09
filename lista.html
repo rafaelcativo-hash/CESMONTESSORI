@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Lista CES MONTESSORI</title>
+    <title>Lista - CES MONTESSORI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -10,19 +10,19 @@
     <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
         <h1 class="text-xl font-bold mb-4">Listado de Estudiantes</h1>
         <table class="w-full border">
-            <thead class="bg-gray-200">
-                <tr><th class="p-2 border">Nombre</th><th class="p-2 border">Cédula</th><th class="p-2 border">Correo</th></tr>
-            </thead>
-            <tbody id="tabla-estudiantes"></tbody>
+            <thead><tr class="bg-gray-200"><th class="p-2 border">Nombre</th><th class="p-2 border">Cédula</th></tr></thead>
+            <tbody id="tabla"></tbody>
         </table>
     </div>
     <script>
         const supabase = supabase.createClient('https://vdfxdydbggeoflagznuq.supabase.co', 'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz');
         async function cargar() {
-            const { data, error } = await supabase.from('estudiantes').select('nombre_completo, cedula, correo_encargado1');
-            if(error) { console.error(error); return; }
-            document.getElementById('tabla-estudiantes').innerHTML = data.map(e => 
-                `<tr><td class="p-2 border">${e.nombre_completo}</td><td class="p-2 border">${e.cedula}</td><td class="p-2 border">${e.correo_encargado1 || ''}</td></tr>`
+            // El asterisco (*) trae todas las columnas automáticamente
+            const { data, error } = await supabase.from('estudiantes').select('*');
+            if(error) { alert("Error al cargar: " + error.message); return; }
+            
+            document.getElementById('tabla').innerHTML = data.map(e => 
+                `<tr><td class="p-2 border">${e.nombre_completo || 'Sin nombre'}</td><td class="p-2 border">${e.cedula || 'Sin cédula'}</td></tr>`
             ).join('');
         }
         cargar();
