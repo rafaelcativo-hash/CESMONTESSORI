@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <title>Acceso CES Montessori</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
-
     <div class="bg-white p-8 rounded-lg shadow-md w-96">
         <h2 class="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
         <input type="email" id="email" class="w-full border p-2 mb-4 rounded" placeholder="Correo">
@@ -14,34 +14,21 @@
         <button id="loginBtn" class="w-full bg-blue-600 text-white py-2 rounded font-bold">Entrar</button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
-        // CONFIGURACIÓN: Usamos un bloque simple
-        try {
-            const db = supabase.createClient(
-                "https://vdfxdydbggeoflagznuq.supabase.co", 
-                "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
-            );
+        // ÚNICA CONEXIÓN
+        const db = supabase.createClient(
+            "https://vdfxdydbggeoflagznuq.supabase.co", 
+            "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
+        );
 
-            document.getElementById('loginBtn').addEventListener('click', async () => {
-                const email = document.getElementById('email').value;
-                const pass = document.getElementById('pass').value;
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
 
-                const { error } = await db.auth.signInWithPassword({
-                    email: email,
-                    password: pass
-                });
-
-                if (error) {
-                    alert("Error: " + error.message);
-                } else {
-                    window.location.href = "calificaciones.html";
-                }
-            });
-        } catch (e) {
-            console.error("Error al cargar la conexión:", e);
-        }
+            const { error } = await db.auth.signInWithPassword({ email, password: pass });
+            if (error) alert("Error: " + error.message);
+            else window.location.href = "calificaciones.html";
+        });
     </script>
 </body>
 </html>
