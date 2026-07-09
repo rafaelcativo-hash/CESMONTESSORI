@@ -2,41 +2,44 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Montessori</title>
+    <title>CES Montessori - Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-blue-800 p-4 text-white flex gap-4">
-        <button onclick="mostrar('estudiantes')">Estudiantes</button>
-        <button onclick="mostrar('docentes')">Docentes</button>
-        <button onclick="mostrar('manual')">Registro Manual</button>
-    </nav>
-
-    <div id="contenido" class="p-6"></div>
+<body class="bg-gray-50 p-6">
+    <h1 class="text-3xl font-bold mb-6">Lista de Estudiantes</h1>
+    <div id="lista" class="grid gap-4">
+        <p>Cargando...</p>
+    </div>
 
     <script>
-        const db = supabase.createClient("URL", "KEY");
+        const supabaseUrl = "https://vdfxdydbggeoflagznuq.supabase.co";
+        const supabaseKey = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
+        window.db = supabase.createClient(supabaseUrl, supabaseKey);
 
-        function mostrar(seccion) {
-            const div = document.getElementById('contenido');
-            if(seccion === 'manual') {
-                div.innerHTML = `
-                    <div class="bg-white p-6 rounded shadow">
-                        <input id="nombre" placeholder="Nombre" class="border p-2 w-full mb-2">
-                        <button onclick="guardar()" class="bg-green-600 text-white p-2">Guardar Estudiante</button>
-                    </div>`;
+        async function cargar() {
+            const listaDiv = document.getElementById('lista');
+            
+            // Hacemos la consulta
+            const { data, error } = await window.db.from('estudiantes').select('*');
+            
+            // Esto es para que tú veas qué pasa en la consola (F12)
+            console.log("Datos recibidos:", data);
+            console.log("Error recibido:", error);
+
+            if (error) {
+                listaDiv.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            } else if (!data || data.length === 0) {
+                listaDiv.innerHTML = `<p class="text-gray-500">La tabla está vacía. Ve a Supabase e inserta un registro.</p>`;
             } else {
-                div.innerHTML = `Cargando ${seccion}...`;
-                // Aquí iría tu lógica de db.from(seccion).select('*')
+                listaDiv.innerHTML = data.map(e => `
+                    <div class="bg-white p-4 shadow rounded border">
+                        <h3 class="font-bold">${e.nombre_completo || 'Sin nombre'}</h3>
+                    </div>
+                `).join('');
             }
         }
-
-        async function guardar() {
-            const nombre = document.getElementById('nombre').value;
-            await db.from('estudiantes').insert([{ nombre_completo: nombre }]);
-            alert("Guardado con éxito");
-        }
+        cargar();
     </script>
 </body>
 </html>
