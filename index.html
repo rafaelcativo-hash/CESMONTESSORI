@@ -1,17 +1,29 @@
 document.getElementById('loginBtn').addEventListener('click', async () => {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
 
-    const { data, error } = await window.db.auth.signInWithPassword({
-        email: email,
-        password: password
-    });
+    // Verificación básica antes de enviar
+    if (!email || !password) {
+        alert("Por favor completa ambos campos.");
+        return;
+    }
 
-    if (error) {
-        // Esto te dirá exactamente por qué falla
-        alert("Fallo en el acceso: " + error.message);
-        console.error("Detalle del error:", error);
-    } else {
-        window.location.href = "app.html";
+    console.log("Intentando login con:", email);
+
+    try {
+        const { data, error } = await window.db.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            console.error("Detalle del error de Supabase:", error);
+            alert("Error de Supabase (400): " + error.message);
+        } else {
+            console.log("Login exitoso:", data);
+            window.location.href = "app.html";
+        }
+    } catch (err) {
+        console.error("Error inesperado:", err);
     }
 });
