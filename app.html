@@ -2,22 +2,21 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>CES Montessori - Panel Administrativo</title>
+    <title>Panel CES Montessori</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-    <!-- Navegación -->
     <nav class="bg-blue-900 p-4 text-white shadow-lg">
-        <div class="max-w-5xl mx-auto flex gap-6">
-            <button onclick="render('docentes')" class="font-bold hover:text-blue-200">Docentes</button>
-            <button onclick="render('matricula')" class="font-bold hover:text-blue-200">Matrícula</button>
-            <button onclick="render('notas')" class="font-bold hover:text-blue-200">Notas</button>
+        <div class="max-w-5xl mx-auto flex flex-wrap gap-4">
+            <button onclick="render('quienes')" class="font-bold hover:text-blue-200 px-2">Quiénes Somos</button>
+            <button onclick="render('docentes')" class="font-bold hover:text-blue-200 px-2">Docentes</button>
+            <button onclick="render('matricula')" class="font-bold hover:text-blue-200 px-2">Matrícula</button>
+            <button onclick="render('notas')" class="font-bold hover:text-blue-200 px-2">Notas</button>
         </div>
     </nav>
 
-    <!-- Contenido -->
     <main id="app" class="p-6 max-w-5xl mx-auto">
         <h1 class="text-3xl font-bold text-gray-800">Bienvenido al Panel CES Montessori</h1>
         <p class="text-gray-600">Selecciona una opción del menú para comenzar.</p>
@@ -29,7 +28,15 @@
         async function render(vista) {
             const app = document.getElementById('app');
             
-            if (vista === 'docentes') {
+            if (vista === 'quienes') {
+                app.innerHTML = `
+                    <div class="bg-white p-8 rounded shadow-lg">
+                        <h2 class="text-3xl font-bold mb-4 text-blue-900">Quiénes Somos</h2>
+                        <p class="text-lg text-gray-700 leading-relaxed">
+                            En <strong>CES Montessori</strong>, nos dedicamos a formar seres humanos integrales bajo la filosofía Montessori, fomentando la autonomía, el respeto y la excelencia.
+                        </p>
+                    </div>`;
+            } else if (vista === 'docentes') {
                 app.innerHTML = `<h2 class="text-2xl font-bold mb-4">Listado de Docentes</h2><div id="tabla-docentes" class="bg-white p-4 shadow rounded">Cargando...</div>`;
                 cargarDocentes();
             } else if (vista === 'matricula') {
@@ -40,7 +47,7 @@
                         <button onclick="guardarMatricula()" class="bg-blue-600 text-white p-2 w-full rounded">Guardar Matrícula</button>
                     </div>`;
             } else if (vista === 'notas') {
-                app.innerHTML = `<h2 class="text-2xl font-bold">Registro de Notas</h2><p>Módulo en desarrollo...</p>`;
+                app.innerHTML = `<h2 class="text-2xl font-bold mb-4">Registro de Notas</h2><p>Módulo de evaluación en desarrollo.</p>`;
             }
         }
 
@@ -52,7 +59,7 @@
             } else {
                 contenedor.innerHTML = `<table class="w-full text-left">
                     <tr class="border-b"><th>Nombre</th><th>Nivel</th></tr>
-                    ${data.map(d => `<tr><td>${d.nombre || 'N/A'}</td><td>${d.nivel || 'N/A'}</td></tr>`).join('')}
+                    ${data.map(d => `<tr><td class="py-2">${d.nombre || 'N/A'}</td><td>${d.nivel || 'N/A'}</td></tr>`).join('')}
                 </table>`;
             }
         }
