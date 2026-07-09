@@ -2,73 +2,72 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel CES Montessori</title>
+    <title>Matrícula CES Montessori</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-100 min-h-screen">
-
-    <nav class="bg-blue-900 p-4 text-white shadow-lg">
-        <div class="max-w-5xl mx-auto flex flex-wrap gap-4">
-            <button onclick="render('quienes')" class="font-bold hover:text-blue-200 px-2">Quiénes Somos</button>
-            <button onclick="render('docentes')" class="font-bold hover:text-blue-200 px-2">Docentes</button>
-            <button onclick="render('matricula')" class="font-bold hover:text-blue-200 px-2">Matrícula</button>
-            <button onclick="render('notas')" class="font-bold hover:text-blue-200 px-2">Notas</button>
-        </div>
+<body class="bg-gray-100 p-6">
+    <nav class="bg-blue-800 p-4 text-white flex gap-4 mb-6 rounded shadow-lg">
+        <button onclick="mostrar('estudiantes')" class="font-bold hover:text-blue-200">Ver Estudiantes</button>
+        <button onclick="mostrar('matricula')" class="font-bold hover:text-blue-200">Nueva Matrícula</button>
     </nav>
 
-    <main id="app" class="p-6 max-w-5xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-800">Bienvenido al Panel CES Montessori</h1>
-        <p class="text-gray-600">Selecciona una opción del menú para comenzar.</p>
-    </main>
+    <div id="contenido" class="bg-white p-6 rounded shadow max-w-4xl mx-auto">
+        <h2 class="text-xl font-bold">Bienvenido al sistema de matrícula</h2>
+    </div>
 
     <script>
         const db = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
 
-        async function render(vista) {
-            const app = document.getElementById('app');
+        async function mostrar(seccion) {
+            const div = document.getElementById('contenido');
             
-            if (vista === 'quienes') {
-                app.innerHTML = `
-                    <div class="bg-white p-8 rounded shadow-lg">
-                        <h2 class="text-3xl font-bold mb-4 text-blue-900">Quiénes Somos</h2>
-                        <p class="text-lg text-gray-700 leading-relaxed">
-                            En <strong>CES Montessori</strong>, nos dedicamos a formar seres humanos integrales bajo la filosofía Montessori, fomentando la autonomía, el respeto y la excelencia.
-                        </p>
+            if(seccion === 'matricula') {
+                div.innerHTML = `
+                    <h2 class="text-xl font-bold mb-4">Formulario de Matrícula</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="nombre" placeholder="Nombre completo" class="border p-2 col-span-2">
+                        <input id="fecha" type="date" class="border p-2">
+                        <input id="edad" placeholder="Edad" class="border p-2">
+                        <input id="nivel" placeholder="Nivel" class="border p-2 col-span-2">
+                        <input id="encargado1" placeholder="Encargado 1" class="border p-2">
+                        <input id="tel1" placeholder="Teléfono 1" class="border p-2">
+                        <input id="email1" placeholder="Correo 1" class="border p-2 col-span-2">
+                        <button onclick="guardarMatricula()" class="bg-green-600 text-white p-2 col-span-2 font-bold rounded">Registrar Matrícula</button>
                     </div>`;
-            } else if (vista === 'docentes') {
-                app.innerHTML = `<h2 class="text-2xl font-bold mb-4">Listado de Docentes</h2><div id="tabla-docentes" class="bg-white p-4 shadow rounded">Cargando...</div>`;
-                cargarDocentes();
-            } else if (vista === 'matricula') {
-                app.innerHTML = `
-                    <h2 class="text-2xl font-bold mb-4">Registro de Matrícula</h2>
-                    <div class="bg-white p-6 shadow rounded space-y-4">
-                        <input id="nombre" placeholder="Nombre completo" class="w-full border p-2 rounded">
-                        <button onclick="guardarMatricula()" class="bg-blue-600 text-white p-2 w-full rounded">Guardar Matrícula</button>
-                    </div>`;
-            } else if (vista === 'notas') {
-                app.innerHTML = `<h2 class="text-2xl font-bold mb-4">Registro de Notas</h2><p>Módulo de evaluación en desarrollo.</p>`;
-            }
-        }
-
-        async function cargarDocentes() {
-            const { data, error } = await db.from('docentes_niveles').select('*');
-            const contenedor = document.getElementById('tabla-docentes');
-            if (error) {
-                contenedor.innerHTML = "Error: " + error.message;
             } else {
-                contenedor.innerHTML = `<table class="w-full text-left">
-                    <tr class="border-b"><th>Nombre</th><th>Nivel</th></tr>
-                    ${data.map(d => `<tr><td class="py-2">${d.nombre || 'N/A'}</td><td>${d.nivel || 'N/A'}</td></tr>`).join('')}
-                </table>`;
+                div.innerHTML = "<p>Cargando lista de estudiantes...</p>";
+                const { data, error } = await db.from('estudiantes').select('*');
+                if (error) {
+                    div.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+                } else {
+                    div.innerHTML = `
+                        <h2 class="text-xl font-bold mb-4">Lista de Estudiantes</h2>
+                        <table class="w-full border-collapse border">
+                            <thead><tr class="bg-gray-200"><th class="border p-2">Nombre</th><th class="border p-2">Nivel</th></tr></thead>
+                            <tbody>${data.map(e => `<tr><td class="border p-2">${e.nombre_completo || '-'}</td><td class="border p-2">${e.nivel || '-'}</td></tr>`).join('')}</tbody>
+                        </table>`;
+                }
             }
         }
 
         async function guardarMatricula() {
-            const nombre = document.getElementById('nombre').value;
-            const { error } = await db.from('estudiantes').insert([{ nombre_completo: nombre }]);
+            const dataToSave = {
+                nombre_completo: document.getElementById('nombre').value,
+                fecha_nacimiento: document.getElementById('fecha').value,
+                edad: document.getElementById('edad').value,
+                nivel: document.getElementById('nivel').value,
+                encargado_1: document.getElementById('encargado1').value,
+                telefono_1: document.getElementById('tel1').value,
+                correo_1: document.getElementById('email1').value
+            };
+
+            const { error } = await db.from('estudiantes').insert([dataToSave]);
             if (error) alert("Error: " + error.message);
-            else alert("¡Estudiante matriculado con éxito!");
+            else {
+                alert("¡Matrícula exitosa!");
+                mostrar('estudiantes'); // Refresca la tabla automáticamente
+            }
         }
     </script>
 </body>
