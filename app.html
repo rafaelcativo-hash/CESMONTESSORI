@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel CES Montessori</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 p-6">
+
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Panel de Control</h1>
+        
+        <div id="dataContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <p class="text-gray-500">Cargando información...</p>
+        </div>
+    </div>
+
+    <script>
+        // Inicialización segura (igual que en index.html)
+        window.db = window.db || supabase.createClient(
+            "https://vdfxdydbggeoflagznuq.supabase.co", 
+            "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz"
+        );
+
+        async function cargarInformacion() {
+            // Ejemplo: Consultando la tabla de estudiantes
+            const { data, error } = await window.db.from('estudiantes').select('*');
+            
+            const container = document.getElementById('dataContainer');
+            
+            if (error) {
+                container.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            } else if (data.length === 0) {
+                container.innerHTML = `<p>No hay registros disponibles.</p>`;
+            } else {
+                container.innerHTML = data.map(e => `
+                    <div class="bg-white p-4 rounded shadow border">
+                        <h3 class="font-bold text-lg">${e.nombre_completo}</h3>
+                        <p class="text-sm text-gray-600">Cédula: ${e.cedula}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Ejecutar carga al abrir
+        cargarInformacion();
+    </script>
+</body>
+</html>
