@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -29,11 +29,8 @@
                 nivel_asignado: document.getElementById('nivel').value
             }]);
             
-            if(error) {
-                alert("Error: " + error.message);
-            } else {
-                alert("¡Guardado correctamente!");
-            }
+            if(error) alert("Error al guardar: " + error.message);
+            else alert("¡Guardado correctamente!");
         }
     </script>
 </body>
