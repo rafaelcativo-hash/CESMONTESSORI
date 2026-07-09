@@ -2,13 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Administrativo CES Montessori</title>
+    <title>CES Montessori - Panel Administrativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
-    
-    <nav class="bg-blue-900 text-white p-4 shadow-md">
+
+    <!-- Navegación -->
+    <nav class="bg-blue-900 p-4 text-white shadow-lg">
         <div class="max-w-5xl mx-auto flex gap-6">
             <button onclick="render('docentes')" class="font-bold hover:text-blue-200">Docentes</button>
             <button onclick="render('matricula')" class="font-bold hover:text-blue-200">Matrícula</button>
@@ -16,24 +17,51 @@
         </div>
     </nav>
 
+    <!-- Contenido -->
     <main id="app" class="p-6 max-w-5xl mx-auto">
         <h1 class="text-3xl font-bold text-gray-800">Bienvenido al Panel CES Montessori</h1>
-        <p class="text-gray-600">Selecciona una opción del menú superior para comenzar.</p>
+        <p class="text-gray-600">Selecciona una opción del menú para comenzar.</p>
     </main>
 
     <script>
         const db = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
 
-        function render(vista) {
+        async function render(vista) {
             const app = document.getElementById('app');
             
             if (vista === 'docentes') {
-                app.innerHTML = `<h2 class="text-2xl font-bold">Listado de Docentes</h2><div class="mt-4 bg-white p-4 shadow rounded">Contenido Docentes aquí...</div>`;
+                app.innerHTML = `<h2 class="text-2xl font-bold mb-4">Listado de Docentes</h2><div id="tabla-docentes" class="bg-white p-4 shadow rounded">Cargando...</div>`;
+                cargarDocentes();
             } else if (vista === 'matricula') {
-                app.innerHTML = `<h2 class="text-2xl font-bold">Registro de Matrícula</h2><div class="mt-4 bg-white p-4 shadow rounded">Formulario de Matrícula aquí...</div>`;
+                app.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4">Registro de Matrícula</h2>
+                    <div class="bg-white p-6 shadow rounded space-y-4">
+                        <input id="nombre" placeholder="Nombre completo" class="w-full border p-2 rounded">
+                        <button onclick="guardarMatricula()" class="bg-blue-600 text-white p-2 w-full rounded">Guardar Matrícula</button>
+                    </div>`;
             } else if (vista === 'notas') {
-                app.innerHTML = `<h2 class="text-2xl font-bold">Registro de Notas</h2><div class="mt-4 bg-white p-4 shadow rounded">Criterios de evaluación aquí...</div>`;
+                app.innerHTML = `<h2 class="text-2xl font-bold">Registro de Notas</h2><p>Módulo en desarrollo...</p>`;
             }
+        }
+
+        async function cargarDocentes() {
+            const { data, error } = await db.from('docentes_niveles').select('*');
+            const contenedor = document.getElementById('tabla-docentes');
+            if (error) {
+                contenedor.innerHTML = "Error: " + error.message;
+            } else {
+                contenedor.innerHTML = `<table class="w-full text-left">
+                    <tr class="border-b"><th>Nombre</th><th>Nivel</th></tr>
+                    ${data.map(d => `<tr><td>${d.nombre || 'N/A'}</td><td>${d.nivel || 'N/A'}</td></tr>`).join('')}
+                </table>`;
+            }
+        }
+
+        async function guardarMatricula() {
+            const nombre = document.getElementById('nombre').value;
+            const { error } = await db.from('estudiantes').insert([{ nombre_completo: nombre }]);
+            if (error) alert("Error: " + error.message);
+            else alert("¡Estudiante matriculado con éxito!");
         }
     </script>
 </body>
