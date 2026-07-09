@@ -2,59 +2,67 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Matrícula CES Montessori</title>
+    <title>Panel CES Montessori</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 p-6">
 
-    <nav class="bg-blue-800 p-4 text-white flex gap-4 mb-6 rounded shadow-lg">
-        <button onclick="mostrar('estudiantes')" class="font-bold hover:text-blue-200">Ver Estudiantes</button>
-        <button onclick="mostrar('matricula')" class="font-bold hover:text-blue-200">Nueva Matrícula</button>
-        <button onclick="mostrar('docentes')" class="font-bold hover:text-blue-200">Docentes</button>
-        <button onclick="mostrar('notas')" class="font-bold hover:text-blue-200">Notas</button>
+    <nav class="bg-blue-900 p-4 text-white flex flex-wrap gap-4 mb-6 rounded shadow-lg">
+        <button onclick="render('quienes')" class="font-bold hover:text-blue-200">Quiénes Somos</button>
+        <button onclick="render('docentes')" class="font-bold hover:text-blue-200">Docentes</button>
+        <button onclick="render('matricula')" class="font-bold hover:text-blue-200">Matrícula</button>
+        <button onclick="render('notas')" class="font-bold hover:text-blue-200">Notas</button>
     </nav>
 
     <div id="contenido" class="bg-white p-6 rounded shadow max-w-4xl mx-auto">
-        <h2 class="text-xl font-bold">Selecciona una opción del menú</h2>
+        <h2 class="text-2xl font-bold">Bienvenido al Panel CES Montessori</h2>
+        <p>Selecciona una opción del menú para comenzar.</p>
     </div>
 
     <script>
         const db = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
 
-        function mostrar(seccion) {
+        async function render(seccion) {
             const div = document.getElementById('contenido');
             
-            if(seccion === 'matricula') {
+            if (seccion === 'quienes') {
+                div.innerHTML = `<h2 class="text-xl font-bold mb-4">Quiénes Somos</h2><p>CES Montessori: Formando seres humanos integrales.</p>`;
+            } 
+            else if (seccion === 'docentes') {
+                div.innerHTML = `<h2 class="text-xl font-bold mb-4">Lista de Docentes</h2><div id="data-container">Cargando...</div>`;
+                const { data } = await db.from('docentes_niveles').select('*');
+                div.querySelector('#data-container').innerHTML = `<table class="w-full border"><tr><th class="border p-2">Nombre</th><th class="border p-2">Nivel</th></tr>${data.map(d => `<tr><td class="border p-2">${d.nombre}</td><td class="border p-2">${d.nivel}</td></tr>`).join('')}</table>`;
+            } 
+            else if (seccion === 'matricula') {
                 div.innerHTML = `
-                    <h2 class="text-xl font-bold mb-4">Formulario de Matrícula</h2>
+                    <h2 class="text-xl font-bold mb-4">Nueva Matrícula</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <input id="nombre" placeholder="Nombre completo" class="border p-2 col-span-2">
-                        <input id="fecha" type="date" class="border p-2">
-                        <input id="edad" placeholder="Edad" class="border p-2">
                         <input id="nivel" placeholder="Nivel" class="border p-2 col-span-2">
-                        <button onclick="guardarMatricula()" class="bg-green-600 text-white p-2 col-span-2 font-bold rounded hover:bg-green-700">Registrar Matrícula</button>
+                        <input id="encargado1" placeholder="Encargado 1" class="border p-2">
+                        <input id="encargado2" placeholder="Encargado 2" class="border p-2">
+                        <input id="direccion" placeholder="Dirección" class="border p-2 col-span-2">
+                        <button onclick="guardarMatricula()" class="bg-green-600 text-white p-2 rounded col-span-2 hover:bg-green-700">Guardar Matrícula</button>
                     </div>`;
-            } else if(seccion === 'estudiantes') {
-                div.innerHTML = "<p>Cargando lista...</p>";
-                cargarEstudiantes();
-            } else {
-                div.innerHTML = `<h2 class="text-xl font-bold">Módulo ${seccion}</h2><p>En desarrollo.</p>`;
+            } 
+            else if (seccion === 'notas') {
+                div.innerHTML = `<h2 class="text-xl font-bold mb-4">Registro de Notas</h2><p>Módulo en desarrollo.</p>`;
             }
         }
 
-        async function cargarEstudiantes() {
-            const div = document.getElementById('contenido');
-            const { data, error } = await db.from('estudiantes').select('*');
-            if (error) div.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
-            else {
-                div.innerHTML = `
-                    <h2 class="text-xl font-bold mb-4">Lista de Estudiantes</h2>
-                    <table class="w-full border-collapse border">
-                        <thead><tr class="bg-gray-200"><th class="border p-2">Nombre</th><th class="border p-2">Nivel</th></tr></thead>
-                        <tbody>${data.map(e => `<tr><td class="border p-2">${e.nombre_completo || '-'}</td><td class="border p-2">${e.nivel || '-'}</td></tr>`).join('')}</tbody>
-                    </table>`;
-            }
+        async function guardarMatricula() {
+            const dataToSave = {
+                nombre_completo: document.getElementById('nombre').value,
+                nivel: document.getElementById('nivel').value,
+                encargado_1: document.getElementById('encargado1').value,
+                encargado_2: document.getElementById('encargado2').value,
+                direccion: document.getElementById('direccion').value
+            };
+            
+            const { error } = await db.from('estudiantes').insert([dataToSave]);
+            if (error) alert("Error: " + error.message);
+            else alert("¡Matrícula exitosa!");
         }
     </script>
 </body>
