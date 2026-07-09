@@ -9,26 +9,30 @@
     
     <style>
         body {
-            /* 'cover' asegura que la imagen se estire para cubrir todo */
             background-image: url('Logo CES.png');
-            background-size: cover; 
-            background-position: center center;
+            background-size: cover;
+            background-position: center;
             background-repeat: no-repeat;
-            /* Fija el fondo para que no se mueva al hacer scroll */
             background-attachment: fixed;
             height: 100vh;
             margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
-        .glass-container {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
+        .glass {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
         }
     </style>
 </head>
-<body class="flex items-center justify-center">
+<body>
 
-    <div class="glass-container p-8 rounded-lg shadow-2xl w-96 border border-white/50">
+    <div class="glass">
         <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Acceso Institucional</h2>
         <input type="email" id="email" class="w-full border p-3 mb-4 rounded" placeholder="Correo electrónico">
         <input type="password" id="password" class="w-full border p-3 mb-6 rounded" placeholder="Contraseña">
@@ -36,17 +40,41 @@
     </div>
 
     <script>
+        // Inicialización
         const supabaseUrl = "https://vdfxdydbggeoflagznuq.supabase.co";
         const supabaseKey = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
-        window.db = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        try {
+            window.db = supabase.createClient(supabaseUrl, supabaseKey);
+            console.log("Supabase inicializado correctamente");
+        } catch (e) {
+            console.error("Error al inicializar Supabase:", e);
+        }
 
+        // Lógica de Login
         document.getElementById('loginBtn').addEventListener('click', async () => {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
 
-            const { error } = await window.db.auth.signInWithPassword({ email, password });
-            if (error) alert("Error: " + error.message);
-            else window.location.href = "app.html";
+            if (!email || !password) {
+                alert("Por favor, rellena todos los campos");
+                return;
+            }
+
+            try {
+                const { error } = await window.db.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    alert("Error: " + error.message);
+                } else {
+                    window.location.href = "app.html";
+                }
+            } catch (err) {
+                console.error("Error inesperado:", err);
+            }
         });
     </script>
 </body>
