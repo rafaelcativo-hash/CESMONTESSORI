@@ -21,12 +21,18 @@
         async function cargar() {
             const { data, error } = await supabase.from('estudiantes').select('*');
             if (error) { alert("Error: " + error.message); return; }
-            document.getElementById('tabla').innerHTML = data.map(e => `
-                <tr class="border-b">
-                    <td class="p-2">${e.nombre_completo}</td>
-                    <td class="p-2">${e.cedula}</td>
-                    <td class="p-2">${e.nivel_numero}</td>
-                </tr>`).join('');
+            
+            const tabla = document.getElementById('tabla');
+            if (data && data.length > 0) {
+                tabla.innerHTML = data.map(e => `
+                    <tr class="border-b">
+                        <td class="p-2">${e.nombre_completo}</td>
+                        <td class="p-2">${e.cedula}</td>
+                        <td class="p-2">${e.nivel_numero}</td>
+                    </tr>`).join('');
+            } else {
+                tabla.innerHTML = "<tr><td colspan='3' class='p-4'>No hay registros</td></tr>";
+            }
         }
         cargar();
     </script>
