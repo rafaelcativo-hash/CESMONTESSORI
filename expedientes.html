@@ -5,31 +5,27 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 p-8">
-    <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+    <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
         <h1 class="text-xl font-bold mb-4">Registro CES MONTESSORI</h1>
         <div class="grid grid-cols-2 gap-4">
             <input id="nombre" placeholder="Nombre completo" class="col-span-2 border p-2 rounded">
             <input id="cedula" placeholder="Cédula" class="border p-2 rounded">
-            
             <select id="ciclo" class="border p-2 rounded">
-                <option value="1er Ciclo">Primer Ciclo</option>
-                <option value="2do Ciclo">Segundo Ciclo</option>
+                <option value="1er Ciclo">1er Ciclo</option>
+                <option value="2do Ciclo">2do Ciclo</option>
             </select>
-            <input id="nivel" placeholder="Nivel (Ej: 1, 4...)" class="border p-2 rounded">
-            
+            <input id="nivel" placeholder="Nivel (Ej: 1, 4)" class="border p-2 rounded">
             <input id="provincia" placeholder="Provincia" class="border p-2 rounded">
             <input id="canton" placeholder="Cantón" class="border p-2 rounded">
             <input id="distrito" placeholder="Distrito" class="border p-2 rounded">
             <input id="otras" placeholder="Otras señas" class="col-span-2 border p-2 rounded">
-            
-            <button onclick="guardar()" class="col-span-2 bg-blue-600 text-white p-2 rounded font-bold">GUARDAR</button>
+            <button onclick="guardar()" class="col-span-2 bg-blue-600 text-white p-2 rounded font-bold">GUARDAR ESTUDIANTE</button>
         </div>
     </div>
-
     <script>
         const supabase = supabase.createClient('https://vdfxdydbggeoflagznuq.supabase.co', 'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz');
         async function guardar() {
-            const { error } = await supabase.from('estudiantes').insert([{
+            const datos = {
                 nombre_completo: document.getElementById('nombre').value,
                 cedula: document.getElementById('cedula').value,
                 ciclo_escolar: document.getElementById('ciclo').value,
@@ -38,7 +34,8 @@
                 canton: document.getElementById('canton').value,
                 distrito: document.getElementById('distrito').value,
                 otras_senas: document.getElementById('otras').value
-            }]);
+            };
+            const { error } = await supabase.from('estudiantes').insert([datos]);
             error ? alert("Error: " + error.message) : alert("Guardado con éxito");
         }
     </script>
