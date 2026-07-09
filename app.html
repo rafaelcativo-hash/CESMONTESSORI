@@ -7,22 +7,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 p-6">
+
     <nav class="bg-blue-800 p-4 text-white flex gap-4 mb-6 rounded shadow-lg">
         <button onclick="mostrar('estudiantes')" class="font-bold hover:text-blue-200">Ver Estudiantes</button>
         <button onclick="mostrar('matricula')" class="font-bold hover:text-blue-200">Nueva Matrícula</button>
+        <button onclick="mostrar('docentes')" class="font-bold hover:text-blue-200">Docentes</button>
+        <button onclick="mostrar('notas')" class="font-bold hover:text-blue-200">Notas</button>
     </nav>
 
     <div id="contenido" class="bg-white p-6 rounded shadow max-w-4xl mx-auto">
-        <h2 class="text-xl font-bold">Selecciona una opción en el menú superior</h2>
+        <h2 class="text-xl font-bold">Selecciona una opción del menú</h2>
     </div>
 
     <script>
-        // Inicialización
-        const supabaseUrl = "https://vdfxdydbggeoflagznuq.supabase.co";
-        const supabaseKey = "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz";
-        const db = supabase.createClient(supabaseUrl, supabaseKey);
+        const db = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
 
-        async function mostrar(seccion) {
+        function mostrar(seccion) {
             const div = document.getElementById('contenido');
             
             if(seccion === 'matricula') {
@@ -33,50 +33,27 @@
                         <input id="fecha" type="date" class="border p-2">
                         <input id="edad" placeholder="Edad" class="border p-2">
                         <input id="nivel" placeholder="Nivel" class="border p-2 col-span-2">
-                        <input id="encargado1" placeholder="Encargado 1" class="border p-2">
-                        <input id="tel1" placeholder="Teléfono 1" class="border p-2">
-                        <input id="email1" placeholder="Correo 1" class="border p-2 col-span-2">
                         <button onclick="guardarMatricula()" class="bg-green-600 text-white p-2 col-span-2 font-bold rounded hover:bg-green-700">Registrar Matrícula</button>
                     </div>`;
+            } else if(seccion === 'estudiantes') {
+                div.innerHTML = "<p>Cargando lista...</p>";
+                cargarEstudiantes();
             } else {
-                div.innerHTML = "<p>Cargando lista desde la base de datos...</p>";
-                
-                // Petición a la tabla
-                const { data, error } = await db.from('estudiantes').select('*');
-                
-                if (error) {
-                    div.innerHTML = `<p class="text-red-600 font-bold">Error en Supabase: ${error.message}</p>
-                                    <p class="mt-2 text-sm">Verifica que la tabla se llame 'estudiantes' y que tenga políticas de lectura (RLS) activadas.</p>`;
-                } else if (!data || data.length === 0) {
-                    div.innerHTML = "<p>No hay estudiantes registrados aún.</p>";
-                } else {
-                    div.innerHTML = `
-                        <h2 class="text-xl font-bold mb-4">Lista de Estudiantes</h2>
-                        <table class="w-full border-collapse border">
-                            <thead><tr class="bg-gray-200"><th class="border p-2">Nombre</th><th class="border p-2">Nivel</th></tr></thead>
-                            <tbody>${data.map(e => `<tr><td class="border p-2">${e.nombre_completo || 'N/A'}</td><td class="border p-2">${e.nivel || 'N/A'}</td></tr>`).join('')}</tbody>
-                        </table>`;
-                }
+                div.innerHTML = `<h2 class="text-xl font-bold">Módulo ${seccion}</h2><p>En desarrollo.</p>`;
             }
         }
 
-        async function guardarMatricula() {
-            const dataToSave = {
-                nombre_completo: document.getElementById('nombre').value,
-                fecha_nacimiento: document.getElementById('fecha').value,
-                edad: document.getElementById('edad').value,
-                nivel: document.getElementById('nivel').value,
-                encargado_1: document.getElementById('encargado1').value,
-                telefono_1: document.getElementById('tel1').value,
-                correo_1: document.getElementById('email1').value
-            };
-
-            const { error } = await db.from('estudiantes').insert([dataToSave]);
-            if (error) {
-                alert("Error al guardar: " + error.message);
-            } else {
-                alert("¡Matrícula exitosa!");
-                mostrar('estudiantes'); 
+        async function cargarEstudiantes() {
+            const div = document.getElementById('contenido');
+            const { data, error } = await db.from('estudiantes').select('*');
+            if (error) div.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            else {
+                div.innerHTML = `
+                    <h2 class="text-xl font-bold mb-4">Lista de Estudiantes</h2>
+                    <table class="w-full border-collapse border">
+                        <thead><tr class="bg-gray-200"><th class="border p-2">Nombre</th><th class="border p-2">Nivel</th></tr></thead>
+                        <tbody>${data.map(e => `<tr><td class="border p-2">${e.nombre_completo || '-'}</td><td class="border p-2">${e.nivel || '-'}</td></tr>`).join('')}</tbody>
+                    </table>`;
             }
         }
     </script>
