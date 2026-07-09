@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Expedientes - CES Montessori</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 p-6">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">Nuevo Expediente Estudiantil</h2>
+        
+        <div id="form-expediente" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" id="nombre" placeholder="Nombre completo" class="col-span-2 p-3 border rounded-xl">
+            <input type="text" id="cedula" placeholder="Cédula / Identificación" class="p-3 border rounded-xl">
+            <input type="date" id="fecha_nacimiento" class="p-3 border rounded-xl">
+            
+            <hr class="col-span-2 my-2">
+            
+            <input type="text" id="encargado1" placeholder="Encargado 1" class="p-3 border rounded-xl">
+            <input type="email" id="correo1" placeholder="Correo Encargado 1" class="p-3 border rounded-xl">
+            <input type="text" id="encargado2" placeholder="Encargado 2" class="p-3 border rounded-xl">
+            <input type="email" id="correo2" placeholder="Correo Encargado 2" class="p-3 border rounded-xl">
+            
+            <textarea id="direccion" placeholder="Dirección exacta" class="col-span-2 p-3 border rounded-xl h-20"></textarea>
+            
+            <select id="nivel" class="p-3 border rounded-xl">
+                <option value="Casa de Niños">Casa de Niños</option>
+                <option value="1° Ciclo">1° Ciclo</option>
+                <option value="2° Ciclo">2° Ciclo</option>
+            </select>
+            <input type="text" id="instrumento" placeholder="Instrumento musical" class="p-3 border rounded-xl">
+            
+            <div class="col-span-2 flex gap-4 text-sm">
+                <label><input type="checkbox" id="pago1"> Opción Pago 1</label>
+                <label><input type="checkbox" id="pago2"> Opción Pago 2</label>
+            </div>
 
+            <button onclick="guardarExpediente()" class="col-span-2 bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800">Registrar Expediente</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // CONFIGURA TUS CREDENCIALES AQUÍ
+        const supabase = supabase.createClient('TU_SUPABASE_URL', 'TU_SUPABASE_ANON_KEY');
+
+        async function guardarExpediente() {
+            const datos = {
+                nombre_completo: document.getElementById('nombre').value,
+                cedula: document.getElementById('cedula').value,
+                fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
+                nombre_encargado: document.getElementById('encargado1').value,
+                segundo_encargado: document.getElementById('encargado2').value,
+                correo_encargado1: document.getElementById('correo1').value,
+                correo_encargado2: document.getElementById('correo2').value,
+                direccion: document.getElementById('direccion').value,
+                nivel_asignado: document.getElementById('nivel').value,
+                instrumento_musical: document.getElementById('instrumento').value,
+                pago_opcional1: document.getElementById('pago1').checked,
+                pago_opcional2: document.getElementById('pago2').checked
+            };
+
+            const { error } = await supabase.from('estudiantes').insert([datos]);
+            if (error) {
+                alert("Error técnico: " + error.message);
+            } else {
+                alert("Expediente creado correctamente.");
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
