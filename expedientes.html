@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <title>Registro - CES MONTESSORI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 p-8">
-    <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
-        <h1 class="text-xl font-bold mb-4">Registro CES MONTESSORI</h1>
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-xl font-bold mb-4">Registro Estudiantes</h1>
         <div class="grid grid-cols-2 gap-4">
             <input id="nombre" placeholder="Nombre completo" class="col-span-2 border p-2 rounded">
             <input id="cedula" placeholder="Cédula" class="border p-2 rounded">
@@ -25,7 +27,7 @@
     <script>
         const supabase = supabase.createClient('https://vdfxdydbggeoflagznuq.supabase.co', 'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz');
         async function guardar() {
-            const datos = {
+            const { error } = await supabase.from('estudiantes').insert([{
                 nombre_completo: document.getElementById('nombre').value,
                 cedula: document.getElementById('cedula').value,
                 ciclo_escolar: document.getElementById('ciclo').value,
@@ -34,9 +36,8 @@
                 canton: document.getElementById('canton').value,
                 distrito: document.getElementById('distrito').value,
                 otras_senas: document.getElementById('otras').value
-            };
-            const { error } = await supabase.from('estudiantes').insert([datos]);
-            error ? alert("Error: " + error.message) : alert("Guardado con éxito");
+            }]);
+            error ? alert("Error: " + error.message) : alert("¡Guardado con éxito!");
         }
     </script>
 </body>
