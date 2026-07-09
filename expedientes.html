@@ -2,35 +2,30 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registro - CES MONTESSORI</title>
+    <title>Registro CES MONTESSORI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 p-8">
     <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
-        <h1 class="text-xl font-bold mb-4">Registro Estudiantes</h1>
+        <h1 class="text-xl font-bold mb-4">Registro de Estudiantes</h1>
         <div class="grid grid-cols-2 gap-4">
             <input id="nombre" type="text" placeholder="Nombre completo" class="col-span-2 border p-2 rounded">
             <input id="cedula" type="text" placeholder="Cédula" class="border p-2 rounded">
             <input id="nivel" type="text" placeholder="Nivel" class="border p-2 rounded">
-            <button onclick="guardar()" class="col-span-2 bg-blue-600 text-white p-2 rounded font-bold">GUARDAR REGISTRO</button>
+            <button onclick="guardar()" class="col-span-2 bg-blue-600 text-white p-2 rounded font-bold">GUARDAR</button>
         </div>
     </div>
     <script>
-        const supabase = supabase.createClient(
-            'https://vdfxdydbggeoflagznuq.supabase.co', 
-            'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz'
-        );
-
+        const supabase = supabase.createClient('https://vdfxdydbggeoflagznuq.supabase.co', 'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz');
         async function guardar() {
             const { error } = await supabase.from('estudiantes').insert([{
                 nombre_completo: document.getElementById('nombre').value,
                 cedula: document.getElementById('cedula').value,
                 nivel_asignado: document.getElementById('nivel').value
             }]);
-            
-            if(error) alert("Error al guardar: " + error.message);
-            else alert("¡Guardado correctamente!");
+            if(error) { alert("Error: " + error.message); }
+            else { alert("Guardado con éxito"); }
         }
     </script>
 </body>
