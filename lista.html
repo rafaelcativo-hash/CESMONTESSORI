@@ -2,61 +2,31 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Lista - CES Montessori</title>
+    <title>Registro - CES MONTESSORI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-50 p-8">
-    <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-slate-900">Estudiantes Registrados</h1>
-            <a href="expedientes.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700">Nuevo Registro</a>
-        </div>
-
-        <div class="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-bold">
-                    <tr>
-                        <th class="px-6 py-4">Nombre</th>
-                        <th class="px-6 py-4">Cédula</th>
-                        <th class="px-6 py-4">Nivel</th>
-                        <th class="px-6 py-4">Instrumento</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-estudiantes" class="divide-y divide-slate-100">
-                    <tr><td colspan="4" class="px-6 py-4 text-center text-slate-400">Cargando...</td></tr>
-                </tbody>
-            </table>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-xl font-bold mb-4">Registro CES MONTESSORI</h1>
+        <div class="grid grid-cols-2 gap-4">
+            <input id="nombre" type="text" placeholder="Nombre Completo" class="col-span-2 border p-2 rounded">
+            <input id="cedula" type="text" placeholder="Cédula" class="border p-2 rounded">
+            <input id="nivel" type="text" placeholder="Nivel" class="border p-2 rounded">
+            <button onclick="guardar()" class="col-span-2 bg-blue-600 text-white p-2 rounded font-bold">GUARDAR</button>
         </div>
     </div>
-
     <script>
-        const supabase = supabase.createClient('TU_URL', 'TU_KEY');
-
-        async function cargarLista() {
-            const { data, error } = await supabase.from('estudiantes').select('*');
-            const tabla = document.getElementById('tabla-estudiantes');
-            
-            if (error) {
-                tabla.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-red-500">Error al cargar: ${error.message}</td></tr>`;
-                return;
-            }
-
-            if (data.length === 0) {
-                tabla.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-slate-400">No hay registros aún.</td></tr>`;
-                return;
-            }
-
-            tabla.innerHTML = data.map(est => `
-                <tr class="hover:bg-slate-50">
-                    <td class="px-6 py-4 font-bold text-slate-900">${est.nombre_completo}</td>
-                    <td class="px-6 py-4 text-slate-600">${est.cedula}</td>
-                    <td class="px-6 py-4 text-slate-600">${est.nivel_asignado}</td>
-                    <td class="px-6 py-4 text-blue-600">${est.instrumento_musical || '-'}</td>
-                </tr>
-            `).join('');
+        const supabase = supabase.createClient('https://vdfxdydbggeoflagznuq.supabase.co', 'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz');
+        async function guardar() {
+            const { error } = await supabase.from('estudiantes').insert([{
+                nombre_completo: document.getElementById('nombre').value,
+                cedula: document.getElementById('cedula').value,
+                nivel_asignado: document.getElementById('nivel').value
+            }]);
+            if(error) alert("Error: " + error.message);
+            else alert("Guardado");
         }
-        cargarLista();
     </script>
 </body>
 </html>
