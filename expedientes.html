@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -19,13 +19,14 @@
     <script>
         const supabase = supabase.createClient('https://vdfxdydbggeoflagznuq.supabase.co', 'sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz');
         async function guardar() {
+            // Usamos solo las columnas que sabemos que existen
             const { error } = await supabase.from('estudiantes').insert([{
                 nombre_completo: document.getElementById('nombre').value,
                 cedula: document.getElementById('cedula').value,
                 nivel_asignado: document.getElementById('nivel').value
             }]);
-            if(error) alert("Error: " + error.message);
-            else alert("¡Guardado!");
+            if(error) alert("Error al guardar: " + error.message);
+            else alert("¡Guardado correctamente!");
         }
     </script>
 </body>
