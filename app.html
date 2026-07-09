@@ -12,12 +12,11 @@
         <button onclick="render('quienes')" class="font-bold hover:text-blue-200">Quiénes Somos</button>
         <button onclick="render('docentes')" class="font-bold hover:text-blue-200">Docentes</button>
         <button onclick="render('matricula')" class="font-bold hover:text-blue-200">Matrícula</button>
-        <button onclick="render('notas')" class="font-bold hover:text-blue-200">Notas</button>
+        <button onclick="render('notas')" class="font-bold hover:text-blue-200">Registro de Notas</button>
     </nav>
 
     <div id="contenido" class="bg-white p-6 rounded shadow max-w-4xl mx-auto">
         <h2 class="text-2xl font-bold">Bienvenido al Panel CES Montessori</h2>
-        <p>Selecciona una opción del menú para comenzar.</p>
     </div>
 
     <script>
@@ -36,18 +35,25 @@
             } 
             else if (seccion === 'matricula') {
                 div.innerHTML = `
-                    <h2 class="text-xl font-bold mb-4">Nueva Matrícula</h2>
+                    <h2 class="text-xl font-bold mb-4">Formulario de Matrícula</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <input id="nombre" placeholder="Nombre completo" class="border p-2 col-span-2">
-                        <input id="nivel" placeholder="Nivel" class="border p-2 col-span-2">
+                        <input id="nivel" placeholder="Nivel" class="border p-2">
+                        <input id="direccion" placeholder="Dirección exacta" class="border p-2">
                         <input id="encargado1" placeholder="Encargado 1" class="border p-2">
                         <input id="encargado2" placeholder="Encargado 2" class="border p-2">
-                        <input id="direccion" placeholder="Dirección" class="border p-2 col-span-2">
                         <button onclick="guardarMatricula()" class="bg-green-600 text-white p-2 rounded col-span-2 hover:bg-green-700">Guardar Matrícula</button>
                     </div>`;
             } 
             else if (seccion === 'notas') {
-                div.innerHTML = `<h2 class="text-xl font-bold mb-4">Registro de Notas</h2><p>Módulo en desarrollo.</p>`;
+                div.innerHTML = `
+                    <h2 class="text-xl font-bold mb-4">Registro de Notas</h2>
+                    <div class="space-y-4">
+                        <input id="nombre-alumno" placeholder="Nombre del alumno" class="border p-2 w-full">
+                        <input id="materia" placeholder="Materia" class="border p-2 w-full">
+                        <input id="nota" type="number" placeholder="Calificación (0-100)" class="border p-2 w-full">
+                        <button onclick="registrarNota()" class="bg-blue-600 text-white p-2 rounded w-full">Registrar Nota en Historial</button>
+                    </div>`;
             }
         }
 
@@ -59,10 +65,20 @@
                 encargado_2: document.getElementById('encargado2').value,
                 direccion: document.getElementById('direccion').value
             };
-            
             const { error } = await db.from('estudiantes').insert([dataToSave]);
             if (error) alert("Error: " + error.message);
             else alert("¡Matrícula exitosa!");
+        }
+
+        async function registrarNota() {
+            const notaData = {
+                alumno: document.getElementById('nombre-alumno').value,
+                materia: document.getElementById('materia').value,
+                calificacion: document.getElementById('nota').value
+            };
+            const { error } = await db.from('registro_notas').insert([notaData]);
+            if (error) alert("Error al registrar nota: " + error.message);
+            else alert("Nota registrada correctamente en el historial.");
         }
     </script>
 </body>
