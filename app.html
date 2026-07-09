@@ -2,63 +2,58 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Matrícula CES Montessori</title>
+    <title>Panel Administrativo CES Montessori</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-100 p-6">
-    <nav class="bg-blue-800 p-4 text-white flex gap-4 mb-6 rounded">
-        <button onclick="mostrar('estudiantes')" class="font-bold">Ver Estudiantes</button>
-        <button onclick="mostrar('matricula')" class="font-bold">Nueva Matrícula</button>
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-blue-900 p-4 text-white shadow-lg">
+        <div class="max-w-6xl mx-auto flex gap-6">
+            <button onclick="render('estudiantes')" class="hover:text-blue-200 font-bold">Gestión Estudiantes</button>
+            <button onclick="render('matricula')" class="hover:text-blue-200 font-bold">Matrícula</button>
+            <button onclick="render('notas')" class="hover:text-blue-200 font-bold">Evaluaciones</button>
+        </div>
     </nav>
 
-    <div id="contenido" class="bg-white p-6 rounded shadow max-w-2xl mx-auto">
-        </div>
+    <main id="app" class="max-w-6xl mx-auto p-6">
+        <h1 class="text-2xl font-bold">Bienvenido al Panel de Control</h1>
+    </main>
 
     <script>
         const db = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
 
-        function mostrar(seccion) {
-            const div = document.getElementById('contenido');
-            if(seccion === 'matricula') {
-                div.innerHTML = `
-                    <h2 class="text-xl font-bold mb-4">Formulario de Matrícula</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input id="nombre" placeholder="Nombre completo" class="border p-2 col-span-2">
-                        <input id="fecha" type="date" class="border p-2">
-                        <input id="edad" placeholder="Edad" class="border p-2">
-                        <input id="nivel" placeholder="Nivel" class="border p-2 col-span-2">
-                        <input id="encargado1" placeholder="Encargado 1" class="border p-2">
-                        <input id="tel1" placeholder="Teléfono 1" class="border p-2">
-                        <input id="email1" placeholder="Correo 1" class="border p-2 col-span-2">
-                        <input id="encargado2" placeholder="Encargado 2" class="border p-2">
-                        <input id="tel2" placeholder="Teléfono 2" class="border p-2">
-                        <input id="email2" placeholder="Correo 2" class="border p-2 col-span-2">
-                        <button onclick="guardarMatricula()" class="bg-green-600 text-white p-2 col-span-2 font-bold">Registrar Matrícula</button>
+        // Motor de navegación simple
+        function render(vista) {
+            const app = document.getElementById('app');
+            if (vista === 'estudiantes') {
+                app.innerHTML = `
+                    <h2 class="text-xl font-bold mb-4">Registro de Estudiantes</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input id="nombre" placeholder="Nombre Completo" class="border p-2 rounded">
+                        <select id="ciclo" class="border p-2 rounded">
+                            <option value="1">Primer Ciclo (1°-3°)</option>
+                            <option value="2">Segundo Ciclo (4°-6°)</option>
+                        </select>
+                        <button onclick="guardarEstudiante()" class="bg-blue-600 text-white p-2 rounded col-span-2">Registrar Estudiante</button>
                     </div>`;
-            } else {
-                div.innerHTML = "<p>Cargando lista...</p>";
-                // Aquí iría tu lógica de db.from('estudiantes').select('*')
+            } else if (vista === 'matricula') {
+                app.innerHTML = `
+                    <h2 class="text-xl font-bold mb-4">Matrícula de Materias</h2>
+                    <p class="mb-4">Seleccione materias: 1 Obligatoria + Opcionales (Pago)</p>
+                    <div id="lista-materias" class="space-y-2">
+                        </div>`;
             }
         }
 
-        async function guardarMatricula() {
-            const dataToSave = {
-                nombre_completo: document.getElementById('nombre').value,
-                fecha_nacimiento: document.getElementById('fecha').value,
-                edad: document.getElementById('edad').value,
-                nivel: document.getElementById('nivel').value,
-                encargado_1: document.getElementById('encargado1').value,
-                telefono_1: document.getElementById('tel1').value,
-                correo_1: document.getElementById('email1').value,
-                encargado_2: document.getElementById('encargado2').value,
-                telefono_2: document.getElementById('tel2').value,
-                correo_2: document.getElementById('email2').value
-            };
-
-            const { error } = await db.from('estudiantes').insert([dataToSave]);
-            if (error) alert("Error: " + error.message);
-            else alert("¡Matrícula exitosa!");
+        async function guardarEstudiante() {
+            const nombre = document.getElementById('nombre').value;
+            const ciclo = document.getElementById('ciclo').value;
+            const { error } = await db.from('estudiantes').insert([{ 
+                nombre_completo: nombre, 
+                ciclo: ciclo 
+            }]);
+            if(error) alert(error.message);
+            else alert("Estudiante registrado");
         }
     </script>
 </body>
