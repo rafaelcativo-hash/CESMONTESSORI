@@ -1,98 +1,19 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Panel CES Montessori</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="bg-gray-100 p-6">
+async function cargar() {
+    // CAMBIA 'estudiantes' por el nombre real de tu tabla
+    const { data, error } = await supabase.from('estudiantes').select('*');
+    
+    if (error) {
+        console.error("Error de Supabase:", error);
+        alert("No se pudo conectar a la tabla. Revisa el nombre.");
+        return;
+    }
 
-    <nav class="bg-blue-900 p-4 text-white flex flex-wrap gap-4 mb-6 rounded shadow-lg">
-        <button onclick="render('quienes')" class="font-bold hover:text-blue-200">Quiénes Somos</button>
-        <button onclick="render('docentes')" class="font-bold hover:text-blue-200">Docentes</button>
-        <button onclick="render('matricula')" class="font-bold hover:text-blue-200">Matrícula</button>
-        <button onclick="render('notas')" class="font-bold hover:text-blue-200">Registro de Notas</button>
-    </nav>
-
-    <div id="contenido" class="bg-white p-6 rounded shadow max-w-4xl mx-auto">
-        <h2 class="text-2xl font-bold">Bienvenido al Panel CES Montessori</h2>
-    </div>
-
-    <script>
-        const db = supabase.createClient("https://vdfxdydbggeoflagznuq.supabase.co", "sb_publishable_1PItL4GwJ_y_8gfSqWFVXw_Tt0GoLsz");
-
-        async function render(seccion) {
-            const div = document.getElementById('contenido');
-            
-            if (seccion === 'quienes') {
-                div.innerHTML = `<h2 class="text-xl font-bold mb-4">Quiénes Somos</h2><p>CES Montessori: Formando seres humanos integrales.</p>`;
-            } 
-            else if (seccion === 'docentes') {
-                div.innerHTML = `<h2 class="text-xl font-bold mb-4">Lista de Docentes</h2><div id="data-container">Cargando...</div>`;
-                const { data } = await db.from('docentes_niveles').select('*');
-                div.querySelector('#data-container').innerHTML = `<table class="w-full border"><tr><th class="border p-2">Nombre</th><th class="border p-2">Nivel</th></tr>${data.map(d => `<tr><td class="border p-2">${d.nombre}</td><td class="border p-2">${d.nivel}</td></tr>`).join('')}</table>`;
-            } 
-            else if (seccion === 'matricula') {
-                div.innerHTML = `
-                    <h2 class="text-xl font-bold mb-4">Nueva Matrícula</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input id="nombre" placeholder="Nombre completo" class="border p-2 col-span-2">
-                        <input id="nivel" placeholder="Nivel" class="border p-2">
-                        <input id="direccion" placeholder="Dirección" class="border p-2">
-                        
-                        <div class="col-span-2 border-t pt-2 mt-2 font-bold">Encargado 1</div>
-                        <input id="e1" placeholder="Nombre Encargado 1" class="border p-2">
-                        <input id="t1" placeholder="Teléfono 1" class="border p-2">
-                        <input id="c1" placeholder="Correo 1" class="border p-2 col-span-2">
-                        
-                        <div class="col-span-2 border-t pt-2 mt-2 font-bold">Encargado 2</div>
-                        <input id="e2" placeholder="Nombre Encargado 2" class="border p-2">
-                        <input id="t2" placeholder="Teléfono 2" class="border p-2">
-                        <input id="c2" placeholder="Correo 2" class="border p-2 col-span-2">
-                        
-                        <button onclick="guardarMatricula()" class="bg-green-600 text-white p-2 rounded col-span-2 hover:bg-green-700">Guardar Matrícula</button>
-                    </div>`;
-            } 
-            else if (seccion === 'notas') {
-                div.innerHTML = `
-                    <h2 class="text-xl font-bold mb-4">Registro de Notas</h2>
-                    <div class="space-y-4">
-                        <input id="nombre-alumno" placeholder="Nombre del alumno" class="border p-2 w-full">
-                        <input id="materia" placeholder="Materia" class="border p-2 w-full">
-                        <input id="nota" type="number" placeholder="Calificación" class="border p-2 w-full">
-                        <button onclick="registrarNota()" class="bg-blue-600 text-white p-2 rounded w-full">Registrar Nota en Historial</button>
-                    </div>`;
-            }
-        }
-
-        async function guardarMatricula() {
-            const dataToSave = {
-                nombre_completo: document.getElementById('nombre').value,
-                nivel: document.getElementById('nivel').value,
-                direccion: document.getElementById('direccion').value,
-                encargado_1: document.getElementById('e1').value,
-                telefono_1: document.getElementById('t1').value,
-                correo_1: document.getElementById('c1').value,
-                encargado_2: document.getElementById('e2').value,
-                telefono_2: document.getElementById('t2').value,
-                correo_2: document.getElementById('c2').value
-            };
-            const { error } = await db.from('estudiantes').insert([dataToSave]);
-            if (error) alert("Error: " + error.message);
-            else alert("¡Matrícula exitosa!");
-        }
-
-        async function registrarNota() {
-            const notaData = {
-                alumno: document.getElementById('nombre-alumno').value,
-                materia: document.getElementById('materia').value,
-                calificacion: document.getElementById('nota').value
-            };
-            const { error } = await db.from('registro_notas').insert([notaData]);
-            if (error) alert("Error: " + error.message);
-            else alert("Nota registrada.");
-        }
-    </script>
-</body>
-</html>
+    // Comprobamos si data existe antes de hacer el map
+    if (data && data.length > 0) {
+        document.getElementById('tabla').innerHTML = data.map(e => 
+            `<tr><td class="border p-2">${e.nombre_completo || '-'}</td></tr>`
+        ).join('');
+    } else {
+        document.getElementById('tabla').innerHTML = "<tr><td>No hay registros</td></tr>";
+    }
+}
